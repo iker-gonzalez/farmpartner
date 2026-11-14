@@ -132,3 +132,37 @@ def test_places_postcodes_switches_and_requests(offline, monkeypatch):
     assert out[0].startswith("For dryland here") and len(out) == 2   # answered, then the step again
     with session() as db:
         assert db.query(Farmer).filter_by(phone="web:pl1").one().fields[-1].irrigated is False
+
+
+def test_tree_crops_become_an_orchard_and_photos_name_the_crop(offline, monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from app import agent, media, messaging
+    from app.db import Farmer, session
+    from app.main import app
+    c = TestClient(app)
+    say = lambda p, **kw: c.post("/api/chat", json={"phone": p, **kw}).json()["messages"]  # noqa: E731
+    for p in ("tree1",):
+        say(p, text="hi"); say(p, lat=38.05, lon=-100.75)
+        with session() as db:
+            db.query(Farmer).filter_by(phone=f"web:{p}").one().fields[-1].current_rotation = None
+            db.commit()
+    out = say("tree1", text="Pistachos, de regadío")
+    assert out[0].startswith("🌳 Pistachos") and "orchard" in out[0]
+    with session() as db:
+        fm = db.query(Farmer).filter_by(phone="web:tree1").one()
+        assert fm.state == "ready" and fm.constraints["perennial_crop"] == "pistachos" and fm.fields[-1].irrigated
+    # a photo at the crop step names the crop
+    sent = []
+    monkeypatch.setattr(messaging, "send", lambda to, m: sent.append(m))
+    monkeypatch.setattr(media, "download", lambda url: (b"\xff\xd8jpeg", "image/jpeg"))
+    monkeypatch.setattr(agent, "identify_crop", lambda image: "corn")
+    c.post("/twilio/webhook", data={"From": "whatsapp:+15550003333", "Body": "hi", "MessageSid": "SM9"})
+    c.post("/twilio/webhook", data={"From": "whatsapp:+15550003333", "Latitude": "38.05", "Longitude": "-100.75"})
+    with session() as db:
+        db.query(Farmer).filter_by(phone="whatsapp:+15550003333").one().fields[-1].current_rotation = None
+        db.commit()
+    sent.clear()
+    c.post("/twilio/webhook", data={"From": "whatsapp:+15550003333", "MediaUrl0": "u", "MediaContentType0": "image/jpeg",
+                                    "NumMedia": "1"})
+    assert sent[0] == "📷 That looks like *corn*." and "Continuous corn" in sent[1]

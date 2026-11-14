@@ -59,6 +59,30 @@ KNOWN_CROPS = ("corn, soybeans, wheat, barley, oats, grain sorghum (milo), rice,
                "proso millet, triticale, and fallow")
 GREETINGS = {"hi", "hello", "hey", "hola", "buenas", "buenos días", "ola", "olá", "bonjour", "salut", "hallo", "ciao",
              "start", "empezar", "comenzar", "こんにちは", "你好", "안녕하세요"}
+TREE_CROPS = re.compile(
+    r"\b(pistachios?|pistachos?|pistatxo\w*|olives?|olive trees?|olivos?|olivar\w*|aceitun\w*|olibondo\w*|almonds?|"
+    r"almendr\w*|vines?|vineyards?|viñ\w*|vid|uvas?|grapes?|mahats\w*|orchards?|frutal\w*|fruit trees?|"
+    r"fruta\w*|citrus|c[ií]tricos|naranj\w*|apples?|manzan\w*|sagar\w*|pears?|peral\w*|peach\w*|melocot\w*|"
+    r"cherr\w*|cerez\w*|gerezi\w*|walnuts?|nogal\w*|nueces|hazelnuts?|avellan\w*|avocados?|aguacat\w*|coffee|"
+    r"caf[eé]|cacao|cocoa|bananas?|pl[aá]tan\w*|mangos?|kiwis?|tea plantation|t[eé]|lemons?|lim[oó]n\w*)\b", re.I)
+
+
+def _orchard(farmer: Farmer, crop: str, irrigated: bool | None) -> "Reply":
+    """Tree crops stay for decades: no rotation to compare. Set the field up as an orchard and move on."""
+    with session() as db:
+        fm = db.get(Farmer, farmer.id)
+        fld = service.main_field(fm)
+        if fld is not None and irrigated is not None:
+            fld.irrigated = irrigated
+        fm.constraints = {**(fm.constraints or {}), "perennial_crop": crop}
+        fm.state, fm.priorities = "ready", fm.priorities or ["soil_health"]
+        db.commit()
+    farmer.state = "ready"
+    return Reply(now=[f"🌳 {crop.capitalize()}: a permanent tree crop, so a crop rotation doesn't apply — I've set "
+                      "up your field as an orchard. I can help with watering, frost and heat alerts, and cover crops "
+                      "between the rows. Just ask.", NEXT_PROMPT])
+
+
 QUESTION = re.compile(r"[?¿？]|^\s*(what|which|how|when|why|where|should|can|could|is|are|do|does|qué|que|cuál|"
                       r"cuáles|cómo|como|cuándo|dónde|por qué|debo|puedo|zer|zein|nola|noiz|non|zergatik|quel|quelle|"
                       r"comment|pourquoi|o que|qual|quais|quando|onde|was|wie|wann|welche|warum|cosa|quale|perché)\b",
@@ -109,9 +133,15 @@ def crops_any_language(text: str) -> tuple[list[str], list[str]]:
         ids = {cid: c["name"] for cid, c in crops().items()}
         raw = quick("A farmer (any language) names the crops on a field. Map them, in order, to these crop ids: "
                     + json.dumps(ids) + '. Reply with ONLY JSON: {"crops": [ids in order], "unknown": [crop names '
-                    'that fit none]}. Ignore words that are not crop names.', text[:300], max_tokens=200)
+                    'that fit none], "tree_crop": "English name if they grow a perennial tree/vine crop (orchard, '
+                    'olives, nuts, vineyard, fruit), else null"}. Ignore words that are not crop names.',
+                    text[:300], max_tokens=200)
         d = json.loads(re.search(r"\{.*\}", raw, re.S).group(0))
-        return [c for c in d.get("crops", []) if c in ids], [str(u)[:40] for u in d.get("unknown", [])][:3]
+        tree = d.get("tree_crop")
+        unknown = [str(u)[:40] for u in d.get("unknown", [])][:3]
+        if tree and isinstance(tree, str):
+            unknown = ["TREE:" + tree[:40]] + unknown
+        return [c for c in d.get("crops", []) if c in ids], unknown
     except Exception:
         return [], []
 
@@ -291,6 +321,12 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
                     and not re.fullmatch(r"(yes|yep|yeah|right|correct|si|sí|ok|okay|correcto|vale|claro|exacto)\W*", low):
                 named, unknown = crops_any_language(t)
             named = named or []
+            tree = TREE_CROPS.search(t)
+            if not named and (tree or any(u.startswith("TREE:") for u in unknown)):
+                crop = next((u[5:] for u in unknown if u.startswith("TREE:")), None) or tree.group(0).lower()
+                db.commit()
+                return _orchard(farmer, crop, parse_irrigated(t))
+            unknown = [u for u in unknown if not u.startswith("TREE:")]
             said_yes = re.search(r"\b(yes|yep|yeah|right|correct|si|sí|ok|okay|correcto|vale|claro|exacto|bai|oui|sim|ja)\b", low)
             said_no = (re.search(r"\b(no|nope|wrong|different|not right|incorrect|incorrecto|otro|otros|distinto)\b", low)
                        and parse_irrigated(t) is None)  # "dryland, no irrigation" is not a rejection

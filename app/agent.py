@@ -36,6 +36,8 @@ this week's watering numbers. When it covers the question (frost, heat, rain, sh
 directly without calling a tool. Call tools for anything else: comparing rotations, saving reports, profile changes, \
 or details not in the snapshot.
 - Voice notes reach you already transcribed; answer them like any message.
+- If the snapshot shows a perennial/tree crop (orchard, vineyard, olives, nuts), don't compare annual rotations: \
+help with watering, frost and heat, and cover crops between the rows (search_library).
 - Research you can cite: following a legume, the next crop yields ~23% more, ~16% after another non-legume crop, \
 ~20% on average vs monoculture; legume rotations cut corn/wheat nitrogen fertilizer 41–46% (Mudare et al. 2025, \
 Nature Communications, 3,663 field trials). The snapshot also lists the country's main crops (FAOSTAT) and nearby \
@@ -270,6 +272,7 @@ def _snapshot(fm: Farmer) -> str:
     c = (fld.features or {}).get("climate") or {}
     snap = {
         "field": {"place": fld.place, "irrigated": fld.irrigated, "goals": fm.priorities,
+                  "perennial_crop": (fm.constraints or {}).get("perennial_crop"),
                   "current_rotation": rotation_label(fld.current_rotation) if fld.current_rotation else None,
                   "report_url": service.report_url(fld)},
         "country_main_crops_FAOSTAT": [t["item"] for t in ((fld.features or {}).get("country") or {}).get("top", [])[:8]],
@@ -413,8 +416,9 @@ def prewarm() -> None:
 _fast = {"ok": True}
 
 
-def quick(system: str, user: str, max_tokens: int = 1500) -> str:
-    """One short Claude call for translation/classification on the fast model (falls back to the main model)."""
+def quick(system: str, user, max_tokens: int = 1500) -> str:
+    """One short Claude call for translation/classification on the fast model (falls back to the main model).
+    user: text, or a list of content blocks (e.g. an image block plus text)."""
     client = claude_client()
     kw = dict(max_tokens=max_tokens, system=system, messages=[{"role": "user", "content": user}],
               betas=["server-side-fallback-2026-07-01"], fallbacks="default")
@@ -428,3 +432,18 @@ def quick(system: str, user: str, max_tokens: int = 1500) -> str:
     if resp is None:
         resp = client.beta.messages.create(model=config.ANTHROPIC_MODEL, output_config={"effort": "low"}, **kw)
     return "".join(b.text for b in resp.content if b.type == "text").strip()
+
+
+def identify_crop(image: dict) -> str:
+    """What crop is in this farmer's photo, as a short English name ("corn", "pistachio trees"), or ""."""
+    if not config.llm_enabled():
+        return ""
+    try:
+        name = quick("You identify crops in farmers' photos. Reply with ONLY the crop's common English name in 1-3 "
+                     "words (e.g. 'corn', 'winter wheat', 'pistachio trees', 'olive trees'), or 'unknown' if no crop "
+                     "is clearly visible.", [image, {"type": "text", "text": "Which crop is this?"}], max_tokens=20)
+    except Exception:
+        log.warning("crop identification failed", exc_info=True)
+        return ""
+    name = name.strip().strip(".").lower()
+    return "" if not name or "unknown" in name or len(name) > 40 else name

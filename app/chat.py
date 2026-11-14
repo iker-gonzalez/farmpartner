@@ -109,6 +109,19 @@ def photo(phone: str, channel: str, image: dict | None, caption: str, media_url:
     with session() as db:
         farmer = service.get_or_create_farmer(db, phone, channel)
     onboarding.record(farmer.id, "in", ("[sent a photo] " + caption).strip(), media_url=media_url)
+    if farmer.state == "awaiting_crops" and image is not None:
+        # A photo at the crop step answers "what do you grow?": identify the crop and carry on with setup.
+        unit, lang = units.preferred(farmer), farmer.language
+
+        def from_photo():
+            name = agent.identify_crop(image)
+            if not name:
+                msgs = ["📷 I couldn't tell the crop from the photo — please type it (e.g. \"wheat, corn\")."]
+            else:
+                r = onboarding.handle(farmer, name, None, None)
+                msgs = [f"📷 That looks like *{name}*."] + ((r.now + (r.later() if r.later else [])) if r else [])
+            return i18n.translate(units.convert(msgs) if unit == "metric" else msgs, lang)
+        return _out(farmer.id, Turn(now=[], later=from_photo))
     if farmer.state != "ready":
         return _out(farmer.id, Turn(now=["📷 Got your photo! I can look at crop photos once your field is set up — "
                                          "let's finish that first. Send RESET if you want to start over."], later=None),

@@ -94,7 +94,7 @@ def test_crop_step_unknown_crop_and_irrigation_alone(offline, monkeypatch):
         fm = db.query(Farmer).filter_by(phone="web:cane").one()
         fm.fields[-1].current_rotation = None
         db.commit()
-    assert "I don't have “Coffee”" in say(text="Coffee")[0]
+    assert "I don't have “Quinoa”" in say(text="Quinoa")[0]
     out = say(text="Dryland")[0]
     assert out.startswith("👍 Dryland — noted.") and "Add" not in out
     out = say(text="Corn")
