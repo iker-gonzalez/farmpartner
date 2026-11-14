@@ -148,3 +148,12 @@ def test_place_on_the_equator(monkeypatch):
     monkeypatch.setattr(geocode, "get_json", lambda *a, **k: {"results": [
         {"name": "Islas galápagos", "longitude": -90.5, "country_code": "EC", "admin1": "Galápagos"}]})
     assert geocode.place_to_point("Islas Galapago", "es") == (0.0, -90.5, "Islas galápagos, Galápagos, EC")
+
+
+def test_degree_minute_second_coordinates():
+    from app.data.maplinks import location_from_text as f
+    lat, lon = f('En estas coordenadas 31°45\'12.0"N 42°18\'34.0')
+    assert round(lat, 3) == 31.753 and round(lon, 3) == 42.309
+    assert f("38° 3' N, 100° 45' W") == (38.05, -100.75)
+    assert f("33°34′30″S 70°39′W") == (-33.575, -70.65)
+    assert f("hace 31° de calor") is None

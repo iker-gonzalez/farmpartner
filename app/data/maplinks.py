@@ -46,6 +46,27 @@ def _resolve(url: str, hops: int = 4) -> str:
     return url
 
 
+_DMS = re.compile(r"(\d{1,3}(?:\.\d+)?)\s*°\s*(?:(\d{1,2}(?:\.\d+)?)\s*['′’]\s*)?(?:(\d{1,2}(?:\.\d+)?)\s*(?:\"|″|''|”)?\s*)?"
+                  r"([NSEWnsewO])?")
+
+
+def _from_dms(text: str) -> tuple[float, float] | None:
+    """31°45'12.0"N 42°18'34.0"E · 31° 45' N, 2° 10' W · 41.39°N 2.17°E (a missing letter means N / E)."""
+    parts = [m for m in _DMS.finditer(text) if m.group(0).strip()]
+    if len(parts) < 2:
+        return None
+    vals = []
+    for m in parts[:2]:
+        v = float(m.group(1)) + float(m.group(2) or 0) / 60 + float(m.group(3) or 0) / 3600
+        if (m.group(4) or "").upper() in ("S", "W", "O"):  # O = oeste
+            v = -v
+        vals.append(v)
+    a, b = vals
+    if (parts[0].group(4) or "").upper() in ("E", "W", "O"):  # longitude written first
+        a, b = b, a
+    return _valid(a, b)
+
+
 def location_from_text(text: str) -> tuple[float, float] | None:
     t = (text or "").strip()
     for url in re.findall(r"https?://\S+", t):
@@ -56,5 +77,9 @@ def location_from_text(text: str) -> tuple[float, float] | None:
                 pt = None
             if pt:
                 return pt
+    if "°" in t:
+        pt = _from_dms(t)
+        if pt:
+            return pt
     m = re.fullmatch(r"\s*" + _PAIR + r"\s*", t.replace(";", ","))
     return _valid(float(m.group(1)), float(m.group(2))) if m else None

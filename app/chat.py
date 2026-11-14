@@ -54,7 +54,7 @@ def inbound(phone: str, channel: str, text: str, lat: float | None = None, lon: 
                 return _out(farmer.id, Turn(now=[f"📊 Your field report: {service.report_url(fld)}"], later=None),
                             farmer.language, units.preferred(farmer))
 
-    if lat is None and re.search(r"https?://|\d\.\d+\s*[,;]", text or ""):
+    if lat is None and re.search(r"https?://|\d\.\d+\s*[,;]|\d\s*°", text or ""):
         pt = maplinks.location_from_text(text)
         if pt:  # a pasted Google/Apple Maps link or "lat, lon" counts as a pin
             lat, lon, text = pt[0], pt[1], ""
