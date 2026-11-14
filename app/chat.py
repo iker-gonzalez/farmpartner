@@ -3,7 +3,7 @@ import re
 from dataclasses import dataclass
 from typing import Callable
 
-from app import agent, onboarding, service
+from app import agent, i18n, onboarding, service
 from app.data import maplinks
 from app.prompts import as_text
 from app.db import now, session
@@ -20,6 +20,17 @@ def inbound(phone: str, channel: str, text: str, lat: float | None = None, lon: 
     with session() as db:
         farmer = service.get_or_create_farmer(db, phone, channel)
     onboarding.record(farmer.id, "in", text or "", lat, lon, media_url)
+    lang = i18n.detect(text or "")
+    if lang and lang != farmer.language:
+        with session() as db:
+            from app.db import Farmer
+            db.get(Farmer, farmer.id).language = lang
+            db.commit()
+        farmer.language = lang
+    if i18n.is_switch(text or ""):
+        reply = onboarding.current_step(farmer)
+        hello = "👍 De acuerdo, seguimos en español." if farmer.language == "es" else "👍 Sure, let's continue in English."
+        return _out(farmer.id, Turn(now=[hello] + reply, later=None), farmer.language)
 
     if (text or "").strip().lower() == "report":
         with session() as db:
@@ -45,8 +56,8 @@ def inbound(phone: str, channel: str, text: str, lat: float | None = None, lon: 
     if reply is None:  # onboarded: free conversation, answered in the background (LLM can take a few seconds)
         def later():
             return [agent.answer(farmer, text or "")]
-        return _out(farmer.id, Turn(now=[], later=later))
-    return _out(farmer.id, Turn(now=reply.now, later=reply.later))
+        return _out(farmer.id, Turn(now=[], later=later))  # Claude already answers in the farmer's language
+    return _out(farmer.id, Turn(now=reply.now, later=reply.later), farmer.language)
 
 
 def photo(phone: str, channel: str, image: dict | None, caption: str, media_url: str | None = None) -> Turn:
@@ -56,18 +67,25 @@ def photo(phone: str, channel: str, image: dict | None, caption: str, media_url:
     onboarding.record(farmer.id, "in", ("[sent a photo] " + caption).strip(), media_url=media_url)
     if farmer.state != "ready":
         return _out(farmer.id, Turn(now=["📷 Got your photo! I can look at crop photos once your field is set up — "
-                                         "let's finish that first. Send RESET if you want to start over."], later=None))
+                                         "let's finish that first. Send RESET if you want to start over."], later=None),
+                    farmer.language)
     if image is None:
         return _out(farmer.id, Turn(now=["📷 I couldn't open that file. Please send it as a normal photo (JPG or PNG)."],
-                                    later=None))
+                                    later=None), farmer.language)
 
     def later():
         return [agent.answer(farmer, caption, image=image)]
-    return _out(farmer.id, Turn(now=["📷 Got it — taking a look…"], later=later))
+    return _out(farmer.id, Turn(now=i18n.translate(["📷 Got it — taking a look…"], farmer.language), later=later))
 
 
-def _out(farmer_id: int, turn: Turn) -> Turn:
-    """Wrap the turn so every outbound message is logged (the agent reads this history)."""
+def _out(farmer_id: int, turn: Turn, lang: str = "en") -> Turn:
+    """Wrap the turn so every outbound message is logged (the agent reads this history). lang="es" translates
+    FarmPartner's scripted messages into Spanish."""
+    if lang != "en":
+        turn = Turn(now=i18n.translate(turn.now, lang), later=turn.later)
+        if turn.later:
+            inner_tr = turn.later
+            turn = Turn(now=turn.now, later=lambda: i18n.translate(inner_tr(), lang))
     for m in turn.now:
         onboarding.record(farmer_id, "out", as_text(m))
     if turn.later is None:

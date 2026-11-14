@@ -11,7 +11,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from sqlalchemy import select
 
-from app import chat, config, landing, media, messaging, ratelimit, service
+from app import chat, config, i18n, landing, media, messaging, ratelimit, service
 from app.prompts import as_text, is_prompt
 from app.db import Farmer, Field, init_db, session
 from app.engine.explain import DISCLAIMER, SCORE_LABELS, evidence, gaps, inch, short_name
@@ -99,7 +99,8 @@ def _media_turn(sender: str, channel: str, url: str, kind: str, caption: str, me
             messaging.send(sender, "🎙️ Sorry, I couldn't make out that voice note. Could you type it, or send a "
                                    "shorter note (under a minute)?")
             return
-        messaging.send(sender, f"🎙️ I heard: “{heard}”")
+        es = i18n.detect(heard) == "es"
+        messaging.send(sender, f"🎙️ {'Escuché' if es else 'I heard'}: “{heard}”")
         turn = chat.inbound(sender, channel, heard, None, None, url)
     else:
         turn = chat.photo(sender, channel, media.image_block(data, content_type), caption, url)

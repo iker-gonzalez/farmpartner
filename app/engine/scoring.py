@@ -190,6 +190,8 @@ def compare(f: dict, priorities: list[str], irrigated: bool | None, current: lis
     for r in rotations():
         if current and _same_cycle(r["years"], current) and not r.get("covers"):
             continue
+        if r.get("requires_any") and not set(r["requires_any"]) & set(current or []):
+            continue  # specialty rotations (vegetables, beets, rice...) only for farmers who already grow those crops
         s = score_rotation(r, f, irrigated)
         if not s["feasible"]:
             continue
@@ -197,6 +199,10 @@ def compare(f: dict, priorities: list[str], irrigated: bool | None, current: lis
         s["total"] = total(s["scores"], weights)
         cands.append(s)
     cands.sort(key=lambda s: s["total"], reverse=True)
+    specialty_ids = {r["id"] for r in rotations() if r.get("requires_any")}
+    specialty = [s for s in cands if s["id"] in specialty_ids]
+    if len(specialty) >= 2:  # a vegetable/beet/rice grower gets options that keep their crop
+        cands = specialty
     # Two alternatives with different jobs: the best fit for the farmer's priorities, and the best soil builder
     # (the challenge goal) that still fits this climate.
     picked = []

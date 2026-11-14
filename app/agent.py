@@ -31,6 +31,10 @@ extension agent or agronomist. Do not lecture.
 - Reply in the language the farmer writes in (many U.S. farm workers write in Spanish).
 - Share the report link when they want details, maps or charts.
 - Voice notes reach you already transcribed; answer them like any message.
+- You can search the web (web_search) for general agronomy knowledge your field data doesn't cover: crops outside \
+your list, rotation research, pests and diseases, practices for their region. Search only when it really helps \
+(at most 2 searches), keep the answer short, and name the source in a few words (e.g. "según la Universidad de \
+California"). Numbers about THEIR field still come only from the FarmPartner tools.
 - When the farmer sends a crop photo: say what you can actually see (crop, growth stage, color, visible wilting, \
 spots, insects or damage) as a visual impression, not a diagnosis. Name the 1-2 most likely causes, what to check in \
 the field to confirm (e.g. underside of leaves, how many plants, roots), and when it matters, connect it to their \
@@ -201,6 +205,25 @@ def claude_client():
     return _client
 
 
+WEB_TOOLS = [{"type": "web_search_20260209", "name": "web_search", "max_uses": 3}]
+_web = {"ok": True}  # switched off for this process if the account doesn't allow web search
+
+
+def _create(client, messages):
+    kw = dict(model=config.ANTHROPIC_MODEL, max_tokens=4000, system=SYSTEM, messages=messages,
+              output_config={"effort": config.ANTHROPIC_EFFORT},
+              betas=["server-side-fallback-2026-07-01"], fallbacks="default")
+    if _web["ok"]:
+        try:
+            return client.beta.messages.create(tools=TOOLS + WEB_TOOLS, **kw)
+        except Exception as e:
+            if "web_search" not in str(e) and "web search" not in str(e).lower():
+                raise
+            log.warning("web search unavailable, continuing without it: %s", e)
+            _web["ok"] = False
+    return client.beta.messages.create(tools=TOOLS, **kw)
+
+
 def _answer_llm(farmer_id: int, image: dict | None = None) -> str:
     client = claude_client()
     messages = _history(farmer_id)
@@ -210,12 +233,11 @@ def _answer_llm(farmer_id: int, image: dict | None = None) -> str:
         return HELP
     if image:
         messages[-1]["content"] = [image, {"type": "text", "text": messages[-1]["content"]}]
-    for _ in range(6):
-        resp = client.beta.messages.create(
-            model=config.ANTHROPIC_MODEL, max_tokens=4000, system=SYSTEM, tools=TOOLS, messages=messages,
-            output_config={"effort": config.ANTHROPIC_EFFORT},
-            betas=["server-side-fallback-2026-07-01"], fallbacks="default",
-        )
+    for _ in range(8):
+        resp = _create(client, messages)
+        if resp.stop_reason == "pause_turn":  # a long web search: send the turn back and the server resumes it
+            messages.append({"role": "assistant", "content": resp.content})
+            continue
         if resp.stop_reason == "refusal":
             return "Sorry, I can't help with that one. I can help with rotations, watering, frost and heat on your field."
         if resp.stop_reason != "tool_use":

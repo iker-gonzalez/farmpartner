@@ -39,11 +39,14 @@ WELCOME = ("👋 Hi! I'm *FarmPartner*, your farm advisor powered by NASA satell
            "3️⃣ Pick your main goal\n\n"
            "After that, ask me anything: watering, frost, heat, what to plant next.\n\n"
            "📍 *Step 1 of 3:* send your field location now.")
-KNOWN_CROPS = ("corn, soybeans, wheat, grain sorghum (milo), cotton, alfalfa, sunflower, canola, oats, field peas, "
+KNOWN_CROPS = ("corn, soybeans, wheat, barley, oats, grain sorghum (milo), rice, cotton, alfalfa, sunflower, canola, "
+               "field peas, dry beans, peanuts, potatoes, tomatoes and other vegetables, sugar beets, sugarcane, "
                "proso millet, triticale, and fallow")
 PRIORITY_KEYS = {"1": "save_water", "2": "soil_health", "3": "income", "4": "less_erosion", "5": "forage"}
 PRIORITY_WORDS = {"water": "save_water", "soil": "soil_health", "income": "income", "money": "income", "profit": "income",
-                  "erosion": "less_erosion", "forage": "forage", "cattle": "forage", "livestock": "forage"}
+                  "erosion": "less_erosion", "forage": "forage", "cattle": "forage", "livestock": "forage",
+                  "agua": "save_water", "suelo": "soil_health", "ingreso": "income", "dinero": "income",
+                  "ganancia": "income", "erosión": "less_erosion", "forraje": "forage", "ganado": "forage"}
 HELP = ("You can ask me things like:\n• \"Should I water this week?\"\n• \"Is frost coming?\"\n"
         "• \"What should I plant after wheat?\"\nOr tell me what you see: \"got 1 inch of rain\", \"saw aphids\".\n"
         "Send REPORT for your field report, RESET to start over.")
@@ -65,9 +68,9 @@ def parse_priorities(text: str) -> list[str]:
 
 def parse_irrigated(text: str) -> bool | None:
     t = text.lower()
-    if re.search(r"\b(dry ?land|rain[- ]?fed|not irrigated|no irrigation|no water)\b", t):
+    if re.search(r"\b(dry ?land|rain[- ]?fed|not irrigated|no irrigation|no water|secano|sin riego|de temporal|no riego)\b", t):
         return False
-    if re.search(r"irrigat|pivot|\bwell\b|sprinkler|drip|flood", t):
+    if re.search(r"irrigat|pivot|\bwell\b|sprinkler|drip|flood|riego|regad|irrigad|goteo|aspersi|pivote|pozo", t):
         return True
     return None
 
@@ -143,7 +146,7 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
     """Return a Reply while onboarding (or for global commands). Return None when the farmer is ready for the agent."""
     t = (text or "").strip()
     low = t.lower()
-    if low in ("reset", "start over", "restart"):
+    if low in ("reset", "start over", "restart", "reiniciar", "empezar de nuevo", "volver a empezar"):
         with session() as db:
             fm = db.get(Farmer, farmer.id)
             for f in list(fm.fields):
@@ -152,7 +155,7 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
             db.commit()
         return Reply(now=["🔄 Starting over.\n\n📍 *Step 1 of 3:* send your field location — tap 📎 → *Location* and "
                           "drop the pin on your field (or text your ZIP code)."])
-    if low in ("help", "?", "menu"):
+    if low in ("help", "?", "menu", "ayuda", "menú"):
         return Reply(now=[HELP])
     if low in ("stop", "unsubscribe", "stop all"):
         _set_constraint(farmer, "opted_out", True)
@@ -194,8 +197,8 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
                 db.commit()
                 return Reply(now=["Please send your field location first (📎 → Location or a ZIP code)."])
             named = crops_in_text(t)
-            said_yes = re.search(r"\b(yes|yep|yeah|right|correct|si|sí|ok|okay)\b", low)
-            said_no = (re.search(r"\b(no|nope|wrong|different|not right|incorrect)\b", low)
+            said_yes = re.search(r"\b(yes|yep|yeah|right|correct|si|sí|ok|okay|correcto|vale|claro|exacto)\b", low)
+            said_no = (re.search(r"\b(no|nope|wrong|different|not right|incorrect|incorrecto|otro|otros|distinto)\b", low)
                        and parse_irrigated(t) is None)  # "dryland, no irrigation" is not a rejection
             if named:
                 fld.current_rotation = named if len(named) > 1 else named * 2
@@ -261,6 +264,15 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
 
         return Reply(now=["🧮 Scoring rotations against your field's climate, soil and goals…"], later=later)
     return None
+
+
+def current_step(farmer: Farmer) -> list:
+    """Repeat what we're waiting for (used after a language switch)."""
+    return {"new": [WELCOME], "awaiting_location": [WELCOME.split("\n\n")[-1]],
+            "awaiting_crops": ["Which crops do you grow on this field? Type them in order, e.g. \"corn, soybeans\". "
+                               "Add \"irrigated\" or \"dryland\"."],
+            "awaiting_irrigation": [IRRIGATION_PROMPT], "awaiting_priority": [PRIORITY_PROMPT],
+            }.get(farmer.state, [NEXT_PROMPT])
 
 
 def _set_constraint(farmer: Farmer, key: str, value) -> None:
