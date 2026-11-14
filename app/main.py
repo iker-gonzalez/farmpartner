@@ -35,9 +35,11 @@ def _twiml(messages: list[str]) -> Response:
     return Response(str(r), media_type="application/xml")
 
 
-def _run_later(to: str, later):
+def _run_later(to: str, later, message_sid: str | None = None):
     try:
-        for m in later():
+        with messaging.typing_while(message_sid):  # "typing…" while NASA data or Claude is working
+            msgs = later()
+        for m in msgs:
             messaging.send(to, m)
     except Exception:
         log.exception("background job failed")
@@ -63,20 +65,24 @@ async def twilio_webhook(request: Request, background: BackgroundTasks):
     text = form.get("ButtonPayload") or form.get("ListId") or form.get("Body", "")
     media_url, media_kind = form.get("MediaUrl0"), media.kind(form.get("MediaContentType0"))
     if media_url and media_kind:  # voice notes and photos need downloading and processing: do it in the background
-        background.add_task(_media_turn, sender, channel, media_url, media_kind, text)
+        background.add_task(_media_turn, sender, channel, media_url, media_kind, text, form.get("MessageSid"))
         return _twiml([])
     turn = chat.inbound(sender, channel, text, lat, lon, form.get("MediaUrl0"))
     if any(is_prompt(m) for m in turn.now):
         # TwiML can't carry buttons: send this turn's messages in order through the API instead.
         now = list(turn.now)
-        background.add_task(_run_later, sender, lambda: now + (turn.later() if turn.later else []))
+        for m in now:  # what's ready goes out first; "typing…" covers the slow part
+            messaging.send(sender, m)
+        if turn.later:
+            background.add_task(_run_later, sender, turn.later, form.get("MessageSid"))
         return _twiml([])
     if turn.later:
-        background.add_task(_run_later, sender, turn.later)
+        background.add_task(_run_later, sender, turn.later, form.get("MessageSid"))
     return _twiml(turn.now)
 
 
-def _media_turn(sender: str, channel: str, url: str, kind: str, caption: str):
+def _media_turn(sender: str, channel: str, url: str, kind: str, caption: str, message_sid: str | None = None):
+    messaging.typing(message_sid)
     try:
         data, content_type = media.download(url)
     except Exception:
@@ -97,7 +103,10 @@ def _media_turn(sender: str, channel: str, url: str, kind: str, caption: str):
         turn = chat.inbound(sender, channel, heard, None, None, url)
     else:
         turn = chat.photo(sender, channel, media.image_block(data, content_type), caption, url)
-    _run_later(sender, lambda: list(turn.now) + (turn.later() if turn.later else []))
+    for m in turn.now:
+        messaging.send(sender, m)
+    if turn.later:
+        _run_later(sender, turn.later, message_sid)
 
 
 class ChatIn(BaseModel):

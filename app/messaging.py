@@ -7,7 +7,9 @@ plain text with the options listed, so the conversation never breaks.
 import hashlib
 import json
 import logging
+import threading
 import time
+from contextlib import contextmanager
 
 import httpx
 
@@ -105,3 +107,42 @@ def send_welcome(to: str) -> bool:
     except Exception:
         log.warning("welcome template to %s failed", to, exc_info=True)
         return False
+
+
+TYPING_API = "https://messaging.twilio.com/v3/Indicators/Typing.json"
+
+
+def typing(message_sid: str | None) -> None:
+    """Show WhatsApp's "typing…" bubble to the farmer (Twilio public beta). It also marks their message as read and
+    lasts up to 25 s or until our next message arrives. Best effort: failures are only logged."""
+    if not (message_sid and config.TWILIO_ACCOUNT_SID and config.TWILIO_AUTH_TOKEN):
+        return
+    try:
+        httpx.post(TYPING_API, auth=(config.TWILIO_ACCOUNT_SID, config.TWILIO_AUTH_TOKEN), timeout=5,
+                   json={"channel": "WHATSAPP", "messageId": message_sid}).raise_for_status()
+    except Exception as e:
+        log.info("typing indicator skipped: %s", e)
+
+
+@contextmanager
+def typing_while(message_sid: str | None, every_s: float = 20, max_s: float = 180, first_after_s: float = 2):
+    """Keep "typing…" visible while slow work runs (refreshed before WhatsApp's 25 s timeout). The first indicator
+    waits a moment so the instant reply (e.g. "📡 Got your pin!") lands first; its arrival would clear the bubble."""
+    if not message_sid:
+        yield
+        return
+    stop = threading.Event()
+
+    def loop():
+        start = time.monotonic()
+        if stop.wait(first_after_s):
+            return
+        while not stop.is_set() and time.monotonic() - start < max_s:
+            typing(message_sid)
+            stop.wait(every_s)
+
+    threading.Thread(target=loop, daemon=True).start()
+    try:
+        yield
+    finally:
+        stop.set()

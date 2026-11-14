@@ -99,3 +99,18 @@ def test_crop_step_unknown_crop_and_irrigation_alone(offline, monkeypatch):
     assert out.startswith("👍 Dryland — noted.") and "Add" not in out
     out = say(text="Corn")
     assert "Continuous corn (dryland)" in out[0] and "Step 3 of 3" in out[1]
+
+
+def test_typing_indicator_while_slow_work(monkeypatch):
+    import time
+
+    from app import messaging
+    calls = []
+    monkeypatch.setattr(messaging, "typing", lambda sid: calls.append(sid))
+    with messaging.typing_while("SM1", every_s=0.05, first_after_s=0.01):
+        time.sleep(0.2)
+    n = len(calls)
+    time.sleep(0.15)
+    assert n >= 2 and set(calls) == {"SM1"} and len(calls) == n  # refreshed while working, stops after
+    with messaging.typing_while(None):
+        pass
