@@ -14,7 +14,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="/static/landing/hero.jpg" media="(min-width: 801px)">
-<link rel="stylesheet" href="/static/optin.css">
 <style>
   :root {
     --bg: #0a0a0b; --ink: #f4f4f5; --ink-2: #c8c8ce; --ink-3: #adadb7; --line: #34343a; --line-2: #5a5a63;
@@ -57,24 +56,18 @@
   .kicker { font-family: var(--mono); font-size: 13px; color: var(--lime); }
   h1 { font-size: 60px; font-weight: 600; line-height: 1.12; letter-spacing: -1.2px; color: var(--ink); }
   .sub { font-size: 17px; line-height: 1.55; color: var(--ink-2); }
-  form.optin { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 8px; }
-  form.optin .row { display: flex; align-items: stretch; }
-  form.optin .cc-btn, form.optin input[type=tel] { background: #0a0a0bcc; border: 1px solid var(--line-2); border-right: 0;
     color: var(--ink); font-family: var(--mono); font-size: 14px; outline: none; border-radius: 0; }
-  form.optin .row { position: relative; }
-  form.optin input[type=tel] { width: 230px; padding: 15px 16px; }
-  form.optin input::placeholder { color: var(--ink-3); }
-  form.optin .cc-btn:focus-visible, form.optin input:focus { border-color: var(--lime); }
-  form.optin .btn { padding: 15px 20px; border: 0; cursor: pointer; }
-  form.optin .btn svg { width: 18px; height: 18px; }
-  form.optin .btn[disabled] { opacity: .6; cursor: wait; }
-  form.optin label { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 12px; color: var(--ink-2); cursor: pointer; }
-  form.optin label input { accent-color: var(--lime); width: 15px; height: 15px; }
   .caps { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; padding: 0; margin-top: -8px; list-style: none;
     font-family: var(--mono); font-size: 12.5px; letter-spacing: .4px; color: var(--ink); }
   .caps li { display: inline-flex; align-items: center; gap: 7px; }
   .caps .ic { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-size: 14px; }
   .caps .dir { color: var(--lime); }
+  .ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding-top: 8px; }
+  .ctas .btn, .ctas .ghost { padding: 15px 20px; }
+  .ctas .btn svg { width: 18px; height: 18px; }
+  .ghost { display: inline-flex; align-items: center; border: 1px solid var(--line-2); background: #0a0a0bcc;
+    font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+  .ghost:hover { border-color: var(--ink); }
   .channels { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 0; list-style: none;
     font-family: var(--mono); font-size: 12px; margin-top: -6px; }
   .channels li { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px;
@@ -138,12 +131,8 @@
     h1 { font-size: 38px; line-height: 1.1; letter-spacing: -1.2px; }
     h1 br { display: none; }
     .sub { font-size: 15.5px; }
-    form.optin { width: 100%; padding-top: 4px; }
-    form.optin .row { flex-wrap: wrap; width: 100%; }
-    form.optin .cc-btn { height: 100%; border-bottom: 0; }
-    form.optin input[type=tel] { flex: 1; min-width: 0; width: auto; border-right: 1px solid var(--line-2); border-bottom: 0; }
-    form.optin .btn { width: 100%; justify-content: center; padding: 16px 20px; }
-    form.optin label { font-size: 11px; text-align: left; }
+    .ctas { flex-direction: column; width: 100%; padding-top: 4px; }
+    .ctas .btn, .ctas .ghost { justify-content: center; padding: 16px 20px; }
     .channels { font-size: 11px; gap: 6px; margin-top: 0; }
     .caps { font-size: 11px; gap: 6px 14px; margin-top: -4px; }
     .channels li { padding: 5px 8px; gap: 6px; }
@@ -182,18 +171,13 @@
         <li title="Text in {{ langs.text }} languages · voice notes understood in {{ langs.voice_in }} · spoken replies in {{ langs.voice_out }}"><span class="ic" aria-hidden="true">🌍</span>{{ langs.text }} LANGUAGES</li>
         <li><span class="ic" aria-hidden="true">📷</span>CROP PHOTOS</li>
       </ul>
-      <form class="optin" data-optin novalidate>
-        <div class="row">
-          <div class="cc" data-picker><input type="hidden" name="cc" value="1"></div>
-          <input type="tel" name="phone" inputmode="tel" autocomplete="tel-national" placeholder="Your WhatsApp number" aria-label="Your WhatsApp number" required>
-          <button class="btn" type="submit">
-            <svg viewBox="0 0 14.6453 14.6344" aria-hidden="true"><path transform="matrix(1 -0.000029 0.000029 1 -1.6875 -1.687)" fill="#0a0a0b" d="{{ whatsapp_path }}"/></svg>
-            READ MY FIELD FROM SPACE →
-          </button>
-        </div>
-        <label><input type="checkbox" name="consent" required> I agree to receive WhatsApp messages from FarmPartner. Reply STOP anytime.</label>
-        <p class="status" role="status" aria-live="polite"></p>
-      </form>
+      <div class="ctas">
+        <a class="btn" href="{{ whatsapp }}" target="_blank" rel="noopener">
+          <svg viewBox="0 0 14.6453 14.6344" aria-hidden="true"><path transform="matrix(1 -0.000029 0.000029 1 -1.6875 -1.687)" fill="#0a0a0b" d="{{ whatsapp_path }}"/></svg>
+          OPEN IN WHATSAPP →
+        </a>
+        <a class="ghost" href="/chat">OPEN IN BROWSER →</a>
+      </div>
       <ul class="channels" aria-label="Messaging channels">
         <li class="live"><a href="{{ whatsapp }}" target="_blank" rel="noopener" aria-label="FarmPartner is live on WhatsApp — open the chat">WhatsApp <span class="tag"><i class="pulse" aria-hidden="true"></i>LIVE</span><span class="go">CHAT NOW →</span></a></li>
         <li>Messenger <span class="tag">SOON</span></li>
@@ -202,8 +186,7 @@
         <li>Line <span class="tag">SOON</span></li>
         <li>SMS <span class="tag">SOON</span></li>
       </ul>
-      <p class="meta">or <a href="{{ whatsapp }}" target="_blank" rel="noopener">open WhatsApp yourself</a><span class="sep"> · </span><span class="nl">or <a href="/chat">try it in your browser →</a></span></p>
-      <p class="meta">Free · Messaging apps &amp; SMS<span class="sep"> · </span><span class="nl">No app to install · Open source (MIT)<span class="sep"> · </span></span><span class="nl"><a href="/sample">See a sample report →</a></span></p>
+      <p class="meta"><span class="nl">Free · No app to install · Open source (MIT)<span class="sep"> · </span></span><span class="nl"><a href="/sample">See a sample report →</a></span></p>
     </div>
     <div class="hero-art" aria-hidden="true"></div>
   </section>
@@ -242,8 +225,6 @@
       </div>
     </div>
   </footer>
-  <script src="/static/landing/country-picker.js" defer></script>
-  <script src="/static/landing/optin.js" defer></script>
   <script>
     // Video: show a grayscale thumbnail first and only load YouTube when the visitor presses play.
     document.querySelector(".facade").addEventListener("click", e => {

@@ -1,6 +1,4 @@
-{# Site header shared by every public page. Header styles: landing.html (own copy) and /static/site.css;
-   the WhatsApp opt-in form: /static/optin.css + /static/landing/country-picker.js + /static/landing/optin.js.
-   It works exactly like the landing hero form (POST /api/optin). #}
+{# Site header shared by the public pages (landing.html includes it too). Styles: /static/site.css and landing.html. #}
 <header>
   <a class="logo" href="/" aria-label="FarmPartner home">
     <img class="orbi" src="/static/brand/orbi.svg" alt="" width="58" height="29">
@@ -11,25 +9,9 @@
     <a href="/data-and-science"{% if active == "data" %} class="on" aria-current="page"{% endif %}>DATA &amp; SCIENCE</a>
     <a href="/team"{% if active == "team" %} class="on" aria-current="page"{% endif %}>TEAM</a>
     <a href="{{ repo }}">GITHUB</a>
-    <div class="nav-cta">
-      <button type="button" class="btn nav-toggle" aria-expanded="false" aria-controls="nav-optin">
-        <svg viewBox="0 0 14.6453 14.6344" aria-hidden="true"><path transform="matrix(1 -0.000029 0.000029 1 -1.6875 -1.687)" fill="#0a0a0b" d="{{ whatsapp_path }}"/></svg>
-        START FREE →
-      </button>
-      <form class="nav-optin" id="nav-optin" data-optin novalidate>
-        <div class="row">
-          <div class="cc" data-picker><input type="hidden" name="cc" value="1"></div>
-          <input type="tel" name="phone" inputmode="tel" autocomplete="tel-national" placeholder="Your WhatsApp number" aria-label="Your WhatsApp number" required>
-          <button class="btn" type="submit">
-            <svg viewBox="0 0 14.6453 14.6344" aria-hidden="true"><path transform="matrix(1 -0.000029 0.000029 1 -1.6875 -1.687)" fill="#0a0a0b" d="{{ whatsapp_path }}"/></svg>
-            START FREE<span class="lbl-long"> ON WHATSAPP</span> →
-          </button>
-        </div>
-        <div class="drop">
-          <label><input type="checkbox" name="consent" required> I agree to receive WhatsApp messages from FarmPartner. Reply STOP anytime.</label>
-          <p class="status" role="status" aria-live="polite"></p>
-        </div>
-      </form>
-    </div>
+    <a class="btn" href="{{ whatsapp }}" target="_blank" rel="noopener">
+      <svg viewBox="0 0 14.6453 14.6344" width="16" height="16" aria-hidden="true"><path transform="matrix(1 -0.000029 0.000029 1 -1.6875 -1.687)" fill="#0a0a0b" d="{{ whatsapp_path }}"/></svg>
+      <span class="long">OPEN IN </span>WHATSAPP →
+    </a>
   </nav>
 </header>
