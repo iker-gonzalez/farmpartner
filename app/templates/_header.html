@@ -1,0 +1,14 @@
+{# Site header shared by landing.html and what_how.html. Styles live in each page (header, .logo, nav, .btn). #}
+<header>
+  <a class="logo" href="/" aria-label="FarmPartner home">
+    <svg viewBox="0 0 13.5005 14.977" aria-hidden="true"><path transform="matrix(1 -0.000029 0.000029 1 -2.2501 -1.5112)" fill="#a8f326" d="{{ sprout_path }}"/></svg>
+    <span class="wordmark">FARMPARTNER</span>
+  </a>
+  <nav>
+    <a href="/what-and-how"{% if active == "what-how" %} class="on" aria-current="page"{% endif %}>WHAT &amp; HOW</a>
+    <a href="{{ repo }}#data-sources">NASA DATA</a>
+    <a href="/team"{% if active == "team" %} class="on" aria-current="page"{% endif %}>TEAM</a>
+    <a href="{{ repo }}">GITHUB</a>
+    <a class="btn" href="/chat">TRY <span class="long">THE </span>DEMO →</a>
+  </nav>
+</header>

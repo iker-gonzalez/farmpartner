@@ -65,6 +65,14 @@ def test_landing_and_simulator_pages():
     assert "https://wa.me/14155238886?text=hi" in home.text
     assert c.get("/static/landing/hero.jpg").status_code == 200
     assert "WhatsApp simulator" in c.get("/chat").text
+    about = c.get("/what-and-how")
+    assert about.status_code == 200 and "Global knowledge exchange" in about.text
+    assert 'href="/what-and-how"' in home.text
+    team_page = c.get("/team")
+    assert team_page.status_code == 200 and team_page.text.count('class="member"') == 6
+    assert 'href="/team"' in home.text
+    limits = c.get("/limits")
+    assert limits.status_code == 200 and "What the data can" in limits.text and 'href="/limits"' in home.text
     assert c.get("/sample", follow_redirects=False).status_code in (302, 404)
 
 
