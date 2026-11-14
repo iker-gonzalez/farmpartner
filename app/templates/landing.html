@@ -7,9 +7,12 @@
 <meta name="description" content="Send a location pin on WhatsApp. FarmPartner reads 20 years of NASA climate, soil-moisture and vegetation data for your field and compares your crop rotation with two that fit your climate.">
 <meta property="og:title" content="FarmPartner — the farm advisor that reads your field from space">
 <meta property="og:image" content="/static/landing/hero.jpg">
+<link rel="icon" href="/static/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/static/brand/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="/static/brand/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&family=Silkscreen&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="/static/landing/hero.jpg" media="(min-width: 801px)">
 <style>
   :root {
@@ -32,8 +35,9 @@
   header { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center;
     padding: 22px 64px; background: #0a0a0bd9; border-bottom: 1px solid var(--line); backdrop-filter: blur(6px); }
   .logo { display: flex; align-items: center; gap: 10px; }
-  .logo svg { width: 18px; height: 18px; }
-  .wordmark { font-family: "Silkscreen", var(--mono); font-size: 16px; color: var(--ink); letter-spacing: .5px; }
+  .logo svg { width: 20px; height: 20px; }
+  .wordmark { font-family: "Space Grotesk", var(--sans); font-size: 20px; font-weight: 600; color: var(--ink); letter-spacing: -.6px; line-height: 1; }
+  .wordmark b { font-weight: 600; color: var(--lime); }
   nav { display: flex; align-items: center; gap: 32px; }
   nav a { font-family: var(--mono); font-size: 13px; color: var(--ink-2); }
   nav a:hover { color: var(--ink); }
@@ -122,8 +126,8 @@
   <section class="hero">
     <header>
       <a class="logo" href="/" aria-label="FarmPartner home">
-        <svg viewBox="0 0 13.5005 14.977" aria-hidden="true"><path transform="matrix(1 -0.000029 0.000029 1 -2.2501 -1.5112)" fill="#a8f326" d="{{ sprout_path }}"/></svg>
-        <span class="wordmark">FARMPARTNER</span>
+        <svg viewBox="0 0 28 28" aria-hidden="true"><path fill="#a8f326" fill-rule="evenodd" d="M0 0h8v8h-8zM10 0h8v2h-8zM10 3h8v2h-8zM10 6h8v2h-8zM20 0h2v8h-2zM23 0h2v8h-2zM26 0h2v8h-2zM0 10h8v2h-8zM0 13h8v2h-8zM0 16h8v2h-8zM10 10h8v8h-8zM20 10h8v2h-8zM20 13h8v2h-8zM20 16h8v2h-8zM0 20h2v8h-2zM3 20h2v8h-2zM6 20h2v8h-2zM10 20h8v2h-8zM10 23h8v2h-8zM10 26h8v2h-8zM20 20h8v8h-8zM21.5 24a2.5 2.5 0 1 0 5.0 0a2.5 2.5 0 1 0 -5.0 0z"/></svg>
+        <span class="wordmark">farm<b>partner</b></span>
       </a>
       <nav>
         <a href="{{ repo }}#how-it-works">HOW IT WORKS</a>
