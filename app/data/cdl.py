@@ -15,7 +15,8 @@ def _one(year: int, x: float, y: float) -> tuple[int, str | None]:
     txt = None
     for _ in range(2):  # the CropScape server drops requests now and then; retry once
         try:
-            txt = get_text(URL, {"year": year, "x": round(x, 1), "y": round(y, 1)}, ttl_s=0)
+            txt = get_text(URL, {"year": year, "x": round(x, 1), "y": round(y, 1)}, ttl_s=0,
+                           keep=lambda t: "category:" in t)  # never cache CropScape's error pages
             break
         except Exception:
             continue

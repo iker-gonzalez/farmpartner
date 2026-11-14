@@ -34,6 +34,8 @@ locals {
     ANTHROPIC_EFFORT     = "low"
     TWILIO_WHATSAPP_FROM = var.twilio_whatsapp_from
     TWILIO_SMS_FROM      = var.twilio_sms_from
+    WHATSAPP_PREFILL     = var.whatsapp_prefill
+    CACHE_BUCKET         = google_storage_bucket.cache.name
     }, { for k, v in {
       ANTHROPIC_FEDERATION_RULE_ID = var.anthropic_federation_rule_id
       ANTHROPIC_ORGANIZATION_ID    = var.anthropic_organization_id
@@ -147,6 +149,7 @@ resource "google_cloud_run_v2_service" "app" {
   }
 
   depends_on = [
+    google_storage_bucket_iam_member.cache_rw,
     google_secret_manager_secret_iam_member.run_access,
     google_secret_manager_secret_version.app,
   ]

@@ -13,7 +13,8 @@ def soil_at(lat: float, lon: float) -> dict | None:
         "WHERE h.hzdept_r=0 ORDER BY c.comppct_r DESC"
     )
     try:
-        res = post_form_json(URL, {"query": q, "format": "JSON+COLUMNNAME"}, ttl_s=0)
+        res = post_form_json(URL, {"query": q, "format": "JSON+COLUMNNAME"}, ttl_s=0,
+                             keep=lambda r: bool(r.get("Table")))
     except Exception:
         return None
     table = res.get("Table") or []

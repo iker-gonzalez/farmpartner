@@ -34,3 +34,7 @@ output "dns_records" {
     ]
   }
 }
+
+output "cache_bucket" {
+  value = google_storage_bucket.cache.name
+}

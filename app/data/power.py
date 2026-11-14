@@ -13,7 +13,10 @@ FILL = -999.0
 
 
 def fetch_daily(lat: float, lon: float, years: int = 20) -> dict[str, dict[str, float]]:
-    end = dt.date.today() - dt.timedelta(days=7)  # POWER has a few days latency
+    # POWER lags a few days. End on the last Sunday at least 7 days ago, so the request (and its cache key)
+    # stays the same for a week instead of changing every day.
+    end = dt.date.today() - dt.timedelta(days=7)
+    end -= dt.timedelta(days=(end.weekday() + 1) % 7)
     start = dt.date(end.year - years, 1, 1)
     data = get_json(URL, {
         "parameters": PARAMS, "community": "AG", "latitude": round(lat, 3), "longitude": round(lon, 3),

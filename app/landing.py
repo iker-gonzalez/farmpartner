@@ -13,5 +13,9 @@ WHATSAPP_PATH = "M9 1.688q-1.969 0-3.621 .949-1.652 .949-2.672 2.636-1.019 1.688
 
 
 def whatsapp_url() -> str:
+    """wa.me link with a prefilled first message. On the Twilio sandbox that must be the sandbox's
+    "join <code>" phrase (WHATSAPP_PREFILL), otherwise the sandbox ignores the visitor."""
+    from urllib.parse import quote
+
     number = re.sub(r"\D", "", config.TWILIO_WHATSAPP_FROM)
-    return f"https://wa.me/{number}?text=hi"
+    return f"https://wa.me/{number}?text={quote(config.WHATSAPP_PREFILL)}"

@@ -12,8 +12,13 @@ def fetch_ndvi(lat: float, lon: float, years: int = 2) -> list[dict]:
     dates = get_json(f"{BASE}/dates", {"latitude": round(lat, 4), "longitude": round(lon, 4)},
                      ttl_s=30 * 86400, headers=HDR)["dates"]
     cutoff = dt.date.today().replace(year=dt.date.today().year - years)
-    wanted = [d for d in dates if dt.date.fromisoformat(d["calendar_date"]) >= cutoff]
-    chunks = [wanted[i:i + 10] for i in range(0, len(wanted), 10)]  # API returns at most 10 composites per call
+    # The API returns at most 10 composites per call. Chunk on fixed positions in the full date list, so
+    # past chunks keep the same request (and cache key) as new composites arrive every 16 days.
+    by_chunk: dict[int, list] = {}
+    for i, d in enumerate(dates):
+        if dt.date.fromisoformat(d["calendar_date"]) >= cutoff:
+            by_chunk.setdefault(i // 10, []).append(d)
+    chunks = [by_chunk[k] for k in sorted(by_chunk)]
 
     def one(chunk, attempt=0):
         try:
@@ -21,7 +26,7 @@ def fetch_ndvi(lat: float, lon: float, years: int = 2) -> list[dict]:
                 "latitude": round(lat, 4), "longitude": round(lon, 4), "band": "250m_16_days_NDVI",
                 "startDate": chunk[0]["modis_date"], "endDate": chunk[-1]["modis_date"],
                 "kmAboveBelow": 0, "kmLeftRight": 0,
-            }, ttl_s=0, headers=HDR, timeout=180).get("subset", [])
+            }, ttl_s=0, headers=HDR, timeout=180, keep=lambda r: bool(r.get("subset"))).get("subset", [])
         except Exception:
             return one(chunk, 1) if attempt == 0 else []
 

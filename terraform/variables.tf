@@ -70,6 +70,12 @@ variable "twilio_whatsapp_from" {
   default = "whatsapp:+14155238886" # Twilio WhatsApp sandbox
 }
 
+variable "whatsapp_prefill" {
+  description = "First message the landing page prefills in WhatsApp. On the Twilio sandbox: \"join <code>\"."
+  type        = string
+  default     = "hi"
+}
+
 variable "twilio_sms_from" {
   type    = string
   default = ""
