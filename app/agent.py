@@ -229,7 +229,9 @@ def _system_for(farmer_id: int) -> str:
     with session() as db:
         fm = db.get(Farmer, farmer_id)
         metric = fm is not None and units.preferred(fm) == "metric"
-    return SYSTEM + ("\n- Units: this farmer uses METRIC. Tools report inches, °F and acres: convert to mm, °C and "
+        note = ((fm.constraints or {}).get("goal_note") if fm else None)
+    goal = f"\n- The farmer's own goal, in their words: “{note}”. Keep it in mind." if note else ""
+    return SYSTEM + goal + ("\n- Units: this farmer uses METRIC. Tools report inches, °F and acres: convert to mm, °C and "
                      "hectares in your reply (1 in = 25.4 mm; °C = (°F − 32) × 5/9; 1 acre = 0.405 ha)." if metric else
                      "\n- Units: inches, °F and acres.")
 

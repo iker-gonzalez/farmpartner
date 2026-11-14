@@ -27,7 +27,7 @@ def test_submit_collect_and_evidence(offline, monkeypatch):
     from app.main import app
 
     c = TestClient(app)
-    for kw in ({"text": "hi"}, {"lat": 40.65, "lon": -98.3}, {"text": "yes irrigated"}, {"text": "2"}):
+    for kw in ({"text": "hi"}, {"lat": 40.65, "lon": -98.3}, {"text": "yes irrigated"}, {"text": "2"}, {"text": "compare now"}):
         c.post("/api/chat", json={"phone": "sat", **kw})
     monkeypatch.setattr(config, "EARTHDATA_TOKEN", "x")
     monkeypatch.setattr(appeears, "submit", lambda lat, lon, name, layers, days: "task-" + name.split("-")[1])

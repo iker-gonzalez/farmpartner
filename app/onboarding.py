@@ -17,14 +17,29 @@ from app.engine.features import crop_name, rotation_label
 from app.engine.knowledge import crops_in_text
 from app.prompts import buttons, picker
 
-PRIORITY_PROMPT = picker(
-    "Step 3 of 3 — what matters most on this field?", "Choose a goal",
-    ("1", "Save water", "Use less irrigation and rain"),
-    ("2", "Build soil health", "More organic matter, better structure"),
-    ("3", "More income", "Better-paying, reliable crops"),
-    ("4", "Less erosion", "Keep the soil covered"),
-    ("5", "Forage for livestock", "Feed for cattle"),
-)
+GOALS = [("1", "Save water", "Use less irrigation and rain"),
+         ("2", "Build soil health", "More organic matter, better structure"),
+         ("3", "More income", "Better-paying, reliable crops"),
+         ("4", "Less erosion", "Keep the soil covered"),
+         ("5", "Forage for livestock", "Feed for cattle")]
+OTHER_GOAL = ("6", "Something else", "Type your own goal")
+PRIORITY_PROMPT = picker("Step 3 of 3 — what matters most on this field? Pick one (you can add more), or just type "
+                         "your goals.", "Choose a goal", *GOALS, OTHER_GOAL)
+GOAL_TEXT_PROMPT = ("✍️ Tell me your goal in a few words, e.g. \"less fertilizer\", \"keep the soil covered for grazing\" "
+                    "or \"a crop I can sell locally\".")
+MAX_GOALS = 3
+
+
+def _more_goals_prompt(chosen: list[str]) -> dict:
+    names = " + ".join(_goal_name(k) for k in chosen)
+    return buttons(f"Got it: {names}. Add another goal, or compare now?",
+                   ("compare now", "Compare now"), ("add goal", "Add another goal"))
+
+
+def _goal_name(key: str) -> str:
+    return next((t for i, t, _ in GOALS if PRIORITY_KEYS[i] == key), key)
+
+
 CROPS_PROMPT = buttons("Step 2 of 3 — is that your rotation?",
                        ("yes irrigated", "Yes, irrigated"), ("yes dryland", "Yes, dryland"),
                        ("different crops", "Different crops"))
@@ -65,7 +80,33 @@ def parse_priorities(text: str) -> list[str]:
     for w, k in PRIORITY_WORDS.items():
         if w in text.lower():
             out.append(k)
-    return list(dict.fromkeys(out))[:2]
+    return list(dict.fromkeys(out))[:MAX_GOALS]
+
+
+def classify_goal(text: str) -> list[str]:
+    """Map a goal in the farmer's own words onto the scoring goals (keywords first, then Claude)."""
+    pr = parse_priorities(text)
+    if pr:
+        return pr
+    from app import config
+    if config.llm_enabled():
+        try:
+            import json
+
+            from app.agent import claude_client
+            resp = claude_client().beta.messages.create(
+                model=config.ANTHROPIC_MODEL, max_tokens=200, output_config={"effort": "low"},
+                betas=["server-side-fallback-2026-07-01"], fallbacks="default",
+                system="Map a farmer's goal (any language) to 1-2 of these crop-rotation scoring goals: save_water, "
+                       "soil_health, income, less_erosion, forage. Reply with ONLY a JSON array of keys.",
+                messages=[{"role": "user", "content": text[:300]}])
+            raw = "".join(b.text for b in resp.content if b.type == "text")
+            keys = [k for k in json.loads(re.search(r"\[.*\]", raw, re.S).group(0)) if k in PRIORITY_KEYS.values()]
+            if keys:
+                return keys[:2]
+        except Exception:
+            pass
+    return ["soil_health"]
 
 
 def parse_irrigated(text: str) -> bool | None:
@@ -249,28 +290,70 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
             db.commit()
         return Reply(now=["👍 " + ("Irrigated" if irr else "Dryland") + " — noted.", PRIORITY_PROMPT])
 
-    if state == "awaiting_priority":
-        pr = parse_priorities(t)
-        if not pr:
-            return Reply(now=[PRIORITY_PROMPT])
-        with session() as db:
-            fm = db.get(Farmer, farmer.id)
-            fm.priorities, fm.state = pr, "ready"
-            db.commit()
-            farmer_id = fm.id
-
-        def later():
-            with session() as db:
-                fm = db.get(Farmer, farmer_id)
-                fld = service.main_field(fm)
-                res = service.recommend(db, fm, fld)
-                msgs = ["🌱 I compared your rotation with alternatives that fit your climate:\n\n"
-                        + ex.chat_summary(res, service.report_url(fld)), NEXT_PROMPT]
-                _spawn(_enrich_ndvi, fld.id)  # slow MODIS pull (~1-2 min); the report picks it up afterwards
-                return msgs
-
-        return Reply(now=["🧮 Scoring rotations against your field's climate, soil and goals…"], later=later)
+    if state in ("awaiting_priority", "awaiting_more_goals", "awaiting_goal_text"):
+        return _goals_step(farmer, state, t, low)
     return None
+
+
+def _save_goals(farmer: Farmer, priorities: list[str], state: str, note: str | None = None) -> None:
+    with session() as db:
+        fm = db.get(Farmer, farmer.id)
+        fm.priorities, fm.state = priorities, state
+        if note:
+            fm.constraints = {**(fm.constraints or {}), "goal_note": note[:200]}
+        db.commit()
+    farmer.priorities, farmer.state = priorities, state
+
+
+def _goals_step(farmer: Farmer, state: str, t: str, low: str) -> Reply:
+    chosen = list(farmer.priorities or []) if state != "awaiting_priority" else []
+    if state == "awaiting_goal_text" or (state == "awaiting_priority" and not parse_priorities(t)
+                                         and len(re.findall(r"\w", t)) >= 6 and low not in ("6", "other")):
+        if low in ("6", "something else", "other", "otro", "otra"):
+            return Reply(now=[GOAL_TEXT_PROMPT])
+        added = classify_goal(t)
+        goals = list(dict.fromkeys(chosen + added))[:MAX_GOALS]
+        from app.engine.scoring import PRIORITY_LABELS
+        names = " + ".join(PRIORITY_LABELS.get(k, k) for k in added)
+        return _compare(farmer, goals, note=t, ack=f"📝 Noted your goal: “{t[:120]}” — I'll weigh it as {names}.")
+    if low in ("6", "something else", "other", "otro", "otra"):
+        _save_goals(farmer, chosen, "awaiting_goal_text")
+        return Reply(now=[GOAL_TEXT_PROMPT])
+    if state == "awaiting_more_goals":
+        if low in ("compare now", "compare", "done", "no", "that's all", "listo", "comparar"):
+            return _compare(farmer, chosen or ["soil_health"])
+        if low in ("add goal", "add", "another", "more", "otro objetivo"):
+            left = [g for g in GOALS if PRIORITY_KEYS[g[0]] not in chosen]
+            return Reply(now=[picker("Pick another goal.", "Choose a goal", *left, OTHER_GOAL)])
+        added = parse_priorities(t)
+        if not added:
+            return Reply(now=[_more_goals_prompt(chosen)])
+        return _compare(farmer, list(dict.fromkeys(chosen + added))[:MAX_GOALS])
+    pr = parse_priorities(t)
+    if not pr:
+        return Reply(now=[PRIORITY_PROMPT])
+    if re.fullmatch(r"[1-5]", t.strip()):  # one tap on the list: offer to add more before comparing
+        _save_goals(farmer, pr, "awaiting_more_goals")
+        return Reply(now=[_more_goals_prompt(pr)])
+    return _compare(farmer, pr)  # typed several goals at once ("1 and 3", "water and soil")
+
+
+def _compare(farmer: Farmer, priorities: list[str], note: str | None = None, ack: str | None = None) -> Reply:
+    _save_goals(farmer, priorities, "ready", note)
+    farmer_id = farmer.id
+
+    def later():
+        with session() as db:
+            fm = db.get(Farmer, farmer_id)
+            fld = service.main_field(fm)
+            res = service.recommend(db, fm, fld)
+            msgs = ["🌱 I compared your rotation with alternatives that fit your climate:\n\n"
+                    + ex.chat_summary(res, service.report_url(fld)), NEXT_PROMPT]
+            _spawn(_enrich_ndvi, fld.id)  # slow MODIS pull (~1-2 min); the report picks it up afterwards
+            return msgs
+
+    return Reply(now=([ack] if ack else []) + ["🧮 Scoring rotations against your field's climate, soil and goals…"],
+                 later=later)
 
 
 def current_step(farmer: Farmer) -> list:
@@ -279,6 +362,8 @@ def current_step(farmer: Farmer) -> list:
             "awaiting_crops": ["Which crops do you grow on this field? Type them in order, e.g. \"corn, soybeans\". "
                                "Add \"irrigated\" or \"dryland\"."],
             "awaiting_irrigation": [IRRIGATION_PROMPT], "awaiting_priority": [PRIORITY_PROMPT],
+            "awaiting_more_goals": [_more_goals_prompt(list(farmer.priorities or []))],
+            "awaiting_goal_text": [GOAL_TEXT_PROMPT],
             }.get(farmer.state, [NEXT_PROMPT])
 
 

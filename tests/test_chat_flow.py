@@ -20,7 +20,8 @@ def test_full_onboarding_with_pin_then_questions(offline):
     assert "NASA" in text and "Winter wheat → Grain sorghum → Fallow" in text
     assert "Finney County" in text and "Step 2 of 3" in msgs[-1]
     assert "Save water" in "\n".join(say(c, "a", text="yes it's dryland"))
-    msgs = say(c, "a", text="2")
+    assert "Add another goal" in say(c, "a", text="2")[0]
+    msgs = say(c, "a", text="compare now")
     summary = next(m for m in msgs if "Option 1" in m)
     assert "/r/" in summary
     url = summary.split("http://localhost:8000")[1].split()[0]
@@ -91,7 +92,7 @@ def test_daily_job_auth_and_refresh(offline, monkeypatch):
 
     monkeypatch.setenv("ADMIN_TOKEN", "t0ken")
     c = _client()
-    for kw in ({"text": "hi"}, {"lat": 38.05, "lon": -100.75}, {"text": "yes dryland"}, {"text": "2"}):
+    for kw in ({"text": "hi"}, {"lat": 38.05, "lon": -100.75}, {"text": "yes dryland"}, {"text": "2"}, {"text": "compare now"}):
         say(c, "daily", **kw)
     with session() as db:
         fld = db.query(Farmer).filter_by(phone="web:daily").one().fields[-1]
@@ -129,8 +130,12 @@ def test_buttons_guide_onboarding(offline):
     assert [b["id"] for b in r["actions"][-1]["buttons"]] == ["irrigated", "dryland"]
     r = c.post("/api/chat", json={"phone": "btn", "text": "dryland"}).json()
     goals = r["actions"][-1]["list"]["items"]
-    assert [g["id"] for g in goals] == ["1", "2", "3", "4", "5"]
+    assert [g["id"] for g in goals] == ["1", "2", "3", "4", "5", "6"]
     r = c.post("/api/chat", json={"phone": "btn", "text": "2"}).json()
+    assert [b["id"] for b in r["actions"][-1]["buttons"]] == ["compare now", "add goal"]
+    r = c.post("/api/chat", json={"phone": "btn", "text": "add goal"}).json()
+    assert [g["id"] for g in r["actions"][-1]["list"]["items"]] == ["1", "3", "4", "5", "6"]   # minus the chosen one
+    r = c.post("/api/chat", json={"phone": "btn", "text": "1"}).json()                          # 2nd pick → compare
     assert r["actions"][-1]["buttons"][2]["id"] == "report"
     assert "/r/" in c.post("/api/chat", json={"phone": "btn", "text": "report"}).json()["messages"][0]
 
@@ -148,3 +153,24 @@ def test_webhook_sends_button_turns_via_api(offline, monkeypatch):
     sent.clear()
     c.post("/twilio/webhook", data={"From": "whatsapp:+15550009", "Body": "Yes, dryland", "ButtonPayload": "yes dryland"})
     assert any(isinstance(m, dict) and "list" in m for m in sent)  # the goal picker
+
+
+def test_goals_typed_together_and_in_own_words(offline):
+    from app.db import Farmer, session
+    c = _client()
+
+    def setup(p):
+        for kw in ({"text": "hi"}, {"lat": 38.05, "lon": -100.75}, {"text": "yes dryland"}):
+            say(c, p, **kw)
+
+    setup("g1")
+    assert "Scoring" in say(c, "g1", text="water and soil please")[0]          # several at once → straight to compare
+    setup("g2")
+    assert "Tell me your goal" in say(c, "g2", text="6")[0]
+    out = say(c, "g2", text="I want to use less fertilizer")
+    assert out[0].startswith("📝 Noted your goal") and "Scoring" in out[1]
+    with session() as db:
+        p1 = db.query(Farmer).filter_by(phone="web:g1").one()
+        p2 = db.query(Farmer).filter_by(phone="web:g2").one()
+        assert p1.priorities == ["save_water", "soil_health"] and p1.state == "ready"
+        assert p2.constraints["goal_note"] == "I want to use less fertilizer" and p2.priorities and p2.state == "ready"

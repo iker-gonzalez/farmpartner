@@ -22,7 +22,7 @@ def test_llm_tool_loop(offline, monkeypatch):
     from app.main import app
 
     c = TestClient(app)
-    for kw in ({"text": "hi"}, {"lat": 40.65, "lon": -98.3}, {"text": "yes irrigated"}, {"text": "1"}):
+    for kw in ({"text": "hi"}, {"lat": 40.65, "lon": -98.3}, {"text": "yes irrigated"}, {"text": "1"}, {"text": "compare now"}):
         c.post("/api/chat", json={"phone": "llm", **kw})
 
     fake = FakeMessages()
@@ -46,7 +46,7 @@ def test_photo_request_ends_on_the_farmers_turn_with_the_image(offline, monkeypa
     from app.main import app
 
     c = TestClient(app)
-    for kw in ({"text": "hi"}, {"lat": 40.65, "lon": -98.3}, {"text": "yes irrigated"}, {"text": "1"}):
+    for kw in ({"text": "hi"}, {"lat": 40.65, "lon": -98.3}, {"text": "yes irrigated"}, {"text": "1"}, {"text": "compare now"}):
         c.post("/api/chat", json={"phone": "pic", **kw})
     with session() as db:  # move the web farmer onto WhatsApp so the webhook finds it onboarded
         db.query(Farmer).filter_by(phone="web:pic").one().phone = "whatsapp:+15550002222"
