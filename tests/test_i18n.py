@@ -75,3 +75,4 @@ def test_basque_catalan_galician():
     assert i18n.detect("Euskeraz hitz egingo zenidake?") == "eu" and i18n.is_switch("Euskeraz hitz egingo zenidake?")
     assert i18n.detect("Ez dut gaztelaniaz hitz egiten") == "eu"
     assert i18n.is_switch("Me hablas en castellano?") and i18n.detect("en català, si us plau") == "ca"
+    assert i18n.is_switch("Euskeraz hitz egin dezakezu, mesedez 🙏") and i18n.is_switch("Can you speak English please?")

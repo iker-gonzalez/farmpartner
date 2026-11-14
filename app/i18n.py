@@ -115,7 +115,8 @@ def is_switch(text: str) -> bool:
     for _, p in SWITCH:
         t = re.sub(p, "", t, flags=re.I)
     t = re.sub(r"\b(en|in|em|auf|por favor|please|habla|hablame|háblame|hablas|me|speak|parle|sprich|parla|hitz|egin|"
-               r"egingo|zenidake|mintzatu|ditzakezu|dezakezu|nahi|dut|parla|parlar|falar|falame)\b|で|お願い|[?¿!¡]", "", t)
+               r"egingo|zenidake|mintzatu|ditzakezu|dezakezu|nahi|dut|parla|parlar|falar|falame|mesedez|si us plau|por favore|"
+               r"s'il vous plaît|bitte|can you|could you|puedes|podrías|pode|peux)\b|で|お願い|[^\w\s]", "", t)
     return not re.search(r"[a-zà-ÿ]{3,}", t)
 
 
