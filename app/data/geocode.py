@@ -33,25 +33,51 @@ def zip_to_point(text: str, country: str = "us") -> tuple[float, float, str] | N
     return float(p["latitude"]), float(p["longitude"]), f"{p['place name']}, {p['state abbreviation'] or p['state']}"
 
 
+STOPWORDS = {"i", "im", "live", "living", "my", "our", "we", "farm", "field", "is", "am", "are", "the", "a", "at",
+             "near", "close", "to", "from", "mi", "mis", "campo", "finca", "parcela", "vivo", "estoy", "soy", "es",
+             "el", "la", "los", "las", "de", "del", "cerca", "por", "aqui", "here", "there", "nire", "naiz", "ma",
+             "mon", "je", "suis", "habite", "près", "pres", "minha", "meu", "fazenda", "moro", "ich", "wohne", "bei"}
+
+
+def _plain(x: str) -> str:
+    import unicodedata
+    return "".join(c for c in unicodedata.normalize("NFKD", (x or "").lower()) if not unicodedata.combining(c))
+
+
 def place_to_point(text: str, lang: str = "en") -> tuple[float, float, str] | None:
-    """A town or region name ("Bilbao", "soy residente en Bilbao") via Open-Meteo's free geocoder."""
+    """A town, region or island name ("Bilbao", "soy residente en Bilbao", "Islas Galápagos", "Garden City Kansas")
+    via Open-Meteo's free geocoder. Tries the whole phrase, then shorter runs of words; a partial match must contain
+    the words searched, and leftover words (a state or country) pick between same-named places."""
     cleaned = FILLER.sub(" ", re.sub(r"[\d,.;:!?¿¡\"'()]", " ", text or "")).strip()
-    words = cleaned.split()
+    words = [w for w in cleaned.split() if _plain(w) not in STOPWORDS]
     if not words or len(words) > 6:
         return None
-    tries = [" ".join(words)] + [w for w in words if w[:1].isupper() and len(w) > 2] + [words[-1]]
-    for name in dict.fromkeys(tries):
-        try:
-            res = get_json("https://geocoding-api.open-meteo.com/v1/search",
-                           {"name": name, "count": 1, "language": lang or "en"}, ttl_s=0).get("results") or []
-        except Exception:
+    runs = [" ".join(words[i:i + n]) for n in range(len(words), 0, -1) for i in range(len(words) - n + 1)]
+    langs = list(dict.fromkeys([lang or "en", "en", "es"]))
+    for run in runs:
+        if len(run) < 4:
             continue
-        if res:
-            r = res[0]
-            label = ", ".join(x for x in (r.get("name"), r.get("admin1"), r.get("country_code")) if x)
-            # the API omits zero values: the Galápagos (on the equator) come back without "latitude"
-            return float(r.get("latitude", 0.0)), float(r.get("longitude", 0.0)), label
+        strict = run != " ".join(words)
+        others = [_plain(w) for w in words if _plain(w) not in _plain(run)]
+        for lg in langs if not strict else langs[:1]:
+            try:
+                res = get_json("https://geocoding-api.open-meteo.com/v1/search",
+                               {"name": run, "count": 10, "language": lg}, ttl_s=0).get("results") or []
+            except Exception:
+                continue
+            if strict:
+                res = [r for r in res if re.search(rf"\b{re.escape(_plain(run))}\b", _plain(r.get("name")))]
+                if others:  # "Garden City Kansas": keep the Garden City whose state/country matches "Kansas"
+                    res = [r for r in res if any(o in _plain(" ".join(str(r.get(k, "")) for k in
+                                                ("admin1", "admin2", "country", "country_code"))) for o in others)] or (
+                        res if len(run.split()) > 1 else [])
+            if res:
+                r = res[0] if strict else max(res[:5], key=lambda r: r.get("population") or 0)
+                label = ", ".join(x for x in (r.get("name"), r.get("admin1"), r.get("country_code")) if x)
+                # the API omits zero values: the Galápagos (on the equator) come back without "latitude"
+                return float(r.get("latitude", 0.0)), float(r.get("longitude", 0.0)), label
     return None
+
 
 STATES = {"01": "AL", "02": "AK", "04": "AZ", "05": "AR", "06": "CA", "08": "CO", "09": "CT", "10": "DE", "12": "FL",
           "13": "GA", "16": "ID", "17": "IL", "18": "IN", "19": "IA", "20": "KS", "21": "KY", "22": "LA", "23": "ME",
