@@ -33,14 +33,6 @@ NA Namibia 264|BW Botswana 267|ZA South Africa 27|LS Lesotho 266|SZ Eswatini 268
   const flag = iso => String.fromCodePoint(...[...iso].map(c => 127397 + c.charCodeAt(0)));
   const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
-  function guessIso() {
-    for (const l of navigator.languages || [navigator.language]) {
-      const r = (l || "").split("-")[1];
-      if (r && COUNTRIES.some(c => c.iso === r.toUpperCase())) return r.toUpperCase();
-    }
-    return "US";
-  }
-
   document.querySelectorAll("[data-picker]").forEach(root => {
     const hidden = root.querySelector("input[type=hidden]");
     root.insertAdjacentHTML("beforeend", `
@@ -52,7 +44,7 @@ NA Namibia 264|BW Botswana 267|ZA South Africa 27|LS Lesotho 266|SZ Eswatini 268
       </div>`);
     const btn = root.querySelector(".cc-btn"), pop = root.querySelector(".cc-pop");
     const search = root.querySelector(".cc-search"), list = root.querySelector(".cc-list");
-    let current = COUNTRIES.find(c => c.iso === guessIso()), shown = [], active = 0;
+    let current = COUNTRIES.find(c => c.iso === "US"), shown = [], active = 0;
 
     const choose = c => {
       current = c; hidden.value = c.dial;
