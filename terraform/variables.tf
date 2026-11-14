@@ -136,3 +136,17 @@ variable "anthropic_workspace_id" {
   type    = string
   default = ""
 }
+
+# --- Custom domain -----------------------------------------------------------------------------------
+# The domain must first be verified for the deploying Google account (gcloud domains verify <domain>).
+variable "custom_domain" {
+  description = "Apex domain served by the app, e.g. farmpartner.space. Empty = run.app URL only."
+  type        = string
+  default     = ""
+}
+
+variable "custom_domain_www" {
+  description = "Also map www.<custom_domain> to the service."
+  type        = bool
+  default     = true
+}

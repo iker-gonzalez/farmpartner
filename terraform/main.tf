@@ -5,7 +5,9 @@ data "google_project" "this" {
 locals {
   # run.app URLs are deterministic, so the app knows its public URL (report links, Twilio signatures)
   # without a dependency cycle.
-  public_url = "https://${var.service_name}-${data.google_project.this.number}.${var.region}.run.app"
+  run_url = "https://${var.service_name}-${data.google_project.this.number}.${var.region}.run.app"
+  # Report links and Twilio signature checks use the custom domain once it is set.
+  public_url = var.custom_domain != "" ? "https://${var.custom_domain}" : local.run_url
   labels     = { product = "farmpartner", env = var.env }
 
   # Secret Manager secrets the service reads. has_value = Terraform writes a version from a variable;
