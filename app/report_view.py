@@ -17,6 +17,8 @@ CROP_COLORS = {
     "peanuts": "#b98a5a", "rice": "#9cc46b", "dry_beans": "#a5764a", "millet": "#c7a46a",
 }
 DARK_TEXT = {"fallow"}
+MONTH_FULL = {"Jan": "January", "Feb": "February", "Mar": "March", "Apr": "April", "May": "May", "Jun": "June",
+              "Jul": "July", "Aug": "August", "Sep": "September", "Oct": "October", "Nov": "November", "Dec": "December"}
 MONTH_ABBR = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 
@@ -43,6 +45,7 @@ def _top_gain(best: dict, cur: dict | None):
 
 
 def _water(climate: dict):
+    years = climate.get("years") or ""
     months = climate.get("monthly") or []
     rows = [{"m": m["month"], "rain": inch(m["precip_mm"]) or 0, "et": inch(m["et0_mm"]) or 0} for m in months]
     if not rows:
@@ -53,6 +56,12 @@ def _water(climate: dict):
         r["et_pct"] = round(100 * r["et"] / top)
     worst = max(rows, key=lambda r: r["et"] - r["rain"])
     gap = round(worst["et"] - worst["rain"], 1)
+    for r in rows:
+        d = round(r["rain"] - r["et"], 1)
+        r["tip"] = {"t": MONTH_FULL.get(r["m"], r["m"]), "s": f"{years} average".strip(),
+                    "r": [["Rain", f'{r["rain"]} in', "rain"], ["Crop demand (ET₀)", f'{r["et"]} in', "et"],
+                          ["Shortfall" if d < 0 else "Surplus", f"{d:+.1f} in".replace("-", "−"), "et" if d < 0 else "lime"]],
+                    "n": "Biggest shortfall of the year" if r is worst and gap > 0 else None}
     return {"rows": rows, "worst": worst if gap > 0 else None, "gap": gap}
 
 
@@ -64,12 +73,34 @@ def _month_label(d: str) -> str:
         return d
 
 
+def _day_label(d: str) -> str:
+    try:
+        x = dt.date.fromisoformat(d)
+        return f"{MONTH_ABBR[x.month - 1]} {x.day}, {x.year}"
+    except ValueError:
+        return d
+
+
+def _ndvi_tip(p: dict) -> dict:
+    v = p["ndvi"]
+    if v < BARE_NDVI:
+        state, cls, note = "Near-bare soil", "bare", "Bare stretches are when a cover crop can protect the soil."
+    elif v < 0.4:
+        state, cls, note = "Sparse cover", "green", None
+    elif v < 0.6:
+        state, cls, note = "Green cover", "green", None
+    else:
+        state, cls, note = "Dense, healthy cover", "lime", None
+    return {"t": _day_label(p["date"]), "s": "MODIS 16-day composite",
+            "r": [["NDVI", f"{v:.2f}", cls], ["Ground", state, cls]], "n": note}
+
+
 def _ndvi(ndvi: dict):
     series = [p for p in (ndvi.get("series") or []) if p.get("ndvi") is not None]
     if not series:
         return None
     pts = [{"date": p["date"], "v": p["ndvi"], "pct": round(min(1.0, max(0.0, p["ndvi"])) * 100),
-            "low": p["ndvi"] < BARE_NDVI} for p in series]
+            "low": p["ndvi"] < BARE_NDVI, "tip": _ndvi_tip(p)} for p in series]
     best, run = None, None
     for i, p in enumerate(pts):
         if p["low"]:
@@ -99,22 +130,48 @@ def _timeline(s: dict):
     out = []
     for i, cid in enumerate(s["years"]):
         cover = (s.get("covers") or {}).get(str(i))
-        out.append({"name": crop_name(cid).replace(" (no crop)", ""), "color": crop_color(cid), "text": crop_text(cid),
-                    "cover": cv.get(cover, {}).get("name") if cover else None})
+        cover_name = cv.get(cover, {}).get("name") if cover else None
+        name = crop_name(cid).replace(" (no crop)", "")
+        rows = [["Main crop", "None — fallow" if cid == "fallow" else name, None]]
+        if cover_name:
+            rows.append(["Cover crop", cover_name, "green"])
+        out.append({"name": name, "color": crop_color(cid), "text": crop_text(cid), "cover": cover_name,
+                    "tip": {"t": f"Year {i + 1} of {len(s['years'])}", "r": rows,
+                            "n": (cv.get(cover, {}).get("note") if cover else None)}})
+    return out
+
+
+def _bars(s: dict, cur: dict | None, best: dict | None) -> list[dict]:
+    """Score bars with a tooltip comparing this plan to today (or today to the best match)."""
+    ref, ref_name = (best, "Best match") if s.get("is_current") else (cur, "Today")
+    out = []
+    for k, v in s["scores"].items():
+        rows = [["This plan" if not s.get("is_current") else "Today", f"{v} / 100", "lime"]]
+        if ref and k in ref["scores"]:
+            d = v - ref["scores"][k]
+            rows.append([ref_name, f'{ref["scores"][k]} / 100', None])
+            rows.append(["Difference", (f"{d:+d}" if d else "same").replace("-", "−"),
+                         "lime" if d > 0 else ("et" if d < 0 else None)])
+        out.append({"k": k, "v": v, "tip": {"t": SCORE_LABELS.get(k, k).capitalize(), "r": rows}})
     return out
 
 
 def build(field, rec: dict | None, f: dict) -> dict:
     cur, best = _strategies(rec)
-    history = [{"year": h.year, "name": crop_name(h.crop).replace(" (no crop)", "") if h.crop else (h.category or "?"), "color": crop_color(h.crop),
-                "text": crop_text(h.crop)} for h in (field.history or [])]
+    history = []
+    for h in field.history or []:
+        name = crop_name(h.crop).replace(" (no crop)", "") if h.crop else (h.category or "?")
+        rows = [["Satellite class", h.category or "—", None], ["Read as", name, None]]
+        history.append({"year": h.year, "name": name, "color": crop_color(h.crop), "text": crop_text(h.crop),
+                        "tip": {"t": str(h.year), "s": "Told us by you" if h.source == "farmer" else "USDA Cropland Data Layer · 30 m",
+                                "r": rows}})
     fallow_years = sum(1 for h in (field.history or []) if h.crop == "fallow")
     return {
         "best": best, "cur": cur, "gain": _top_gain(best, cur),
         "best_name": short_name(best) if best else None,
         "water": _water(f.get("climate") or {}),
         "ndvi": _ndvi(f.get("ndvi") or {}),
-        "strats": [dict(s, timeline=_timeline(s), is_best=s is best) for s in (rec or {}).get("strategies", [])],
+        "strats": [dict(s, timeline=_timeline(s), bars=_bars(s, cur, best), is_best=s is best) for s in (rec or {}).get("strategies", [])],
         "history": history, "fallow_years": fallow_years,
         "elevation": f.get("elevation_m"),
     }

@@ -129,7 +129,7 @@
   .plot .rain { background:var(--rain) } .plot .et { background:#e0913f33; border-top:2px solid var(--et) }
   .plot .mo.worst .et { background:#e0913f55 }
   .mlabels { display:flex; gap:4px } .mlabels span { flex:1; text-align:center; font:10px var(--mono); color:var(--mute) }
-  .mlabels span.worst { color:var(--et) }
+  .mlabels span.worst { color:var(--et) } .mlabels span.on { color:var(--ink) }
   .plot.nd { gap:2px } .plot.nd i { flex:1; display:block; background:#4f9a34 } .plot.nd i.hi { background:#7cc94f } .plot.nd i.low { background:#8a6a4a }
   .plot .thr { position:absolute; left:0; right:0; border-top:1px solid var(--bare) }
   .plot .thr span { position:absolute; left:0; top:-17px; background:var(--panel); padding:1px 5px; font:9px var(--mono); color:var(--bare); letter-spacing:.05em }
@@ -161,6 +161,30 @@
   .gaps li::before { content:"0" counter(g); font:11px var(--mono); color:var(--warn); padding-top:2px }
   .ground .panel .btn { margin-top:14px; padding:13px 16px; display:none }
 
+  /* interactive data points */
+  .plot.scrub { cursor:crosshair; touch-action:pan-y; -webkit-user-select:none; user-select:none }
+  .plot > [data-tip] { transition:opacity .12s }
+  .plot.live > [data-tip] { opacity:.32 } .plot.live > [data-tip].on { opacity:1 }
+  .plot.live > .mo.on { background:#ffffff0d }
+  .plot.nd.live > i.on { outline:1px solid var(--ink); outline-offset:1px }
+  .bar[data-tip], .tl > [data-tip], .hist > [data-tip] { cursor:default; transition:opacity .12s, filter .12s }
+  .bar[data-tip].on { color:var(--ink) } .bar[data-tip].on .t { background:#33333a }
+  .tl:has(.on) > div:not(.on), .hist:has(.on) > div:not(.on) { opacity:.45 }
+  .hist > .on, .tl > .on { filter:brightness(1.12) }
+  .tip { position:fixed; z-index:1000; left:0; top:0; min-width:170px; max-width:260px; pointer-events:none; opacity:0;
+    transform:translateY(4px); transition:opacity .1s, transform .1s; background:#18181c; border:1px solid #3a3a41;
+    box-shadow:0 10px 30px #000a; padding:10px 12px; font-size:12.5px }
+  .tip.on { opacity:1; transform:none }
+  .tip .tt { font-weight:600; font-size:13.5px; color:var(--ink) }
+  .tip .ts { font:9.5px var(--mono); letter-spacing:.06em; text-transform:uppercase; color:var(--mute); margin-top:1px }
+  .tip .tr { display:flex; justify-content:space-between; gap:14px; margin-top:6px; color:var(--ink2) }
+  .tip .tr:first-of-type { margin-top:9px }
+  .tip .tr b { font-weight:600; color:var(--ink); font-variant-numeric:tabular-nums }
+  .tip .tr i { display:inline-block; width:8px; height:8px; margin-right:7px; vertical-align:0 }
+  .tip .c-rain i { background:var(--rain) } .tip .c-et i { background:var(--et) } .tip .c-et b { color:var(--et) }
+  .tip .c-lime i { background:var(--lime) } .tip .c-lime b { color:var(--lime) }
+  .tip .c-green i { background:#5fae3e } .tip .c-bare i { background:#8a6a4a } .tip .c-bare b { color:var(--bare) }
+  .tip .tn { margin-top:8px; padding-top:8px; border-top:1px solid #2c2c32; color:var(--mute); font-size:11.5px; line-height:1.4 }
   footer { border-top:1px solid var(--line); padding:24px 0 112px }
   footer .wrap { display:grid; gap:12px }
   footer p { font-size:11.5px; line-height:1.5; color:var(--mute) }
@@ -291,15 +315,15 @@
         <div class="score"><b>{{ "%.0f"|format(s.total) }}</b><span>/ 100</span></div>
       </div>
       <div>
-        <div class="tl">{% for y in s.timeline %}<div><span style="background:{{ y.color }};color:{{ y.text }}">{{ y.name }}</span>{% if y.cover %}<em title="{{ y.cover }}"></em>{% endif %}</div>{% endfor %}</div>
+        <div class="tl">{% for y in s.timeline %}<div data-tip='{{ y.tip|tojson }}'><span style="background:{{ y.color }};color:{{ y.text }}">{{ y.name }}</span>{% if y.cover %}<em></em>{% endif %}</div>{% endfor %}</div>
         <div class="tlk"><span>{{ s.timeline|length }}-year cycle{% if s.covers %} · ▬ cover{% endif %}</span>
           <span class="{{ 'baremany' if s.metrics.bare_months_per_yr >= 6 }}">{{ "%.0f"|format(s.metrics.bare_months_per_yr) }} mo bare / yr</span></div>
       </div>
       <div class="score lg"><b>{{ "%.0f"|format(s.total) }}</b><span>/ 100 for<br>your goals</span></div>
       <details class="more" {{ 'open' if best }}>
         <summary>All {{ s.scores|length }} scores, why &amp; risks</summary>
-        <div class="bars">{% for k, val in s.scores.items() %}
-          <div class="bar {{ 'goal' if k in goal_keys or (k == 'soil' and 'soil_health' in goal_keys) or (k == 'water' and 'save_water' in goal_keys) or (k == 'erosion' and 'less_erosion' in goal_keys) }}"><span>{{ labels[k]|capitalize }}</span><div class="t"><i style="width:{{ val }}%"></i></div><span class="n">{{ val }}</span></div>{% endfor %}
+        <div class="bars">{% for b in s.bars %}{% set k = b.k %}
+          <div class="bar {{ 'goal' if k in goal_keys or (k == 'soil' and 'soil_health' in goal_keys) or (k == 'water' and 'save_water' in goal_keys) or (k == 'erosion' and 'less_erosion' in goal_keys) }}" data-tip='{{ b.tip|tojson }}'><span>{{ labels[k]|capitalize }}</span><div class="t"><i style="width:{{ b.v }}%"></i></div><span class="n">{{ b.v }}</span></div>{% endfor %}
         </div>
         <div class="notes">
           {% if s.why %}<div><span class="k">Why it's here</span><ul>{% for w in s.why %}<li>{{ w }}</li>{% endfor %}</ul></div>{% endif %}
@@ -320,7 +344,7 @@
     <div class="chart panel">
       <h3>Rain vs. crop water demand</h3>
       <div class="legend"><span><i style="background:var(--rain)"></i>Rain</span><span><i style="background:var(--et)"></i>ET₀ demand</span><span>Inches / month</span></div>
-      <div class="plot">{% for m in v.water.rows %}<div class="mo {{ 'worst' if v.water.worst and m.m == v.water.worst.m }}" title="{{ m.m }}: rain {{ m.rain }} in, demand {{ m.et }} in"><i class="rain" style="height:{{ m.rain_pct }}%"></i><i class="et" style="height:{{ m.et_pct }}%"></i></div>{% endfor %}</div>
+      <div class="plot scrub" aria-label="Monthly rain vs crop water demand">{% for m in v.water.rows %}<div class="mo {{ 'worst' if v.water.worst and m.m == v.water.worst.m }}" data-tip='{{ m.tip|tojson }}'><i class="rain" style="height:{{ m.rain_pct }}%"></i><i class="et" style="height:{{ m.et_pct }}%"></i></div>{% endfor %}</div>
       <div class="mlabels">{% for m in v.water.rows %}<span class="{{ 'worst' if v.water.worst and m.m == v.water.worst.m }}">{{ m.m[:1] }}</span>{% endfor %}</div>
       {% if v.water.worst %}<div class="take"><b style="color:var(--et)">−{{ v.water.gap }} in in {{ v.water.worst.m }}</b>
         <p>Crops want {{ v.water.worst.et }} in, rain brings {{ v.water.worst.rain }}. The rest has to come from water stored in the soil{{ " or irrigation" if field.irrigated != False }} — that's why residue and cover matter here.</p></div>{% endif %}
@@ -331,7 +355,7 @@
       <h3>Vegetation from space (NDVI)</h3>
       {% if v.ndvi %}
       <div class="legend"><span><i style="background:#5fae3e"></i>Green cover</span><span><i style="background:#8a6a4a"></i>Near-bare &lt; 0.25</span></div>
-      <div class="plot nd">{% for p in v.ndvi.points %}<i class="{{ 'low' if p.low else ('hi' if p.v > 0.55 else '') }}" style="height:{{ p.pct }}%" title="{{ p.date }}: {{ p.v }}"></i>{% endfor %}
+      <div class="plot nd scrub" aria-label="NDVI over time">{% for p in v.ndvi.points %}<i class="{{ 'low' if p.low else ('hi' if p.v > 0.55 else '') }}" style="height:{{ p.pct }}%" data-tip='{{ p.tip|tojson }}'></i>{% endfor %}
         <div class="thr" style="bottom:25%"><span>0.25 BARE SOIL</span></div></div>
       <div class="ticks">{% for t in v.ndvi.ticks %}<span>{{ t }}</span>{% endfor %}</div>
       {% if v.ndvi.low %}<div class="take"><b style="color:var(--bare)">~{{ v.ndvi.low.months }} mo near bare</b>
@@ -346,7 +370,7 @@
 <section id="history" class="alt"><div class="wrap">
   <div class="sh"><span class="k">{{ "04" if rec else "03" }} / History &amp; ground truth</span><h2>{{ v.history|length }} seasons on this field</h2><span class="k aside">USDA Cropland Data Layer · 30 m</span></div>
   {% if v.history %}
-  <div class="hist">{% for h in v.history %}<div style="background:{{ h.color }}"><small style="color:{{ h.text }}">{{ h.year }}</small><b style="background:{{ h.color }};color:{{ h.text }}">{{ h.name }}</b></div>{% endfor %}</div>
+  <div class="hist">{% for h in v.history %}<div style="background:{{ h.color }}" data-tip='{{ h.tip|tojson }}'><small style="color:{{ h.text }}">{{ h.year }}</small><b style="background:{{ h.color }};color:{{ h.text }}">{{ h.name }}</b></div>{% endfor %}</div>
   {% if field.current_rotation and field.current_rotation|length > 1 %}
   <div class="pattern"><svg viewBox="0 0 256 256"><path d="M224 48v48a8 8 0 0 1-8 8h-48a8 8 0 0 1 0-16h28.7L182.1 73.4A88 88 0 0 0 57.5 72.8 8 8 0 0 1 46.3 61.4a104 104 0 0 1 147.1.7L208 76.7V48a8 8 0 0 1 16 0Zm-25.7 135.2a88 88 0 0 1-124.4-.6L59.3 168H88a8 8 0 0 0 0-16H40a8 8 0 0 0-8 8v48a8 8 0 0 0 16 0v-28.7l14.6 14.6a104 104 0 0 0 147.1.7 8 8 0 0 0-11.2-11.4Z"/></svg>
     <span>Detected pattern: {{ rotation_label(field.current_rotation) }}, repeating every {{ field.current_rotation|length }} years.{% if v.fallow_years %} {{ v.fallow_years }} of {{ v.history|length }} seasons the field carried no crop.{% endif %}</span></div>
@@ -399,6 +423,61 @@
 <script>
   // Desktop shows every strategy's details; on phones only the pick is open.
   if (matchMedia('(min-width:800px)').matches) document.querySelectorAll('details.more').forEach(d => d.open = true);
+  // Tooltips: hover (mouse) or tap / drag (touch) on any element with data-tip. Charts scrub by x position.
+  (() => {
+    const tip = document.createElement('div'); tip.className = 'tip'; tip.setAttribute('role', 'tooltip'); document.body.append(tip);
+    let cur = null;
+    const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+    function render(d) {
+      tip.replaceChildren(el('div', 'tt', d.t));
+      if (d.s) tip.append(el('div', 'ts', d.s));
+      for (const [label, value, color] of d.r || []) {
+        const row = el('div', 'tr' + (color ? ' c-' + color : '')), l = el('span');
+        if (color) l.append(el('i')); l.append(label); row.append(l, el('b', null, value)); tip.append(row);
+      }
+      if (d.n) tip.append(el('div', 'tn', d.n));
+    }
+    function place(target) {
+      const r = target.getBoundingClientRect();
+      let top = r.top;
+      if (target.classList.contains('mo')) top = Math.min(...[...target.children].map(c => c.getBoundingClientRect().top));
+      const w = tip.offsetWidth, h = tip.offsetHeight;
+      const x = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2));
+      let y = top - h - 10; if (y < 70) y = r.bottom + 10;
+      tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    }
+    function show(target) {
+      if (cur === target) return place(target);
+      hide(); cur = target; target.classList.add('on'); target.parentElement.classList.add('live');
+      render(JSON.parse(target.dataset.tip)); tip.classList.add('on'); place(target);
+      const labels = target.parentElement.nextElementSibling;
+      if (labels && labels.classList.contains('mlabels')) labels.children[[...target.parentElement.children].indexOf(target)]?.classList.add('on');
+    }
+    function hide() {
+      if (!cur) return; document.querySelectorAll('.mlabels .on').forEach(l => l.classList.remove('on')); cur.classList.remove('on'); cur.parentElement.classList.remove('live'); cur = null; tip.classList.remove('on');
+    }
+    // Charts: nearest column to the pointer, so thin bars and empty space above them still respond.
+    document.querySelectorAll('.plot.scrub').forEach(plot => {
+      const items = [...plot.children].filter(c => c.dataset.tip);
+      const pick = e => {
+        let best = null, dist = Infinity;
+        for (const it of items) { const r = it.getBoundingClientRect(), d = Math.abs(e.clientX - (r.left + r.width / 2)); if (d < dist) { dist = d; best = it; } }
+        if (best) show(best);
+      };
+      plot.addEventListener('pointermove', pick);
+      plot.addEventListener('pointerdown', pick);
+      plot.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') hide(); });
+    });
+    document.querySelectorAll('[data-tip]').forEach(t => {
+      if (t.parentElement.classList.contains('scrub')) return;
+      t.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') show(t); });
+      t.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') hide(); });
+      t.addEventListener('click', () => cur === t ? hide() : show(t));
+    });
+    document.addEventListener('pointerdown', e => { if (!e.target.closest('[data-tip], .plot.scrub')) hide(); });
+    addEventListener('scroll', () => { if (cur) place(cur); }, { passive: true });
+    addEventListener('resize', hide);
+  })();
   document.getElementById('share').addEventListener('click', async () => {
     const data = { title: document.title, url: location.href };
     if (navigator.share) { try { await navigator.share(data); } catch (e) {} }
