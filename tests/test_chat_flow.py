@@ -26,7 +26,7 @@ def test_full_onboarding_with_pin_then_questions(offline):
     assert "/r/" in summary
     url = summary.split("http://localhost:8000")[1].split()[0]
     page = c.get(url)
-    assert page.status_code == 200 and "Rotation strategies compared" in page.text
+    assert page.status_code == 200 and "Rotation strategies" in page.text and "The bottom line" in page.text
 
     assert "Dryland" in say(c, "a", text="should I water this week?")[0]
     assert "Saved 1.2 in" in say(c, "a", text="we got 1.2 inches of rain")[0]

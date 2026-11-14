@@ -1,119 +1,416 @@
 <!doctype html>
 <html lang="en">
 <head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{ field.place or "Your field" }} · FarmPartner field report</title>
+<meta name="theme-color" content="#0a0a0b">
 <link rel="icon" href="/static/brand/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/static/brand/favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="/static/brand/apple-touch-icon.png">
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FarmPartner · Field report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 <style>
-  :root { --ink:#1d2a1f; --muted:#5d6b5f; --line:#dfe5dc; --bg:#f6f4ee; --card:#fff; --green:#2f6b3a; --amber:#b7791f; --soil:#7a5230; }
-  * { box-sizing:border-box } body { margin:0; font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg) }
-  header { padding:20px 20px 8px; max-width:1100px; margin:auto } h1 { margin:0; font-size:1.6rem } .sub { color:var(--muted) }
-  main { max-width:1100px; margin:auto; padding:0 20px 40px; display:grid; gap:16px }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px }
-  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px } @media (max-width:800px){ .grid2,.strats,.top,.ev{ grid-template-columns:1fr } }
-  .top { grid-template-columns:1fr 1.4fr } .top .card { display:flex; flex-direction:column }
-  #map { flex:1; min-height:300px; border-radius:8px }
-  .ev { display:grid; grid-template-columns:1fr 1fr; gap:10px 16px } .ev div { display:flex; flex-direction:column; border-left:3px solid #cfe0cf; padding-left:8px }
-  .ev .m { font-size:.82rem; color:var(--muted) } .ev .src { font-size:.72rem; color:#8a968b }
-  h2 { font-size:1.1rem; margin:0 0 10px } h3 { margin:4px 0 8px; font-size:1.05rem }
-  table { width:100%; border-collapse:collapse; font-size:.92rem } td { padding:5px 4px; border-bottom:1px solid var(--line); vertical-align:top }
-  td.src { color:var(--muted); font-size:.8rem; white-space:nowrap }
-  .strats { display:grid; grid-template-columns:repeat(3,1fr); gap:16px }
-  .strat.current { border-color:#c9c2b0; background:#fbfaf6 } .role { font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted) }
-  .total { font-size:2rem; font-weight:700; color:var(--green) } .total small { font-size:.9rem; color:var(--muted); font-weight:400 }
-  .bar { display:grid; grid-template-columns:150px 1fr 32px; gap:6px; align-items:center; font-size:.82rem; margin:3px 0 }
-  .bar div.t { height:8px; background:#edf0ea; border-radius:4px; overflow:hidden } .bar div.t i { display:block; height:100%; background:var(--green) }
-  ul { margin:4px 0 10px; padding-left:18px } li { margin:2px 0 } .k { font-weight:600; font-size:.85rem; margin-top:10px }
-  .risk li { color:#7a4b0c } .gap li { color:var(--muted) }
-  .chips span { display:inline-block; padding:2px 8px; margin:2px; border-radius:99px; background:#edf0ea; font-size:.82rem }
-  .chips span.fallow { background:#f1e6d8 } .note { background:#fff8e6; border:1px solid #f1dfae; border-radius:10px; padding:10px 14px; font-size:.92rem }
-  footer { color:var(--muted); font-size:.82rem; max-width:1100px; margin:auto; padding:0 20px 30px }
+  :root { --bg:#0a0a0b; --bg2:#0d0d0f; --panel:#111114; --line:#26262b; --line2:#3a3a41; --ink:#f4f4f5; --ink2:#c8c8ce;
+    --mute:#8b8b95; --mute2:#6f6f78; --lime:#a8f326; --rain:#6fa8dc; --et:#e0913f; --warn:#e8b46a; --bare:#d9a066;
+    --mono:"IBM Plex Mono", ui-monospace, monospace; --sans:"Inter", system-ui, -apple-system, sans-serif; --pad:20px; }
+  * { box-sizing:border-box; margin:0; padding:0 }
+  body { background:var(--bg); color:var(--ink); font:15px/1.5 var(--sans); -webkit-font-smoothing:antialiased; }
+  a { color:inherit; text-decoration:none }
+  .mono { font-family:var(--mono); letter-spacing:.06em; text-transform:uppercase }
+  .k { font-family:var(--mono); font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--mute) }
+  .wrap { max-width:1312px; margin:0 auto; padding:0 var(--pad) }
+
+  /* header */
+  header.top { position:sticky; top:0; z-index:500; background:#0a0a0bf2; border-bottom:1px solid #34343a; backdrop-filter:blur(6px) }
+  header.top .wrap { display:flex; align-items:center; justify-content:space-between; padding-top:12px; padding-bottom:12px }
+  .logo { display:flex; align-items:center; gap:10px }
+  .logo img { width:48px; height:24px }
+  .wordmark { font:600 19px/1 "Space Grotesk", var(--sans); letter-spacing:-.6px }
+  .wordmark b { color:var(--lime); font-weight:600 }
+  nav.sec { display:none; gap:28px }
+  nav.sec a { font:13px var(--mono); letter-spacing:.05em; color:var(--ink2) } nav.sec a:hover { color:var(--ink) }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; background:var(--lime); color:var(--bg);
+    font:600 12px var(--mono); letter-spacing:.07em; text-transform:uppercase; padding:9px 12px; white-space:nowrap }
+  .btn svg { width:15px; height:15px; fill:currentColor }
+  .btn .long { display:none }
+
+  /* title */
+  .title { padding-top:28px; padding-bottom:20px; display:grid; gap:12px }
+  .kicker { font:11px var(--mono); letter-spacing:.08em; color:var(--lime); text-transform:uppercase }
+  h1 { font-size:36px; line-height:1.1; font-weight:600; letter-spacing:-1.3px }
+  .tags { display:flex; flex-wrap:wrap; gap:6px }
+  .tag { font:10.5px var(--mono); letter-spacing:.06em; text-transform:uppercase; color:var(--ink2); border:1px solid var(--line2); padding:5px 8px }
+  .tag.hl { color:var(--lime); border-color:var(--lime); background:#a8f32614 }
+  .rot { display:grid; gap:4px; padding-top:4px }
+  .rot .seq { font-size:16px; font-weight:500 } .rot .seq i { font-style:normal; color:var(--mute); font-family:var(--mono); padding:0 4px }
+  .rot .fallow { color:var(--bare) }
+
+  /* bottom line */
+  .verdict { border:1.5px solid var(--lime); background:#a8f3260f; padding:18px; display:grid; gap:14px; margin-bottom:24px }
+  .verdict .row1 { display:flex; justify-content:space-between; align-items:center }
+  .pick { background:var(--lime); color:var(--bg); font:600 10px var(--mono); letter-spacing:.08em; padding:3px 7px; text-transform:uppercase }
+  .verdict h2 { font-size:20px; line-height:1.25; font-weight:600; letter-spacing:-.5px }
+  .verdict h2 b { color:var(--lime); font-weight:600 }
+  .nums { display:grid; grid-template-columns:repeat(3,1fr); border-top:1px solid var(--line); padding-top:12px }
+  .nums div { display:grid; gap:2px } .nums b { font-size:30px; font-weight:600; letter-spacing:-1px; line-height:1.1 }
+  .nums .k { font-size:9.5px }
+  .note { display:flex; gap:8px; font-size:12px; line-height:1.45; color:#d9d3b4 }
+
+  /* sections */
+  section { border-top:1px solid var(--line); padding:28px 0 }
+  section.alt { background:var(--bg2) }
+  .sh { display:grid; gap:6px; margin-bottom:18px }
+  .sh .k { color:var(--lime) }
+  .sh h2 { font-size:26px; line-height:1.15; font-weight:600; letter-spacing:-.8px }
+  .sh .aside { display:none }
+  .panel { background:var(--panel); border:1px solid var(--line); padding:16px }
+
+  /* field + nasa */
+  .fieldgrid { display:grid; gap:18px }
+  #map { height:260px; border:1px solid var(--line); background:#1a1d14 }
+  .leaflet-container { font-family:var(--mono) }
+  .stats { display:grid; grid-template-columns:repeat(3,1fr); background:var(--panel); border:1px solid var(--line) }
+  .stats > div { padding:12px; display:grid; gap:2px; align-content:start } .stats > div + div { border-left:1px solid var(--line) }
+  .stats b { font-size:24px; font-weight:600; letter-spacing:-1px; line-height:1.15 }
+  .stats .u { font:10px var(--mono); color:var(--ink2) }
+  .stats .s { display:none }
+  .neg { color:#f08a5d } .lime { color:var(--lime) }
+  .signals { list-style:none }
+  .signals li { padding:11px 0; border-bottom:1px solid var(--line); display:grid; grid-template-columns:1fr auto; gap:3px 12px }
+  .signals .m { font-size:12.5px; color:var(--mute) }
+  .signals .src { font:9px var(--mono); letter-spacing:.05em; text-transform:uppercase; color:var(--mute2); text-align:right; align-self:center }
+  .signals .v { grid-column:1 / -1; font-size:15px; font-weight:500 }
+
+  /* strategies */
+  .strats { display:grid; gap:14px }
+  .strat { background:var(--panel); border:1px solid var(--line); padding:18px; display:grid; gap:16px; align-content:start }
+  .strat.best { border:1.5px solid var(--lime); background:#a8f3260d; order:-1 }
+  .strat .hd { display:flex; justify-content:space-between; gap:12px; align-items:flex-start }
+  .strat .role { font:9.5px var(--mono); letter-spacing:.07em; text-transform:uppercase; color:var(--mute) }
+  .strat.best .role { color:var(--lime) }
+  .strat h3 { font-size:18px; line-height:1.25; font-weight:600; letter-spacing:-.4px; margin-top:6px }
+  .score { text-align:right; line-height:1 } .score b { font-size:40px; font-weight:600; letter-spacing:-1.6px; display:block }
+  .strat.best .score b { color:var(--lime) } .score span { font:10px var(--mono); color:var(--mute) }
+  .tl { display:flex; gap:3px; height:30px }
+  .tl div { flex:1; display:flex; flex-direction:column; min-width:0 }
+  .tl span { flex:1; display:flex; align-items:center; padding:0 8px; font-size:11.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+  .tl em { height:6px; background:#6fbf4a }
+  .tlk { display:flex; justify-content:space-between; font:9.5px var(--mono); letter-spacing:.05em; text-transform:uppercase; color:var(--mute); margin-top:6px }
+  .tlk .baremany { color:var(--bare) }
+  .bars { display:grid; gap:8px }
+  .bar { display:grid; grid-template-columns:118px 1fr 24px; gap:8px; align-items:center; font-size:12px; color:var(--ink2) }
+  .bar .t { height:6px; background:#24242a } .bar .t i { display:block; height:100%; background:var(--mute) }
+  .strat.best .bar .t i { background:#a8f32699 }
+  .bar.goal { color:var(--ink); font-weight:600 } .bar.goal .t i, .strat.best .bar.goal .t i { background:var(--lime) }
+  .bar .n { font:11.5px var(--mono); text-align:right }
+  details.more summary { list-style:none; cursor:pointer; display:flex; justify-content:space-between; align-items:center;
+    border-top:1px solid var(--line); padding-top:12px; font:10.5px var(--mono); letter-spacing:.07em; text-transform:uppercase; color:var(--ink2) }
+  details.more summary::-webkit-details-marker { display:none }
+  details.more summary::after { content:"▾"; font-size:14px } details.more[open] summary::after { content:"▴" }
+  details.more[open] summary { margin-bottom:14px }
+  .strat.best details.more summary { display:none }
+  .notes { display:grid; gap:12px; border-top:1px solid var(--line); padding-top:14px; margin-top:16px }
+  .notes ul { list-style:none; display:grid; gap:4px; margin-top:5px }
+  .notes li { font-size:13.5px; line-height:1.45; color:var(--ink2) } .notes li::before { content:"— " }
+  .notes .risk li { color:var(--warn) } .notes .risk li::before { content:"⚠ " }
+
+  /* charts */
+  .charts { display:grid; gap:14px }
+  .chart { display:grid; gap:12px }
+  .chart h3 { font-size:16px; font-weight:600 }
+  .legend { display:flex; flex-wrap:wrap; gap:12px; font:9.5px var(--mono); letter-spacing:.05em; text-transform:uppercase; color:var(--ink2) }
+  .legend i { display:inline-block; width:9px; height:9px; margin-right:5px; vertical-align:-1px }
+  .plot { height:170px; display:flex; align-items:flex-end; gap:4px; border-bottom:1px solid var(--line); position:relative }
+  .plot .mo { flex:1; height:100%; display:flex; align-items:flex-end; gap:2px }
+  .plot .mo i { flex:1; display:block }
+  .plot .rain { background:var(--rain) } .plot .et { background:#e0913f33; border-top:2px solid var(--et) }
+  .plot .mo.worst .et { background:#e0913f55 }
+  .mlabels { display:flex; gap:4px } .mlabels span { flex:1; text-align:center; font:10px var(--mono); color:var(--mute) }
+  .mlabels span.worst { color:var(--et) }
+  .plot.nd { gap:2px } .plot.nd i { flex:1; display:block; background:#4f9a34 } .plot.nd i.hi { background:#7cc94f } .plot.nd i.low { background:#8a6a4a }
+  .plot .thr { position:absolute; left:0; right:0; border-top:1px solid var(--bare) }
+  .plot .thr span { position:absolute; left:0; top:-17px; background:var(--panel); padding:1px 5px; font:9px var(--mono); color:var(--bare); letter-spacing:.05em }
+  .ticks { display:flex; justify-content:space-between; font:10px var(--mono); color:var(--mute); text-transform:uppercase }
+  .take { border-top:1px solid var(--line); padding-top:10px; display:grid; gap:4px }
+  .take b { font-size:22px; font-weight:600; letter-spacing:-.6px }
+  .take p { font-size:13px; line-height:1.45; color:var(--ink2) }
+  .src { font:10px var(--mono); color:var(--mute2); text-transform:uppercase; letter-spacing:.05em }
+
+  /* history */
+  .hist { display:grid; grid-template-columns:repeat(3,1fr); gap:4px }
+  .hist div { height:54px; padding:8px 10px; display:flex; flex-direction:column; justify-content:space-between }
+  .hist small { font:10px var(--mono); letter-spacing:.05em } .hist b { font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+  .pattern { display:flex; gap:8px; margin:14px 0 6px; font-size:13px; line-height:1.45; color:var(--ink2) }
+  .pattern svg { flex:none; width:15px; height:15px; fill:var(--lime); margin-top:2px }
+  .ground { display:grid; gap:14px; margin-top:18px }
+  .ground h3 { font-size:20px; font-weight:600; letter-spacing:-.5px; margin:6px 0 4px }
+  .ground p { font-size:13px; line-height:1.45; color:var(--ink2) }
+  .soilnums { display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); padding-top:10px; margin-top:10px }
+  .soilnums b { display:block; font-size:18px; font-weight:600 }
+  .ex { display:grid; gap:6px; margin-top:10px; justify-items:start }
+  .ex span { background:#1b2a17; color:#d6efc6; font-size:12.5px; padding:8px 11px }
+  .obs { width:100%; border-collapse:collapse; font-size:13px; margin-top:8px }
+  .obs td { padding:7px 4px; border-bottom:1px solid var(--line); vertical-align:top; color:var(--ink2) } .obs td:first-child { color:var(--mute); font-family:var(--mono); font-size:11px; white-space:nowrap }
+  .gaps { border:1px solid var(--line2); padding:16px }
+  .gaps .k { color:var(--warn) }
+  .gaps ol { list-style:none; counter-reset:g; display:grid; gap:10px; margin-top:10px }
+  .gaps li { counter-increment:g; display:grid; grid-template-columns:22px 1fr; font-size:13px; line-height:1.45; color:var(--ink2) }
+  .gaps li::before { content:"0" counter(g); font:11px var(--mono); color:var(--warn); padding-top:2px }
+  .ground .panel .btn { margin-top:14px; padding:13px 16px; display:none }
+
+  footer { border-top:1px solid var(--line); padding:24px 0 112px }
+  footer .wrap { display:grid; gap:12px }
+  footer p { font-size:11.5px; line-height:1.5; color:var(--mute) }
+
+  /* sticky action bar (mobile) */
+  .dock { position:fixed; left:0; right:0; bottom:0; z-index:600; display:flex; gap:10px; padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+    background:#0a0a0bf2; border-top:1px solid #34343a; backdrop-filter:blur(6px) }
+  .dock .btn { flex:1; padding:14px 16px; font-size:13px }
+  .dock button { width:50px; background:none; border:1px solid #5a5a63; color:var(--ink); display:grid; place-items:center; cursor:pointer }
+  .dock button svg { width:20px; height:20px; fill:currentColor }
+
+  @media (min-width:800px) {
+    :root { --pad:64px }
+    header.top .wrap { padding-top:20px; padding-bottom:20px }
+    .logo img { width:58px; height:29px } .wordmark { font-size:20px }
+    nav.sec { display:flex }
+    .btn .short { display:none } .btn .long { display:inline } header.top .btn { padding:9px 14px }
+    .title { padding-top:56px; grid-template-columns:1fr auto; align-items:end; gap:14px 40px }
+    .title .kicker, .title .verdict { grid-column:1 / -1 }
+    h1 { font-size:64px; letter-spacing:-2.2px }
+    .rot { grid-column:2; grid-row:2 / span 2; text-align:right; align-self:end } .rot .seq { font-size:20px }
+    .verdict { grid-template-columns:1fr auto; align-items:center; gap:14px 40px; padding:22px 26px; margin:8px 0 0 }
+    .verdict .row1 { grid-column:1 / -1; justify-content:flex-start; gap:12px }
+    .verdict h2 { font-size:26px } .nums { border:0; padding:0; gap:32px; grid-template-columns:repeat(3,auto) }
+    .nums b { font-size:36px } .note { grid-column:1 / -1 }
+    section { padding:56px 0 }
+    .sh { grid-template-columns:1fr auto; align-items:end; margin-bottom:28px } .sh h2 { font-size:34px; letter-spacing:-1.1px }
+    .sh .k:first-child { grid-column:1 } .sh h2 { grid-column:1 } .sh .aside { display:block; grid-column:2; grid-row:2; font-size:11px }
+    .fieldgrid { grid-template-columns:540px 1fr; gap:24px }
+    #map { height:auto; min-height:560px }
+    .stats > div { padding:20px 22px; gap:6px } .stats b { font-size:44px; letter-spacing:-1.6px } .stats .s { display:block; font:10.5px var(--mono); color:var(--mute) }
+    .signals { background:#0d0d0f; border:1px solid var(--line); border-top:0 }
+    .signals li { grid-template-columns:220px 1fr 150px; padding:13px 22px; align-items:center; gap:16px }
+    .signals .m { font-size:13.5px } .signals .v { grid-column:auto; font-size:14.5px } .signals .src { font-size:10px }
+    .strats { grid-template-columns:repeat(3,1fr); gap:20px }
+    .strat { padding:26px; gap:22px } .strat.best { order:0 } .strat h3 { font-size:22px }
+    .tl { height:36px } .tl span { font-size:12px }
+    .score { text-align:left; display:flex; align-items:flex-end; gap:10px; border-top:1px solid var(--line); padding-top:6px }
+    .strat .hd .score { display:none } .score.lg b { font-size:64px; letter-spacing:-2.6px }
+    .score.lg span { padding-bottom:12px; line-height:1.4 }
+    .bar { grid-template-columns:132px 1fr 24px; font-size:12.5px }
+    details.more summary { display:none }
+    .charts { grid-template-columns:1fr 1fr; gap:20px } .chart.panel { padding:26px; gap:18px } .chart h3 { font-size:18px }
+    .plot { height:250px; gap:6px } .plot.nd { gap:3px } .mlabels { gap:6px }
+    .take { grid-template-columns:auto 1fr; gap:16px; align-items:center } .take b { font-size:28px }
+    .hist { grid-template-columns:repeat(9,1fr) } .hist div { height:auto; flex-direction:column-reverse; padding:0; gap:8px; background:none !important }
+    .hist small { color:var(--mute) !important } .hist b { padding:22px 12px; display:block }
+    .ground { grid-template-columns:repeat(3,1fr); gap:20px; margin-top:28px } .ground .panel, .gaps { padding:26px }
+    .ground h3 { font-size:24px } .ground .panel .btn { display:inline-flex }
+    footer { padding:40px 0 48px } .dock { display:none }
+  }
+  .score.lg { display:none }
+  @media (min-width:800px) { .score.lg { display:flex } }
 </style>
 </head>
 <body>
-<header>
-  <h1>🌾 {{ field.place or "Your field" }}</h1>
-  <div class="sub">FarmPartner field report · {{ "irrigated" if field.irrigated else ("dryland" if field.irrigated == False else "irrigation unknown") }} ·
-    current rotation: <b>{{ rotation_label(field.current_rotation) }}</b></div>
-</header>
-<main>
-  <div class="note">🤝 {{ disclaimer }}</div>
+{% set wa_svg = '<svg viewBox="0 0 18 18" aria-hidden="true"><path d="' ~ whatsapp_path ~ '"/></svg>' %}
+{% set goal_keys = (rec or {}).get("priorities", []) %}
+<header class="top"><div class="wrap">
+  <a class="logo" href="/"><img src="/static/brand/orbi.svg" alt=""><span class="wordmark">farm<b>partner</b></span></a>
+  <nav class="sec"><a href="#field">FIELD</a>{% if rec %}<a href="#strategies">STRATEGIES</a>{% endif %}<a href="#water">WATER</a><a href="#history">HISTORY</a></nav>
+  <a class="btn" href="{{ whatsapp }}">{{ wa_svg|safe }}<span class="short">Ask</span><span class="long">Ask on WhatsApp →</span></a>
+</div></header>
 
-  <div class="grid2 top">
-    <div class="card"><h2>📍 Field</h2><div id="map"></div></div>
-    <div class="card"><h2>🛰️ What NASA sees</h2>
-      <div class="ev">{% for e in evidence %}
-        <div><span class="m">{{ e.metric }}</span><b>{{ e.value }}</b><span class="src">{{ e.source }}</span></div>{% endfor %}
-      </div>
+<div class="wrap title">
+  <div class="kicker">● Field report · updated {{ updated }}{% if field.lat %} · {{ "%.2f"|format(field.lat) }}°N, {{ "%.2f"|format(-field.lon if field.lon < 0 else field.lon) }}°{{ "W" if field.lon < 0 else "E" }}{% endif %}</div>
+  <div style="display:grid;gap:12px">
+    <h1>{{ field.place or "Your field" }}</h1>
+    <div class="tags">
+      <span class="tag">{{ "Irrigated" if field.irrigated else ("Dryland" if field.irrigated == False else "Irrigation unknown") }}</span>
+      {% if f.soil %}<span class="tag">{{ f.soil.series or f.soil.map_unit.split(",")[0] }}</span>{% endif %}
+      <span class="tag hl">Goal · {{ goals }}</span>
     </div>
   </div>
-
-  {% if rec %}
-  <div class="card">
-    <h2>🔄 Rotation strategies compared
-      <span class="sub" style="font-weight:400">— your goals: {{ goals }}</span></h2>
-    <div class="strats">
-    {% for s in rec.strategies %}
-      <div class="card strat {{ 'current' if s.is_current }}">
-        <div class="role">{{ s.role }}</div>
-        <h3>{{ short_name(s) }}</h3>
-        <div class="chips">{% for y in s.years %}<span class="{{ 'fallow' if y == 'fallow' }}">Yr {{ loop.index }} · {{ crop_name(y) }}{% if s.covers.get(loop.index0|string) %} + cover{% endif %}</span>{% endfor %}</div>
-        <div class="total">{{ "%.0f"|format(s.total) }}<small> / 100 for your goals</small></div>
-        {% for k, v in s.scores.items() %}
-          <div class="bar"><span>{{ labels[k] }}</span><div class="t"><i style="width:{{ v }}%"></i></div><span>{{ v }}</span></div>
-        {% endfor %}
-        <div class="k">Why it's here</div><ul>{% for w in s.why %}<li>{{ w }}</li>{% endfor %}</ul>
-        <div class="k">Possible benefits</div><ul>{% for b in s.benefits %}<li>{{ b }}</li>{% endfor %}</ul>
-        {% if s.risks %}<div class="k">Check locally</div><ul class="risk">{% for r in s.risks %}<li>{{ r }}</li>{% endfor %}</ul>{% endif %}
-      </div>
-    {% endfor %}
-    </div>
-    <div class="k">What this analysis can't see (information gaps)</div>
-    <ul class="gap">{% for g in gaps %}<li>{{ g }}</li>{% endfor %}</ul>
-  </div>
+  {% if field.current_rotation %}
+  <div class="rot"><span class="k">You grow today</span>
+    <div class="seq">{% for c in field.current_rotation %}{% if not loop.first %}<i>→</i>{% endif %}<span class="{{ 'fallow' if c == 'fallow' }}">{{ crop_name(c).replace(" (no crop)", "") }}</span>{% endfor %}</div></div>
   {% endif %}
 
-  <div class="grid2">
-    <div class="card"><h2>💧 Rain vs. crop water demand (inches / month)</h2><canvas id="water"></canvas>
-      <div class="sub" style="font-size:.85rem">Bars: average rain. Line: reference crop water use (ET₀). The gap is what crops must pull from stored soil water or irrigation. NASA POWER, {{ c.years }}.</div></div>
-    <div class="card"><h2>🌿 Vegetation from space (MODIS NDVI)</h2>
-      {% if f.ndvi %}<canvas id="ndvi"></canvas>
-        <div class="sub" style="font-size:.85rem">NDVI under 0.25 ≈ bare soil. Bare months on this field: <b>{{ f.ndvi.bare_months | join(", ") or "none" }}</b>. Bare months are when cover crops can protect soil.</div>
-      {% else %}<p class="sub">Satellite vegetation is still loading for this field — refresh in a minute.</p>{% endif %}
+  {% if v.best %}
+  <div class="verdict">
+    <div class="row1"><span class="k lime">The bottom line</span><span class="pick">★ Pick</span></div>
+    <h2>Best fit for your goals: <b>{{ v.best_name }}</b></h2>
+    <div class="nums">
+      {% if v.cur %}<div><span class="k">Today</span><b>{{ "%.0f"|format(v.cur.total) }}</b></div>{% endif %}
+      <div><span class="k">This plan</span><b class="lime">{{ "%.0f"|format(v.best.total) }}</b></div>
+      {% if v.gain %}<div><span class="k">{{ v.gain.label }}</span><b class="lime">+{{ v.gain.delta }}</b></div>{% endif %}
     </div>
+    <div class="note">🤝 {{ disclaimer }}</div>
   </div>
+  {% else %}
+  <div class="verdict" style="border-color:#3d3a22;background:#16160f"><div class="note">🤝 {{ disclaimer }}</div></div>
+  {% endif %}
+</div>
 
-  <div class="grid2">
-    <div class="card"><h2>🗓️ Crop history (USDA Cropland Data Layer)</h2>
-      <div class="chips">{% for h in field.history %}<span class="{{ 'fallow' if h.crop == 'fallow' }}">{{ h.year }} · {{ h.category }}</span>{% endfor %}</div>
-      {% if f.soil %}<p style="margin-top:12px">🟫 <b>Soil:</b> {{ f.soil.map_unit }} — organic matter {{ f.soil.om_pct }}%, clay {{ f.soil.clay_pct }}%, {{ f.soil.drainage }}, erodibility K={{ f.soil.k_factor }} <span class="sub">(USDA NRCS SSURGO)</span></p>{% endif %}
-    </div>
-    <div class="card"><h2>📝 Your reports</h2>
-      {% if observations %}<table>{% for o in observations %}<tr><td>{{ o.created_at.strftime("%b %d") }}</td><td>{{ o.kind }}</td><td>{{ (o.value ~ " " ~ (o.unit or "")) if o.value is not none else "" }} {{ o.text or "" }}</td></tr>{% endfor %}</table>
-      {% else %}<p class="sub">Text the bot what you see — rain gauge readings, pests, planting dates, yields. Your ground truth sits next to the satellite data.</p>{% endif %}
+<section id="field"><div class="wrap">
+  <div class="sh"><span class="k">01 / What NASA sees</span><h2>Your field, from orbit</h2><span class="k aside">{{ evidence|length }} signals · NASA + USDA</span></div>
+  <div class="fieldgrid">
+    <div id="map" role="img" aria-label="Satellite map of the field"></div>
+    <div>
+      {% if f.climate and f.climate.annual_precip_mm %}
+      <div class="stats">
+        <div><span class="k">Avg rainfall</span><b>{{ inch(f.climate.annual_precip_mm) }}</b><span class="u">in / yr</span><span class="s">{{ f.climate.years }} · NASA POWER</span></div>
+        <div><span class="k">Water balance</span><b class="{{ 'neg' if f.climate.water_balance_mm < 0 }}">{{ "%+.1f"|format(inch(f.climate.water_balance_mm)) | replace("-", "−") }}</b><span class="u">in / yr</span><span class="s">Rain − crop demand (ET₀)</span></div>
+        {% if f.ecostress and f.ecostress.latest %}
+        <div><span class="k">Crop stress</span><b class="{{ 'lime' if f.ecostress.latest.esi >= 0.4 else 'neg' }}">{{ f.ecostress.latest.esi }}</b><span class="u">ESI · 1 = none</span><span class="s">{{ f.ecostress.latest.date }} · ECOSTRESS 70 m</span></div>
+        {% else %}
+        <div><span class="k">Last 12 months</span><b>{{ f.climate.last_12mo_precip_pct_normal }}%</b><span class="u">of normal rain</span><span class="s">NASA POWER</span></div>
+        {% endif %}
+      </div>
+      {% endif %}
+      <ul class="signals">{% for e in evidence if not e.metric.startswith(("Average rainfall", "Water balance")) %}
+        <li><span class="m">{{ e.metric }}</span><span class="src">{{ e.source }}</span><span class="v">{{ e.value }}</span></li>{% endfor %}
+      </ul>
     </div>
   </div>
-</main>
-<footer>Data: {{ (f.sources or []) | join(" · ") }}. Open source (MIT). Built for NASA Space Apps 2026 “Field Shift”. This tool supports, not replaces, farmer judgment and local agronomic expertise.</footer>
+</div></section>
+
+{% if rec %}
+<section id="strategies" class="alt"><div class="wrap">
+  <div class="sh"><span class="k">02 / Rotation strategies</span><h2>Today vs. {{ "two alternatives" if v.strats|length == 3 else "the alternatives" }}</h2><span class="k aside">Scored 0–100 for your goals · {{ goals }}</span></div>
+  <div class="strats">
+  {% for s in v.strats %}
+    {% set best = s.is_best %}
+    <article class="strat {{ 'best' if best }}">
+      <div class="hd">
+        <div><div class="role">{{ s.role }}</div><h3>{{ short_name(s) }}</h3></div>
+        <div class="score"><b>{{ "%.0f"|format(s.total) }}</b><span>/ 100</span></div>
+      </div>
+      <div>
+        <div class="tl">{% for y in s.timeline %}<div><span style="background:{{ y.color }};color:{{ y.text }}">{{ y.name }}</span>{% if y.cover %}<em title="{{ y.cover }}"></em>{% endif %}</div>{% endfor %}</div>
+        <div class="tlk"><span>{{ s.timeline|length }}-year cycle{% if s.covers %} · ▬ cover{% endif %}</span>
+          <span class="{{ 'baremany' if s.metrics.bare_months_per_yr >= 6 }}">{{ "%.0f"|format(s.metrics.bare_months_per_yr) }} mo bare / yr</span></div>
+      </div>
+      <div class="score lg"><b>{{ "%.0f"|format(s.total) }}</b><span>/ 100 for<br>your goals</span></div>
+      <details class="more" {{ 'open' if best }}>
+        <summary>All {{ s.scores|length }} scores, why &amp; risks</summary>
+        <div class="bars">{% for k, val in s.scores.items() %}
+          <div class="bar {{ 'goal' if k in goal_keys or (k == 'soil' and 'soil_health' in goal_keys) or (k == 'water' and 'save_water' in goal_keys) or (k == 'erosion' and 'less_erosion' in goal_keys) }}"><span>{{ labels[k]|capitalize }}</span><div class="t"><i style="width:{{ val }}%"></i></div><span class="n">{{ val }}</span></div>{% endfor %}
+        </div>
+        <div class="notes">
+          {% if s.why %}<div><span class="k">Why it's here</span><ul>{% for w in s.why %}<li>{{ w }}</li>{% endfor %}</ul></div>{% endif %}
+          {% if s.benefits %}<div><span class="k">Possible benefits</span><ul>{% for b in s.benefits %}<li>{{ b }}</li>{% endfor %}</ul></div>{% endif %}
+          {% if s.risks %}<div><span class="k">Check locally</span><ul class="risk">{% for r in s.risks %}<li>{{ r }}</li>{% endfor %}</ul></div>{% endif %}
+        </div>
+      </details>
+    </article>
+  {% endfor %}
+  </div>
+</div></section>
+{% endif %}
+
+<section id="water"><div class="wrap">
+  <div class="sh"><span class="k">{{ "03" if rec else "02" }} / Water &amp; vegetation</span><h2>Where the water goes</h2><span class="k aside">NASA POWER {{ c.years }} · MODIS 250 m</span></div>
+  <div class="charts">
+    {% if v.water %}
+    <div class="chart panel">
+      <h3>Rain vs. crop water demand</h3>
+      <div class="legend"><span><i style="background:var(--rain)"></i>Rain</span><span><i style="background:var(--et)"></i>ET₀ demand</span><span>Inches / month</span></div>
+      <div class="plot">{% for m in v.water.rows %}<div class="mo {{ 'worst' if v.water.worst and m.m == v.water.worst.m }}" title="{{ m.m }}: rain {{ m.rain }} in, demand {{ m.et }} in"><i class="rain" style="height:{{ m.rain_pct }}%"></i><i class="et" style="height:{{ m.et_pct }}%"></i></div>{% endfor %}</div>
+      <div class="mlabels">{% for m in v.water.rows %}<span class="{{ 'worst' if v.water.worst and m.m == v.water.worst.m }}">{{ m.m[:1] }}</span>{% endfor %}</div>
+      {% if v.water.worst %}<div class="take"><b style="color:var(--et)">−{{ v.water.gap }} in in {{ v.water.worst.m }}</b>
+        <p>Crops want {{ v.water.worst.et }} in, rain brings {{ v.water.worst.rain }}. The rest has to come from water stored in the soil{{ " or irrigation" if field.irrigated != False }} — that's why residue and cover matter here.</p></div>{% endif %}
+      <span class="src">NASA POWER · {{ c.years }} averages</span>
+    </div>
+    {% endif %}
+    <div class="chart panel">
+      <h3>Vegetation from space (NDVI)</h3>
+      {% if v.ndvi %}
+      <div class="legend"><span><i style="background:#5fae3e"></i>Green cover</span><span><i style="background:#8a6a4a"></i>Near-bare &lt; 0.25</span></div>
+      <div class="plot nd">{% for p in v.ndvi.points %}<i class="{{ 'low' if p.low else ('hi' if p.v > 0.55 else '') }}" style="height:{{ p.pct }}%" title="{{ p.date }}: {{ p.v }}"></i>{% endfor %}
+        <div class="thr" style="bottom:25%"><span>0.25 BARE SOIL</span></div></div>
+      <div class="ticks">{% for t in v.ndvi.ticks %}<span>{{ t }}</span>{% endfor %}</div>
+      {% if v.ndvi.low %}<div class="take"><b style="color:var(--bare)">~{{ v.ndvi.low.months }} mo near bare</b>
+        <p>{{ v.ndvi.low.from }} → {{ v.ndvi.low.to }} sat below the bare-soil line — a window where a cover crop could protect and feed the soil.</p></div>
+      {% else %}<div class="take"><p>The field stayed above the bare-soil line in every satellite pass since {{ v.ndvi.first }}.</p></div>{% endif %}
+      <span class="src">NASA MODIS MOD13Q1 · 16-day composites</span>
+      {% else %}<p style="color:var(--ink2)">Satellite vegetation is still loading for this field — refresh in a minute.</p>{% endif %}
+    </div>
+  </div>
+</div></section>
+
+<section id="history" class="alt"><div class="wrap">
+  <div class="sh"><span class="k">{{ "04" if rec else "03" }} / History &amp; ground truth</span><h2>{{ v.history|length }} seasons on this field</h2><span class="k aside">USDA Cropland Data Layer · 30 m</span></div>
+  {% if v.history %}
+  <div class="hist">{% for h in v.history %}<div style="background:{{ h.color }}"><small style="color:{{ h.text }}">{{ h.year }}</small><b style="background:{{ h.color }};color:{{ h.text }}">{{ h.name }}</b></div>{% endfor %}</div>
+  {% if field.current_rotation and field.current_rotation|length > 1 %}
+  <div class="pattern"><svg viewBox="0 0 256 256"><path d="M224 48v48a8 8 0 0 1-8 8h-48a8 8 0 0 1 0-16h28.7L182.1 73.4A88 88 0 0 0 57.5 72.8 8 8 0 0 1 46.3 61.4a104 104 0 0 1 147.1.7L208 76.7V48a8 8 0 0 1 16 0Zm-25.7 135.2a88 88 0 0 1-124.4-.6L59.3 168H88a8 8 0 0 0 0-16H40a8 8 0 0 0-8 8v48a8 8 0 0 0 16 0v-28.7l14.6 14.6a104 104 0 0 0 147.1.7 8 8 0 0 0-11.2-11.4Z"/></svg>
+    <span>Detected pattern: {{ rotation_label(field.current_rotation) }}, repeating every {{ field.current_rotation|length }} years.{% if v.fallow_years %} {{ v.fallow_years }} of {{ v.history|length }} seasons the field carried no crop.{% endif %}</span></div>
+  {% endif %}
+  {% endif %}
+  <div class="ground">
+    {% if f.soil %}
+    <div class="panel">
+      <span class="k">Soil · USDA NRCS SSURGO</span>
+      <h3>{{ f.soil.map_unit.split(",")[0] }}</h3>
+      <p>{{ f.soil.slope_pct }}% slope · {{ (f.soil.drainage or "")|lower }}{% if f.soil.hydrologic_group %} · hydrologic group {{ f.soil.hydrologic_group }}{% endif %}</p>
+      <div class="soilnums">
+        <div><span class="k">OM</span><b class="lime">{{ f.soil.om_pct }}%</b></div>
+        <div><span class="k">Clay</span><b>{{ "%.0f"|format(f.soil.clay_pct or 0) }}%</b></div>
+        <div><span class="k">Sand</span><b>{{ "%.0f"|format(f.soil.sand_pct or 0) }}%</b></div>
+        <div><span class="k">K</span><b>{{ f.soil.k_factor }}</b></div>
+      </div>
+    </div>
+    {% endif %}
+    <div class="panel">
+      <span class="k">Your reports · {{ observations|length }} so far</span>
+      {% if observations %}
+      <h3>What you've told us</h3>
+      <table class="obs">{% for o in observations|reverse %}<tr><td>{{ o.created_at.strftime("%b %d") }}</td><td>{{ o.kind }}</td><td>{{ (o.value ~ " " ~ (o.unit or "")) if o.value is not none else "" }} {{ o.text or "" }}</td></tr>{% endfor %}</table>
+      {% else %}
+      <h3>Your ground truth goes here</h3>
+      <p>Text the bot what you see — rain gauge readings, pests, planting dates, yields. It sits right next to the satellite data.</p>
+      <div class="ex"><span>“Got 0.8 in of rain last night”</span><span>“Aphids on the sorghum, north side”</span><span>“Wheat yielded 42 bu/ac”</span></div>
+      {% endif %}
+      <a class="btn" href="{{ whatsapp }}">{{ wa_svg|safe }}Send a report on WhatsApp →</a>
+    </div>
+    <div class="gaps">
+      <span class="k">What this can't see</span>
+      <ol>{% for g in gaps %}<li>{{ g }}</li>{% endfor %}</ol>
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <a class="logo" href="/"><img src="/static/brand/orbi.svg" alt=""><span class="wordmark">farm<b>partner</b></span></a>
+  <p>Data: {{ (f.sources or []) | join(" · ") }}. This tool supports, not replaces, farmer judgment and local agronomic expertise.</p>
+  <span class="k" style="color:var(--mute2)">Open source · MIT · NASA Space Apps 2026 · Field Shift</span>
+</div></footer>
+
+<div class="dock">
+  <a class="btn" href="{{ whatsapp }}">{{ wa_svg|safe }}Ask or send a report →</a>
+  <button type="button" id="share" aria-label="Share this report"><svg viewBox="0 0 256 256"><path d="M176 160a39.9 39.9 0 0 0-28.6 12.1l-46.1-29.6a40 40 0 0 0 0-29l46.1-29.6A40 40 0 1 0 136 56a39.6 39.6 0 0 0 2.7 14.5l-46.1 29.6a40 40 0 1 0 0 55.8l46.1 29.6A40 40 0 1 0 176 160Zm0-128a24 24 0 1 1-24 24 24 24 0 0 1 24-24ZM64 152a24 24 0 1 1 24-24 24 24 0 0 1-24 24Zm112 72a24 24 0 1 1 24-24 24 24 0 0 1-24 24Z"/></svg></button>
+</div>
+
 <script>
-  const lat = {{ field.lat }}, lon = {{ field.lon }};
-  const map = L.map('map').setView([lat, lon], 14);
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {attribution: 'Esri, Maxar, Earthstar'}).addTo(map);
-  L.circleMarker([lat, lon], {radius: 9, color: '#ffd84d', weight: 3}).addTo(map);
-  const clim = {{ (c.monthly or []) | tojson }};
-  if (clim.length) new Chart(document.getElementById('water'), { data: { labels: clim.map(m => m.month), datasets: [
-    { type: 'bar', label: 'Rain', data: clim.map(m => +(m.precip_mm / 25.4).toFixed(2)), backgroundColor: '#6fa8dc' },
-    { type: 'line', label: 'Crop water demand (ET₀)', data: clim.map(m => +(m.et0_mm / 25.4).toFixed(2)), borderColor: '#b7791f', tension: .3 } ] } });
-  const nd = {{ ((f.ndvi or {}).get("series") or []) | tojson }};
-  if (nd.length) new Chart(document.getElementById('ndvi'), { type: 'line', data: { labels: nd.map(p => p.date), datasets: [
-    { label: 'NDVI', data: nd.map(p => p.ndvi), borderColor: '#2f6b3a', pointRadius: 0, tension: .25 },
-    { label: 'Bare-soil threshold', data: nd.map(() => 0.25), borderColor: '#c9a27a', borderDash: [5,5], pointRadius: 0 } ] },
-    options: { scales: { y: { min: 0, max: 1 } } } });
+  // Desktop shows every strategy's details; on phones only the pick is open.
+  if (matchMedia('(min-width:800px)').matches) document.querySelectorAll('details.more').forEach(d => d.open = true);
+  document.getElementById('share').addEventListener('click', async () => {
+    const data = { title: document.title, url: location.href };
+    if (navigator.share) { try { await navigator.share(data); } catch (e) {} }
+    else { try { await navigator.clipboard.writeText(location.href); document.getElementById('share').style.borderColor = '#a8f326'; } catch (e) {} }
+  });
+  window.addEventListener('DOMContentLoaded', () => {
+    const lat = {{ field.lat }}, lon = {{ field.lon }};
+    const map = L.map('map', { scrollWheelZoom: false, dragging: !L.Browser.mobile, tap: false }).setView([lat, lon], 14);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {attribution: 'Esri, Maxar, Earthstar'}).addTo(map);
+    L.circleMarker([lat, lon], { radius: 18, color: '#a8f326', weight: 2, fill: false }).addTo(map);
+    L.circleMarker([lat, lon], { radius: 7, color: '#0a0a0b', weight: 2, fillColor: '#ffd84d', fillOpacity: 1 }).addTo(map);
+  });
 </script>
 </body>
 </html>

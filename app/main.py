@@ -11,7 +11,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from sqlalchemy import select
 
-from app import chat, config, i18n, landing, media, messaging, ratelimit, service
+from app import chat, config, i18n, landing, media, messaging, ratelimit, report_view, service
 from app.prompts import as_text, is_prompt
 from app.db import Farmer, Field, init_db, session
 from app.engine.explain import DISCLAIMER, SCORE_LABELS, evidence, gaps, inch, short_name
@@ -284,7 +284,17 @@ def report(request: Request, public_id: str):
         "goals": ", ".join(PRIORITY_LABELS.get(p, p) for p in (rec or {}).get("priorities", [])) or "balanced",
         "short_name": short_name, "crop_name": crop_name, "rotation_label": rotation_label, "inch": inch, "disclaimer": DISCLAIMER,
         "observations": fld.observations[-10:],
+        "v": report_view.build(fld, rec, f), "updated": _report_date(f.get("built_at")),
+        "whatsapp": landing.whatsapp_url(), "whatsapp_path": landing.WHATSAPP_PATH,
     })
+
+
+def _report_date(built_at) -> str:
+    try:
+        d = dt.datetime.fromisoformat(str(built_at)) if built_at else dt.datetime.now(dt.timezone.utc)
+    except ValueError:
+        d = dt.datetime.now(dt.timezone.utc)
+    return d.strftime("%b %-d, %Y")
 
 
 def _send_alerts(db) -> int:
