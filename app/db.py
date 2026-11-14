@@ -112,12 +112,24 @@ class Alert(Base):
     sent_at: Mapped[dt.datetime] = mapped_column(DateTime, default=now)
 
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {})
+if DATABASE_URL.startswith("sqlite"):
+    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+else:
+    # Small pool (Supabase free tier caps connections); prepare_threshold=None keeps it compatible with
+    # Supabase's transaction pooler (port 6543) as well as the session pooler (5432).
+    engine = create_engine(DATABASE_URL, pool_size=3, max_overflow=2, pool_pre_ping=True, pool_recycle=300,
+                           connect_args={"prepare_threshold": None})
 SessionLocal = sessionmaker(bind=engine, expire_on_commit=False)
 
 
 def init_db():
     Base.metadata.create_all(engine)
+    if engine.dialect.name == "postgresql":
+        # Supabase exposes every public table through its REST API to anyone with the anon key. Enabling RLS with no
+        # policies blocks that API; this app connects as the table owner, which bypasses RLS.
+        with engine.begin() as conn:
+            for table in Base.metadata.sorted_tables:
+                conn.exec_driver_sql(f'ALTER TABLE "{table.name}" ENABLE ROW LEVEL SECURITY')
 
 
 def session() -> Session:

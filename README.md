@@ -91,6 +91,28 @@ URL. Farmers join with the sandbox code. **SMS:** point a Twilio number's messag
 heat and irrigation alerts. WhatsApp only allows free-form messages within 24 h of the farmer's last message;
 production needs approved templates.
 
+## Deploy (Cloud Run + Supabase, Terraform)
+
+`terraform/` owns the Cloud Run service `farmpartner-run-dev-01` (europe-west1, project `launchpad-all-dev-01`),
+its runtime service account, Secret Manager secrets and IAM. State lives in
+`gs://tf-state-polynode-root-01/dev/launchpad-all-dev-01/farmpartner`.
+
+```bash
+./scripts/set-db-secret.sh     # once: Supabase password from clipboard → farmpartner-database-url (never in TF state)
+./scripts/deploy.sh            # docker build + push, then terraform apply -var image=<new tag>
+PLAN_ONLY=1 ./scripts/deploy.sh
+```
+
+- **Database:** Supabase Postgres through the session pooler (IPv4). The app creates its tables and enables
+  row-level security on startup, which closes Supabase's public Data API. Set `manage_supabase_project = true`
+  (with a Supabase access token) to adopt the project into state with `prevent_destroy`.
+- **Optional secrets:** set `anthropic_api_key`, `twilio_account_sid`, `twilio_auth_token` in
+  `terraform/terraform.tfvars` (gitignored); they are mounted only when set.
+- **Service shape:** public, scales to zero, max 1 instance (the simulator's poll outbox is in memory), CPU kept
+  allocated after responses so background NASA fetches and Twilio pushes finish. Health check: `/health`
+  (Cloud Run reserves paths ending in `z`).
+- **Twilio webhook:** `terraform output twilio_webhook`.
+
 ## Known limits (said out loud in the app, too)
 
 - Crop traits and scoring weights are hackathon approximations from public extension guidance. They need

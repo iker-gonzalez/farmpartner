@@ -137,9 +137,10 @@ def ndvi_features(series: list[dict]) -> dict:
 
 def detect_rotation(history: list[dict]) -> dict:
     seq = [(h["year"], crop_from_cdl(h["category"])) for h in history]
+    sequence = [{"year": y, "crop": c, "category": h["category"]} for (y, c), h in zip(seq, history)]
     known = [(y, c) for y, c in seq if c]
     if len(known) < 3:
-        return {"is_cropland": False, "sequence": seq, "pattern": []}
+        return {"is_cropland": False, "sequence": sequence, "pattern": []}
     ids = [c for _, c in known][-6:]
     def phase_mode(p):
         """Most common crop at each position of a p-year cycle, aligned so the cycle ends on the latest year."""
@@ -158,9 +159,7 @@ def detect_rotation(history: list[dict]) -> dict:
     # Continuous single crop shows as period 1; keep two entries so scoring sees the repeat.
     if len(pattern) == 1:
         pattern = pattern * 2
-    return {"is_cropland": True, "sequence": [{"year": y, "crop": c, "category": h["category"]}
-                                              for (y, c), h in zip(seq, history)],
-            "recent": ids, "pattern": pattern}
+    return {"is_cropland": True, "sequence": sequence, "recent": ids, "pattern": pattern}
 
 
 def build_features(lat: float, lon: float, with_ndvi: bool = True) -> dict:

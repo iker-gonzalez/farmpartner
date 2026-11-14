@@ -17,6 +17,12 @@ def test_detects_continuous_corn_despite_one_soy_year():
     assert r["pattern"] == ["corn", "corn"]
 
 
+def test_sparse_history_keeps_sequence_shape():
+    r = detect_rotation([{"year": 2024, "category": "Corn"}, {"year": 2025, "category": "Soybeans"}])
+    assert not r["is_cropland"]
+    assert r["sequence"][0] == {"year": 2024, "crop": "corn", "category": "Corn"}
+
+
 def test_non_cropland():
     r = detect_rotation([{"year": 2020 + i, "category": "Grassland/Pasture"} for i in range(5)])
     assert not r["is_cropland"]

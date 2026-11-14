@@ -158,6 +158,7 @@ def run_alerts(token: str = Form("")):
     return {"alerts": sent}
 
 
-@app.get("/healthz")
+@app.get("/health")
+@app.get("/healthz")  # note: Cloud Run reserves paths ending in "z"; use /health there
 def healthz():
     return {"ok": True, "llm": config.llm_enabled(), "twilio": bool(config.TWILIO_ACCOUNT_SID)}

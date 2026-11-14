@@ -7,6 +7,10 @@ ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env")
 
 DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{ROOT / 'farmpartner.db'}")
+# Supabase/Heroku-style URLs → SQLAlchemy's psycopg 3 driver
+for _prefix in ("postgres://", "postgresql://"):
+    if DATABASE_URL.startswith(_prefix):
+        DATABASE_URL = "postgresql+psycopg://" + DATABASE_URL[len(_prefix):]
 CACHE_DIR = Path(os.getenv("CACHE_DIR", ROOT / ".cache"))
 PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "http://localhost:8000").rstrip("/")
 

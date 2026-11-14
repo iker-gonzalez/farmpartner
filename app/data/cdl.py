@@ -12,9 +12,14 @@ YEARS = list(range(2017, 2026))
 
 
 def _one(year: int, x: float, y: float) -> tuple[int, str | None]:
-    try:
-        txt = get_text(URL, {"year": year, "x": round(x, 1), "y": round(y, 1)}, ttl_s=0)
-    except Exception:
+    txt = None
+    for _ in range(2):  # the CropScape server drops requests now and then; retry once
+        try:
+            txt = get_text(URL, {"year": year, "x": round(x, 1), "y": round(y, 1)}, ttl_s=0)
+            break
+        except Exception:
+            continue
+    if txt is None:
         return year, None
     m = re.search(r'category: "([^"]*)"', txt)
     return year, (m.group(1) if m else None)
