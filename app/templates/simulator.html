@@ -18,7 +18,7 @@
 </head>
 <body>
 <div class="phone">
-  <div class="top">FarmPartner 🌾 <button class="alt" style="float:right;padding:4px 10px;font-size:.8rem" onclick="newFarmer()">New farmer</button><small>WhatsApp simulator · same backend as the real bot</small></div>
+  <div class="top"><a href="/" style="color:inherit;text-decoration:none">FarmPartner 🌾</a> <button class="alt" style="float:right;padding:4px 10px;font-size:.8rem" onclick="newFarmer()">New farmer</button><small>WhatsApp simulator · same backend as the real bot</small></div>
   <div id="log"></div>
   <div class="pins">
     <span>📍 Send pin:</span>
@@ -29,7 +29,7 @@
   <div class="bar"><input id="t" placeholder="Type a message" autofocus><button onclick="send()">Send</button></div>
 </div>
 <script>
-  const phone = localStorage.fpPhone || (localStorage.fpPhone = 'demo-' + Math.random().toString(36).slice(2, 8));
+  let phone = localStorage.fpPhone || (localStorage.fpPhone = 'demo-' + Math.random().toString(36).slice(2, 8));
   const log = document.getElementById('log'), t = document.getElementById('t');
   t.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
   function add(text, cls) {
@@ -39,6 +39,7 @@
     log.appendChild(d); requestAnimationFrame(() => d.scrollIntoView({block: 'end', behavior: 'smooth'})); return d;
   }
   async function post(body, label) {
+    phone = localStorage.fpPhone || phone;
     add(label, 'out');
     const r = await fetch('/api/chat', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({phone, wait: false, ...body}) });
     const j = await r.json(); (j.messages || []).forEach(m => add(m, 'in'));
@@ -54,6 +55,12 @@
   function pin(lat, lon, name) { post({lat, lon, text: ''}, '📍 Location: ' + name); }
   function myLocation() { navigator.geolocation.getCurrentPosition(p => pin(p.coords.latitude, p.coords.longitude, 'my location')); }
   add('Say "hi" to start. Type RESET to start over, or tap "New farmer" for a fresh session.', 'sys');
+  const zip = new URLSearchParams(location.search).get('zip');
+  if (zip) {
+    localStorage.fpPhone = 'demo-' + Math.random().toString(36).slice(2, 8);
+    history.replaceState(null, '', '/chat');
+    (async () => { await post({text: 'hi'}, 'hi'); await post({text: zip}, zip); })();
+  }
 </script>
 </body>
 </html>

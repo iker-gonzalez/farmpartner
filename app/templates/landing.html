@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FarmPartner — the farm advisor that reads your field from space</title>
+<meta name="description" content="Send a location pin on WhatsApp. FarmPartner reads 20 years of NASA climate, soil-moisture and vegetation data for your field and compares your crop rotation with two that fit your climate.">
+<meta property="og:title" content="FarmPartner — the farm advisor that reads your field from space">
+<meta property="og:image" content="/static/landing/hero.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&family=Silkscreen&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="/static/landing/hero.jpg" media="(min-width: 801px)">
+<style>
+  :root {
+    --bg: #0a0a0b; --ink: #f4f4f5; --ink-2: #c8c8ce; --ink-3: #adadb7; --line: #34343a; --line-2: #5a5a63;
+    --lime: #a8f326; --mono: "IBM Plex Mono", ui-monospace, monospace; --sans: "Inter", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+
+  /* ---------- Hero ---------- */
+  .hero { position: relative; min-height: 1180px; overflow: hidden; isolation: isolate;
+    background: url("/static/landing/hero.jpg") center / cover no-repeat; }
+  .hero::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 620px; z-index: -1;
+    background: linear-gradient(180deg, #0a0a0bf2 0%, #0a0a0bb3 60%, #0a0a0b00 100%); }
+  .hero::after { content: ""; position: absolute; inset: auto 0 0 0; height: 100px; z-index: -1;
+    background: linear-gradient(180deg, #0a0a0b00 0%, var(--bg) 100%); }
+
+  header { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center;
+    padding: 22px 64px; background: #0a0a0bd9; border-bottom: 1px solid var(--line); backdrop-filter: blur(6px); }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo svg { width: 18px; height: 18px; }
+  .wordmark { font-family: "Silkscreen", var(--mono); font-size: 16px; color: var(--ink); letter-spacing: .5px; }
+  nav { display: flex; align-items: center; gap: 32px; }
+  nav a { font-family: var(--mono); font-size: 13px; color: var(--ink-2); }
+  nav a:hover { color: var(--ink); }
+  .btn { display: inline-flex; align-items: center; gap: 10px; background: var(--lime); color: var(--bg);
+    font-family: var(--mono); font-size: 13px; font-weight: 600; white-space: nowrap; }
+  .btn:hover { filter: brightness(1.08); }
+  nav .btn { padding: 9px 14px; color: var(--bg); }
+
+  .copy { width: 800px; max-width: calc(100% - 48px); margin: 71px auto 0; display: flex; flex-direction: column;
+    align-items: center; gap: 26px; text-align: center; }
+  .kicker { font-family: var(--mono); font-size: 13px; color: var(--lime); }
+  h1 { font-size: 60px; font-weight: 600; line-height: 1.12; letter-spacing: -1.2px; color: var(--ink); }
+  .sub { font-size: 17px; line-height: 1.55; color: var(--ink-2); }
+  form.zip { display: flex; align-items: stretch; padding-top: 8px; }
+  form.zip input { width: 280px; padding: 15px 16px; background: #0a0a0bcc; border: 1px solid var(--line-2); border-right: 0;
+    color: var(--ink); font-family: var(--mono); font-size: 14px; outline: none; border-radius: 0; }
+  form.zip input::placeholder { color: var(--ink-3); }
+  form.zip input:focus { border-color: var(--lime); }
+  form.zip .btn { padding: 15px 20px; }
+  form.zip .btn svg { width: 18px; height: 18px; }
+  .meta { font-family: var(--mono); font-size: 13px; color: #f4f4f5e6; }
+  .meta a { text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ---------- Footer ---------- */
+  .links { display: flex; flex-direction: column; align-items: center; gap: 48px; padding: 96px 64px 72px; }
+  .tagline { font-family: var(--mono); font-size: 14px; color: #f4f4f5cc; }
+  .grid { width: 1100px; max-width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 48px 24px; }
+  .grid a { display: flex; flex-direction: column; gap: 4px; }
+  .grid .t { font-size: 28px; font-weight: 500; color: var(--ink); }
+  .grid .s { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+  .grid a:hover .t { color: var(--lime); }
+
+  .art { position: relative; height: 720px; overflow: hidden; isolation: isolate;
+    background: url("/static/landing/footer.jpg") center / cover no-repeat; }
+  .art::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 380px; z-index: -1;
+    background: linear-gradient(180deg, var(--bg) 0%, #0a0a0b00 100%); }
+  .start { position: absolute; left: calc(50% + 370px); top: 90px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .start .label { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--bg); }
+  .qr { width: 132px; height: 132px; padding: 8px; background: #fff; border: 2px solid #0b0b0c; box-shadow: 6px 6px 0 #000; }
+  .qr img { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+  .chip { background: #0a0a0bcc; padding: 6px 10px; font-size: 16px; font-weight: 500; color: var(--ink); }
+  .bar { position: absolute; inset: auto 0 0 0; height: 103px; display: flex; justify-content: space-between; align-items: flex-end;
+    padding: 0 64px 28px; background: linear-gradient(180deg, #00000000 0%, #000000e6 100%);
+    font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1100px) {
+    nav a:not(.btn) { display: none; }
+    .start { left: auto; right: 40px; }
+  }
+  @media (max-width: 800px) {
+    /* Mobile — matches Pencil frame "Landing D — Mobile (390)" */
+    header { padding: 14px 20px; }
+    nav .btn { padding: 9px 12px; font-size: 12px; }
+    .long { display: none; }
+    .hero { min-height: 1000px; background-image: url("/static/landing/hero-800.jpg"); background-position: center bottom; }
+    .hero::before { height: 740px; }
+    .copy { width: auto; max-width: none; margin: 41px 20px 0; gap: 20px; }
+    .kicker { font-size: 11px; letter-spacing: .4px; line-height: 1.6; }
+    .kicker .sep { display: none; }
+    .kicker .nl { display: block; }
+    h1 { font-size: 38px; line-height: 1.1; letter-spacing: -1.2px; }
+    h1 br { display: none; }
+    .sub { font-size: 15.5px; }
+    form.zip { flex-direction: column; width: 100%; padding-top: 4px; }
+    form.zip input { width: 100%; border-right: 1px solid var(--line-2); border-bottom: 0; }
+    form.zip .btn { justify-content: center; padding: 16px 20px; }
+    .meta { font-size: 12px; line-height: 1.7; }
+    .meta .nl { display: block; }
+    .meta .sep { display: none; }
+    .links { padding: 64px 20px 48px; gap: 32px; }
+    .tagline { font-size: 12px; text-align: center; }
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 32px 16px; text-align: center; }
+    .grid a { align-items: center; }
+    .grid .t { font-size: 22px; letter-spacing: -.5px; }
+    .grid .s { font-size: 10.5px; letter-spacing: .4px; }
+    .art { height: 600px; background-image: url("/static/landing/footer-800.jpg"); }
+    .art::before { height: 300px; }
+    .start { left: 50%; right: auto; top: 56px; transform: translateX(-50%); }
+    .bar { flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 6px; height: 110px;
+      padding: 0 20px 20px; font-size: 10.5px; letter-spacing: .4px; }
+  }
+</style>
+</head>
+<body>
+  <section class="hero">
+    <header>
+      <a class="logo" href="/" aria-label="FarmPartner home">
+        <svg viewBox="0 0 13.5005 14.977" aria-hidden="true"><path transform="matrix(1 -0.000029 0.000029 1 -2.2501 -1.5112)" fill="#a8f326" d="{{ sprout_path }}"/></svg>
+        <span class="wordmark">FARMPARTNER</span>
+      </a>
+      <nav>
+        <a href="{{ repo }}#how-it-works">HOW IT WORKS</a>
+        <a href="{{ repo }}#data-sources">NASA DATA</a>
+        <a href="/sample">STRATEGIES</a>
+        <a href="{{ repo }}/graphs/contributors">TEAM</a>
+        <a href="{{ repo }}">GITHUB</a>
+        <a class="btn" href="/chat">TRY <span class="long">THE </span>DEMO →</a>
+      </nav>
+    </header>
+
+    <div class="copy">
+      <p class="kicker">● NASA SPACE APPS 2026<span class="sep"> · </span><span class="nl">FIELD SHIFT CHALLENGE</span></p>
+      <h1>The farm advisor that <br>reads your field from space.</h1>
+      <p class="sub">Send a location pin on WhatsApp. FarmPartner reads 20 years of NASA climate, soil-moisture and vegetation data for that field, then compares your crop rotation with two that fit your climate — with the evidence and the risks to check locally.</p>
+      <form class="zip" action="/chat" method="get">
+        <input name="zip" inputmode="numeric" autocomplete="postal-code" placeholder="ZIP code or 📍 pin" aria-label="ZIP code — press Enter to try the web demo">
+        <a class="btn" href="{{ whatsapp }}" target="_blank" rel="noopener">
+          <svg viewBox="0 0 14.6453 14.6344" aria-hidden="true"><path transform="matrix(1 -0.000029 0.000029 1 -1.6875 -1.687)" fill="#0a0a0b" d="{{ whatsapp_path }}"/></svg>
+          TEXT “HI” ON WHATSAPP →
+        </a>
+      </form>
+      <p class="meta">Free · WhatsApp &amp; SMS · No app to install<span class="sep"> · </span><span class="nl">Open source (MIT) · <a href="/sample">See a sample report →</a></span></p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="links">
+      <p class="tagline">■ ALWAYS WATCHING THE SKY FOR YOUR FIELD</p>
+      <div class="grid">
+        <a href="{{ repo }}#how-it-works"><span class="t">How it works</span><span class="s">PIN · CROPS · GOAL</span></a>
+        <a href="{{ repo }}#data-sources"><span class="t">NASA data</span><span class="s">POWER · MODIS · GRACE</span></a>
+        <a href="/sample"><span class="t">Strategies</span><span class="s">TODAY VS. 2 OPTIONS</span></a>
+        <a href="/sample"><span class="t">Field report</span><span class="s">MAP · RAIN VS ET · NDVI</span></a>
+        <a href="{{ repo }}"><span class="t">GitHub</span><span class="s">OPEN SOURCE · MIT</span></a>
+        <a href="{{ repo }}/graphs/contributors"><span class="t">Team</span><span class="s">SIX BUILDERS</span></a>
+        <a href="https://www.spaceappschallenge.org/2026/challenges/adapting-farms-with-nasa-data/"><span class="t">Space Apps</span><span class="s">FIELD SHIFT · 2026</span></a>
+        <a href="{{ repo }}#known-limits-said-out-loud-in-the-app-too"><span class="t">Our limits</span><span class="s">WHAT DATA CAN’T SEE</span></a>
+      </div>
+    </div>
+    <div class="art">
+      <a class="start" href="{{ whatsapp }}" target="_blank" rel="noopener">
+        <span class="label">START</span>
+        <span class="qr"><img src="/static/landing/qr-whatsapp.png" alt="QR code: open WhatsApp and text “hi” to FarmPartner"></span>
+        <span class="chip">Text “hi” on WhatsApp</span>
+      </a>
+      <div class="bar">
+        <span>FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT</span>
+        <span>BUILT ON OPEN NASA &amp; USDA DATA · © 2026</span>
+      </div>
+    </div>
+  </footer>
+  <script>
+    // ZIP field: Enter opens the web demo pre-filled with that ZIP.
+    document.querySelector("form.zip").addEventListener("submit", e => {
+      if (!e.target.zip.value.trim()) { e.preventDefault(); location.href = "/chat"; }
+    });
+  </script>
+</body>
+</html>

@@ -55,7 +55,7 @@ WhatsApp / SMS ─► Twilio ─► POST /twilio/webhook ─► app/chat.py
                                 ──► engine/explain.py    (why / evidence / benefits / gaps / risks, inches & °F)
                                 ──► db.py                (farmer, field, crop_history, observation, recommendation, message, alert)
 GET /r/<id>  field report (Leaflet map, rain-vs-ET₀ chart, NDVI chart, 3 strategy cards)
-GET /        WhatsApp-style web simulator (same backend), for demos without a phone
+GET /        landing page · GET /chat  WhatsApp-style web simulator · GET /sample  demo field report
 ```
 
 **Scoring is deterministic and explainable.** `seeds/crops.json` holds crop traits: water need, drought and heat
@@ -80,7 +80,7 @@ uv sync
 cp .env.example .env               # optional: ANTHROPIC_API_KEY, Twilio credentials
 uv run python scripts/warm_cache.py   # pre-fetch demo farms (MODIS takes a few minutes)
 uv run uvicorn app.main:app --reload
-open http://localhost:8000          # web chat simulator: tap "Garden City, KS"
+open http://localhost:8000          # landing page; web chat simulator at /chat
 uv run pytest                       # offline tests using real-data fixtures
 ```
 

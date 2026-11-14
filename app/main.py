@@ -3,12 +3,13 @@ import os
 import threading
 
 from fastapi import BackgroundTasks, FastAPI, Form, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse, Response
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from sqlalchemy import select
 
-from app import chat, config, messaging, service
+from app import chat, config, landing, messaging, service
 from app.db import Farmer, Field, init_db, session
 from app.engine.explain import DISCLAIMER, SCORE_LABELS, evidence, gaps, inch, short_name
 from app.engine.scoring import PRIORITY_LABELS
@@ -18,6 +19,7 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("farmpartner")
 app = FastAPI(title="FarmPartner")
 templates = Jinja2Templates(directory=str(config.ROOT / "app" / "templates"))
+app.mount("/static", StaticFiles(directory=str(config.ROOT / "app" / "static")), name="static")
 init_db()
 
 
@@ -106,8 +108,49 @@ def api_poll(phone: str):
 
 
 @app.get("/", response_class=HTMLResponse)
+def home(request: Request):
+    return templates.TemplateResponse(request, "landing.html", {
+        "repo": landing.REPO_URL, "whatsapp": landing.whatsapp_url(),
+        "sprout_path": landing.SPROUT_PATH, "whatsapp_path": landing.WHATSAPP_PATH})
+
+
+@app.get("/chat", response_class=HTMLResponse)
 def simulator(request: Request):
     return templates.TemplateResponse(request, "simulator.html", {})
+
+
+@app.get("/sample")
+def sample_report():
+    """Stable link to the demo farm's field report (built with POST /admin/sample)."""
+    with session() as db:
+        fm = db.scalar(select(Farmer).where(Farmer.phone == landing.SAMPLE_PHONE))
+        fld = service.main_field(fm) if fm else None
+        if not fld:
+            raise HTTPException(404, "Sample report not built yet")
+        return RedirectResponse(f"/r/{fld.public_id}", status_code=302)
+
+
+@app.post("/admin/sample")
+def build_sample(token: str = Form("")):
+    """(Re)build the demo farm behind /sample: Garden City, KS, dryland, goal soil health. Admin-token protected."""
+    if token != os.getenv("ADMIN_TOKEN", "") or not token:
+        raise HTTPException(403)
+    s = landing.SAMPLE_FIELD
+    with session() as db:
+        fm = service.get_or_create_farmer(db, landing.SAMPLE_PHONE, "sample")
+        for f in list(fm.fields):
+            db.delete(f)
+        fm.state, fm.priorities = "ready", s["priorities"]
+        db.commit()
+        from app.data.geocode import county_name
+
+        fld = Field(farmer_id=fm.id, lat=s["lat"], lon=s["lon"], irrigated=s["irrigated"],
+                    place=county_name(s["lat"], s["lon"]) or "Demo field")
+        db.add(fld)
+        db.commit()
+        service.analyze_field(db, fld, with_ndvi=True)
+        service.recommend(db, fm, fld)
+        return {"report": service.report_url(fld)}
 
 
 def _field_by_public(public_id: str) -> Field:

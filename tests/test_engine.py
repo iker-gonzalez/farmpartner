@@ -11,6 +11,14 @@ def test_detects_three_year_cycle():
     assert canonical_cycle(r["pattern"]) == ["winter_wheat", "sorghum", "fallow"]
 
 
+def test_missing_year_does_not_shift_the_cycle():
+    cycle = ["Winter Wheat", "Sorghum", "Fallow/Idle Cropland"]
+    hist = [{"year": 2017 + i, "category": cycle[i % 3]} for i in range(9)]
+    hist = [h for h in hist if h["year"] not in (2020, 2024)]  # two years (wheat, sorghum) failed to load
+    r = detect_rotation(hist)
+    assert canonical_cycle(r["pattern"]) == ["winter_wheat", "sorghum", "fallow"]
+
+
 def test_detects_continuous_corn_despite_one_soy_year():
     cats = ["Corn", "Corn", "Corn", "Soybeans", "Corn", "Corn", "Corn", "Corn"]
     r = detect_rotation([{"year": 2018 + i, "category": c} for i, c in enumerate(cats)])

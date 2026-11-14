@@ -141,19 +141,27 @@ def detect_rotation(history: list[dict]) -> dict:
     known = [(y, c) for y, c in seq if c]
     if len(known) < 3:
         return {"is_cropland": False, "sequence": sequence, "pattern": []}
-    ids = [c for _, c in known][-6:]
+    # Use the last 9 calendar years (all CDL years we query) and align phases by *year*, not list position, so a year missing from the
+    # crop maps (CropScape drops requests now and then) doesn't shift the whole cycle.
+    last_year = known[-1][0]
+    window = [(y, c) for y, c in known if y > last_year - 9]
+    ids = [c for _, c in window]
+
     def phase_mode(p):
-        """Most common crop at each position of a p-year cycle, aligned so the cycle ends on the latest year."""
-        n = len(ids)
-        return [Counter(ids[i] for i in range(n) if (n - 1 - i) % p == p - 1 - j).most_common(1)[0][0]
-                for j in range(p)]
+        """Most common crop at each position of a p-year cycle; position p-1 is the latest year."""
+        out = []
+        for j in range(p):
+            crops_at = [c for y, c in window if (last_year - y) % p == p - 1 - j]
+            out.append(Counter(crops_at).most_common(1)[0][0] if crops_at else None)
+        return out
 
     pattern = ids[-3:]
     for p in range(1, 5):
         cand = phase_mode(p)
-        n = len(ids)
-        mism = sum(1 for i in range(n) if ids[i] != cand[(i - (n - p)) % p])
-        if mism <= max(1, n // 5):
+        if None in cand:
+            continue
+        mism = sum(1 for y, c in window if c != cand[p - 1 - (last_year - y) % p])
+        if mism <= max(1, len(window) // 5):
             pattern = cand
             break
     # Continuous single crop shows as period 1; keep two entries so scoring sees the repeat.
