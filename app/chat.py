@@ -50,7 +50,8 @@ def inbound(phone: str, channel: str, text: str, lat: float | None = None, lon: 
             from app.db import Farmer
             fld = service.main_field(db.get(Farmer, farmer.id))
             if fld:
-                return _out(farmer.id, Turn(now=[f"📊 Your field report: {service.report_url(fld)}"], later=None))
+                return _out(farmer.id, Turn(now=[f"📊 Your field report: {service.report_url(fld)}"], later=None),
+                            farmer.language, units.preferred(farmer))
 
     if lat is None and re.search(r"https?://|\d\.\d+\s*[,;]", text or ""):
         pt = maplinks.location_from_text(text)

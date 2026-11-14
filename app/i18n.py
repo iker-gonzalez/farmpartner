@@ -54,7 +54,7 @@ def _save(lang: str) -> None:
 
 LANGS = {"es": "Spanish", "pt": "Portuguese", "fr": "French", "de": "German", "it": "Italian", "ja": "Japanese",
          "zh": "Chinese (Simplified)", "ko": "Korean", "ru": "Russian", "ar": "Arabic", "hi": "Hindi", "th": "Thai",
-         "el": "Greek", "en": "English"}
+         "el": "Greek", "eu": "Basque (Euskara)", "ca": "Catalan", "gl": "Galician", "en": "English"}
 WORDS = {
     "es": {"hola", "quiero", "gracias", "buenos", "buenas", "tengo", "mi", "mis", "campo", "riego", "secano", "plantar",
            "cultivo", "cultivos", "puedo", "por", "favor", "que", "qué", "como", "cómo", "cuándo", "cuando", "debo",
@@ -68,6 +68,13 @@ WORDS = {
            "was", "pflanzen", "regen", "wasser", "boden", "soll", "woche", "hof", "wo"},
     "it": {"ciao", "grazie", "voglio", "mio", "mia", "campo", "è", "sono", "piantare", "come", "cosa", "sì", "pioggia",
            "acqua", "suolo", "devo", "irrigare", "settimana", "azienda", "dove"},
+    "eu": {"kaixo", "eskerrik", "asko", "euskaraz", "euskeraz", "nire", "nahi", "dut", "ditut", "zer", "nola", "bai",
+           "ez", "da", "dira", "eta", "baina", "lurra", "ura", "euria", "landatu", "soroa", "baserria", "egun", "on",
+           "hitz", "egin", "egingo", "zenidake", "ditzakezu", "mintzatu", "gaztelaniaz"},
+    "ca": {"hola", "gràcies", "vull", "meu", "meva", "camp", "és", "són", "amb", "però", "també", "aigua", "sòl",
+           "pluja", "plantar", "puc", "he", "regar", "setmana", "què", "com", "on", "català"},
+    "gl": {"ola", "grazas", "quero", "meu", "miña", "campo", "é", "son", "con", "pero", "tamén", "auga", "chan",
+           "chuvia", "plantar", "podo", "debo", "regar", "semana", "que", "como", "onde", "galego", "non"},
     "en": {"hi", "hello", "the", "my", "what", "how", "is", "should", "i", "water", "field", "crops", "yes", "frost",
            "please", "thanks", "this", "week", "do", "can", "you", "it", "rain", "grow", "help", "where", "when", "want"},
 }
@@ -76,7 +83,9 @@ SCRIPTS = [("ja", r"[\u3040-\u30ff]"), ("ko", r"[\uac00-\ud7af]"), ("zh", r"[\u4
            ("th", r"[\u0e00-\u0e7f]"), ("el", r"[\u0370-\u03ff]")]
 SWITCH = [("es", r"\b(español|espanol|castellano|spanish)\b"), ("pt", r"\b(português|portugues|portuguese)\b"),
           ("fr", r"\b(français|francais|french)\b"), ("de", r"\b(deutsch|german)\b"),
-          ("it", r"\b(italiano|italian)\b"), ("ja", r"(日本語|\bjapanese\b)"), ("en", r"\b(english|inglés|ingles)\b")]
+          ("it", r"\b(italiano|italian)\b"), ("ja", r"(日本語|\bjapanese\b)"),
+          ("eu", r"\b(euskara|euskaraz|euskera|euskeraz|basque|vasco|euskaldun)\b"),
+          ("ca", r"\b(català|catala|catalan|catalán)\b"), ("gl", r"\b(galego|galician|gallego)\b"), ("en", r"\b(english|inglés|ingles)\b")]
 
 
 def detect(text: str) -> str | None:
@@ -105,7 +114,8 @@ def is_switch(text: str) -> bool:
         return False
     for _, p in SWITCH:
         t = re.sub(p, "", t, flags=re.I)
-    t = re.sub(r"\b(en|in|em|auf|por favor|please|habla|hablame|háblame|speak|parle|sprich|parla)\b|で|お願い", "", t)
+    t = re.sub(r"\b(en|in|em|auf|por favor|please|habla|hablame|háblame|hablas|me|speak|parle|sprich|parla|hitz|egin|"
+               r"egingo|zenidake|mintzatu|ditzakezu|dezakezu|nahi|dut|parla|parlar|falar|falame)\b|で|お願い|[?¿!¡]", "", t)
     return not re.search(r"[a-zà-ÿ]{3,}", t)
 
 
@@ -182,7 +192,7 @@ def translate(msgs: list, lang: str) -> list:
     return [_rebuild(m, tr) for m in msgs]
 
 
-PREWARM_LANGS = ("es", "pt", "fr", "ja", "de", "it", "zh")
+PREWARM_LANGS = ("es", "eu", "pt", "fr", "ja", "de", "it", "zh", "ca")
 
 
 def prewarm(messages: list, langs=PREWARM_LANGS) -> None:

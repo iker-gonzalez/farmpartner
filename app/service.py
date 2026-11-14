@@ -293,6 +293,8 @@ def wait_for_satellite(field_id: int, timeout_s: int = 3600, every_s: int = 60) 
         time.sleep(every_s)
         with new_session() as db:
             fld = db.get(Field, field_id)
+            if fld is None:  # the farmer sent RESET or a new pin: this field is gone
+                return
             try:
                 if collect_satellite(db, fld) != "processing":
                     return

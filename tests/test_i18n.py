@@ -68,3 +68,10 @@ def test_more_languages_units_and_location_hints(offline):
     assert "metric" in out[0] and "Step 1 of 3" in out[1]
     out = say("u1", lat=38.05, lon=-100.75)
     assert "mm/yr" in out[1] and "°C" in out[1] and "in/yr" not in out[1]
+
+
+def test_basque_catalan_galician():
+    from app import i18n
+    assert i18n.detect("Euskeraz hitz egingo zenidake?") == "eu" and i18n.is_switch("Euskeraz hitz egingo zenidake?")
+    assert i18n.detect("Ez dut gaztelaniaz hitz egiten") == "eu"
+    assert i18n.is_switch("Me hablas en castellano?") and i18n.detect("en català, si us plau") == "ca"
