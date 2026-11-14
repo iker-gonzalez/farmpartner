@@ -80,10 +80,10 @@
   .fab { width:48px; height:48px; border-radius:50%; background:var(--green); color:#fff; border:0; font-size:21px; cursor:pointer;
          display:grid; place-items:center; flex:none; box-shadow:0 1px 3px #0003 }
   .fab svg { width:22px; height:22px; fill:#fff }
-  .rec { flex:1; min-height:46px; background:#fff; border-radius:24px; display:flex; align-items:center; gap:10px; padding:0 14px; box-shadow:0 1px .5px #0b141a21 }
+  .rec { flex:1; min-width:0; min-height:46px; background:#fff; border-radius:24px; display:flex; align-items:center; gap:10px; padding:0 14px; box-shadow:0 1px .5px #0b141a21 }
   .rec .dot { width:10px; height:10px; border-radius:50%; background:#ea0038; animation:p 1s infinite }
   @keyframes p { 50% { opacity:.25 } }
-  .rec .lvl { flex:1; height:22px; display:flex; align-items:center; gap:2px; overflow:hidden; justify-content:flex-end }
+  .rec .lvl { flex:1; min-width:0; height:22px; display:flex; align-items:center; gap:2px; overflow:hidden; justify-content:flex-end }
   .rec .lvl i { width:3px; border-radius:2px; background:#8696a0; flex:none }
   .rec button { background:none; border:0; font-size:20px; cursor:pointer; color:#54656f }
   /* attach sheet + list sheet */
