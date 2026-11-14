@@ -35,9 +35,9 @@ def _twiml(messages: list[str]) -> Response:
     return Response(str(r), media_type="application/xml")
 
 
-def _run_later(to: str, later, message_sid: str | None = None):
+def _run_later(to: str, later, message_sid: str | None = None, first_after_s: float = 2):
     try:
-        with messaging.typing_while(message_sid):  # "typing…" while NASA data or Claude is working
+        with messaging.typing_while(message_sid, first_after_s=first_after_s):  # "typing…" while NASA data or Claude is working
             msgs = later()
         for m in msgs:
             messaging.send(to, m)
@@ -76,8 +76,8 @@ async def twilio_webhook(request: Request, background: BackgroundTasks):
         if turn.later:
             background.add_task(_run_later, sender, turn.later, form.get("MessageSid"))
         return _twiml([])
-    if turn.later:
-        background.add_task(_run_later, sender, turn.later, form.get("MessageSid"))
+    if turn.later:  # nothing instant to send (e.g. a question for Claude): show "typing…" right away
+        background.add_task(_run_later, sender, turn.later, form.get("MessageSid"), 2 if turn.now else 0)
     return _twiml(turn.now)
 
 
