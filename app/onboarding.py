@@ -39,6 +39,8 @@ WELCOME = ("👋 Hi! I'm *FarmPartner*, your farm advisor powered by NASA satell
            "3️⃣ Pick your main goal\n\n"
            "After that, ask me anything: watering, frost, heat, what to plant next.\n\n"
            "📍 *Step 1 of 3:* send your field location now.")
+KNOWN_CROPS = ("corn, soybeans, wheat, grain sorghum (milo), cotton, alfalfa, sunflower, canola, oats, field peas, "
+               "proso millet, triticale, and fallow")
 PRIORITY_KEYS = {"1": "save_water", "2": "soil_health", "3": "income", "4": "less_erosion", "5": "forage"}
 PRIORITY_WORDS = {"water": "save_water", "soil": "soil_health", "income": "income", "money": "income", "profit": "income",
                   "erosion": "less_erosion", "forage": "forage", "cattle": "forage", "livestock": "forage"}
@@ -198,7 +200,17 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
             if named:
                 fld.current_rotation = named if len(named) > 1 else named * 2
             elif said_no or not fld.current_rotation:
+                irr_only = parse_irrigated(t)
+                if irr_only is not None:  # "dryland" on its own: keep it, ask only for the crops
+                    fld.irrigated = irr_only
+                    db.commit()
+                    return Reply(now=["👍 " + ("Irrigated" if irr_only else "Dryland") + " — noted. Which crops do you "
+                                      "grow on this field? Type them in order, e.g. \"corn, soybeans\" or "
+                                      "\"wheat, sorghum, fallow\"."])
                 db.commit()
+                if not said_no and re.search(r"[a-zA-Z]{3}", t):  # they named something we don't know
+                    return Reply(now=[f"🌱 I don't have “{t[:40]}” in my crop list yet. I can compare rotations of: "
+                                      f"{KNOWN_CROPS}. Which of these do you grow? (Send RESET to start over.)"])
                 return Reply(now=["No problem — which crops do you grow on this field? Type them in order, "
                                   "e.g. \"corn, soybeans\" or \"wheat, sorghum, fallow\". Add \"irrigated\" or \"dryland\"."])
             elif not said_yes and parse_irrigated(t) is None:

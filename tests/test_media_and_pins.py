@@ -82,3 +82,20 @@ def test_photo_block_and_opus_rate():
     assert media.image_block(b"x", "image/heic") is None
     head = b"OggS" + b"\0" * 20 + b"OpusHead" + bytes([1, 1, 0, 0]) + (48000).to_bytes(4, "little")
     assert media._opus_rate(head) == 48000 and media._opus_rate(b"none") == 16000
+
+
+def test_crop_step_unknown_crop_and_irrigation_alone(offline, monkeypatch):
+    from app.db import Farmer, session
+    c = _client()
+    say = lambda **kw: c.post("/api/chat", json={"phone": "cane", **kw}).json()["messages"]  # noqa: E731
+    say(text="hi")
+    say(lat=38.05, lon=-100.75)
+    with session() as db:  # pretend the crop map saw nothing here
+        fm = db.query(Farmer).filter_by(phone="web:cane").one()
+        fm.fields[-1].current_rotation = None
+        db.commit()
+    assert "I don't have “Sugarcane”" in say(text="Sugarcane")[0]
+    out = say(text="Dryland")[0]
+    assert out.startswith("👍 Dryland — noted.") and "Add" not in out
+    out = say(text="Corn")
+    assert "Continuous corn (dryland)" in out[0] and "Step 3 of 3" in out[1]
