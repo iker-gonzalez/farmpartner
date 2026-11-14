@@ -99,8 +99,7 @@ def _media_turn(sender: str, channel: str, url: str, kind: str, caption: str, me
             messaging.send(sender, "🎙️ Sorry, I couldn't make out that voice note. Could you type it, or send a "
                                    "shorter note (under a minute)?")
             return
-        es = i18n.detect(heard) == "es"
-        messaging.send(sender, f"🎙️ {'Escuché' if es else 'I heard'}: “{heard}”")
+        messaging.send(sender, "🎙️ " + i18n.translate(["I heard:"], i18n.detect(heard) or "en")[0] + f" “{heard}”")
         turn = chat.inbound(sender, channel, heard, None, None, url)
     else:
         turn = chat.photo(sender, channel, media.image_block(data, content_type), caption, url)

@@ -1,8 +1,9 @@
-"""Spanish for the scripted onboarding messages. Claude's own answers already follow the farmer's language.
+"""The farmer's language for the scripted onboarding messages. Claude's own answers already follow it.
 
-detect() guesses the language of what the farmer writes; translate() turns FarmPartner's fixed messages (and the
-titles of tap-buttons and list items, never their ids) into Spanish with Claude, cached per string, so each
-prompt is translated once. If Claude is unavailable, the English original is sent.
+detect() guesses the language of what the farmer writes (script for Japanese, Chinese, Korean, Cyrillic, Arabic,
+Hindi, Thai, Greek; common words for Spanish, Portuguese, French, German, Italian, English). translate() turns
+FarmPartner's fixed messages (and the titles of tap-buttons and list items, never their ids) into that language
+with Claude, cached per string, so each prompt is translated once. If Claude is unavailable, English is sent.
 """
 import json
 import logging
@@ -13,44 +14,64 @@ from app import config
 from app.prompts import is_prompt
 
 log = logging.getLogger(__name__)
-_cache: dict[str, str] = {}
+_cache: dict[tuple[str, str], str] = {}
 _lock = threading.Lock()
 
-ES_WORDS = {"hola", "quiero", "gracias", "buenos", "buenas", "tengo", "mi", "mis", "campo", "riego", "secano",
-            "plantar", "cultivo", "cultivos", "puedo", "por", "favor", "que", "qué", "como", "cómo", "cuándo", "cuando",
-            "debo", "regar", "esta", "semana", "el", "la", "los", "las", "del", "es", "está", "son", "una", "un", "con",
-            "para", "pero", "también", "agua", "suelo", "lluvia", "helada", "sí", "vale", "ayuda", "dónde", "donde"}
-EN_WORDS = {"hi", "hello", "the", "my", "what", "how", "is", "should", "i", "water", "field", "crops", "yes", "frost",
-            "please", "thanks", "this", "week", "do", "can", "you", "it", "rain", "grow", "help", "where", "when"}
-ES_SWITCH = re.compile(r"\b(español|espanol|castellano|spanish|en español)\b", re.I)
-EN_SWITCH = re.compile(r"\b(english|in english|inglés|ingles)\b", re.I)
+LANGS = {"es": "Spanish", "pt": "Portuguese", "fr": "French", "de": "German", "it": "Italian", "ja": "Japanese",
+         "zh": "Chinese (Simplified)", "ko": "Korean", "ru": "Russian", "ar": "Arabic", "hi": "Hindi", "th": "Thai",
+         "el": "Greek", "en": "English"}
+WORDS = {
+    "es": {"hola", "quiero", "gracias", "buenos", "buenas", "tengo", "mi", "mis", "campo", "riego", "secano", "plantar",
+           "cultivo", "cultivos", "puedo", "por", "favor", "que", "qué", "como", "cómo", "cuándo", "cuando", "debo",
+           "regar", "esta", "semana", "el", "la", "los", "las", "del", "es", "está", "son", "una", "un", "con", "para",
+           "pero", "también", "agua", "suelo", "lluvia", "helada", "sí", "vale", "ayuda", "dónde", "donde", "y"},
+    "pt": {"olá", "ola", "obrigado", "obrigada", "quero", "meu", "minha", "não", "sim", "você", "está", "plantação",
+           "fazenda", "chuva", "água", "solo", "posso", "devo", "regar", "semana", "uma", "com", "também", "onde"},
+    "fr": {"bonjour", "merci", "je", "veux", "mon", "mes", "champ", "est", "les", "des", "une", "pour", "avec", "oui",
+           "quoi", "comment", "planter", "pluie", "eau", "sol", "dois", "arroser", "semaine", "ferme", "où"},
+    "de": {"hallo", "danke", "ich", "möchte", "mein", "meine", "feld", "ist", "und", "nicht", "ja", "bitte", "wie",
+           "was", "pflanzen", "regen", "wasser", "boden", "soll", "woche", "hof", "wo"},
+    "it": {"ciao", "grazie", "voglio", "mio", "mia", "campo", "è", "sono", "piantare", "come", "cosa", "sì", "pioggia",
+           "acqua", "suolo", "devo", "irrigare", "settimana", "azienda", "dove"},
+    "en": {"hi", "hello", "the", "my", "what", "how", "is", "should", "i", "water", "field", "crops", "yes", "frost",
+           "please", "thanks", "this", "week", "do", "can", "you", "it", "rain", "grow", "help", "where", "when", "want"},
+}
+SCRIPTS = [("ja", r"[\u3040-\u30ff]"), ("ko", r"[\uac00-\ud7af]"), ("zh", r"[\u4e00-\u9fff]"),
+           ("ru", r"[\u0400-\u04ff]"), ("ar", r"[\u0600-\u06ff]"), ("hi", r"[\u0900-\u097f]"),
+           ("th", r"[\u0e00-\u0e7f]"), ("el", r"[\u0370-\u03ff]")]
+SWITCH = [("es", r"\b(español|espanol|castellano|spanish)\b"), ("pt", r"\b(português|portugues|portuguese)\b"),
+          ("fr", r"\b(français|francais|french)\b"), ("de", r"\b(deutsch|german)\b"),
+          ("it", r"\b(italiano|italian)\b"), ("ja", r"(日本語|\bjapanese\b)"), ("en", r"\b(english|inglés|ingles)\b")]
 
 
 def detect(text: str) -> str | None:
-    """'es', 'en' or None when the message is too short or ambiguous to tell (e.g. "corn", "2")."""
+    """A language code, or None when the message is too short or ambiguous to tell (e.g. "corn", "2")."""
     t = (text or "").strip()
     if not t:
         return None
-    if ES_SWITCH.search(t):
-        return "es"
-    if EN_SWITCH.search(t):
-        return "en"
+    for code, pat in SWITCH:
+        if re.search(pat, t, re.I):
+            return code
+    for code, pat in SCRIPTS:
+        if re.search(pat, t):
+            return code
     if re.search(r"[ñ¿¡]", t):
         return "es"
-    words = re.findall(r"[a-záéíóúñü]+", t.lower())
-    es, en = sum(w in ES_WORDS for w in words), sum(w in EN_WORDS for w in words)
-    if es >= 2 and es > en:
-        return "es"
-    if en >= 2 and en > es:
-        return "en"
-    return None
+    words = re.findall(r"[a-záàâãéèêíóôõúüçñäöß]+", t.lower())
+    scores = sorted(((sum(w in ws for w in words), code) for code, ws in WORDS.items()), reverse=True)
+    (best, code), (second, _) = scores[0], scores[1]
+    return code if best >= 2 and best > second else None
 
 
 def is_switch(text: str) -> bool:
-    """A message that only asks to change language ("en castellano", "in English please")."""
-    t = re.sub(r"\b(en|in|por favor|please|habla|hablame|háblame|speak)\b", "", (text or "").lower())
-    t = ES_SWITCH.sub("", EN_SWITCH.sub("", t))
-    return bool(ES_SWITCH.search(text or "") or EN_SWITCH.search(text or "")) and not re.search(r"[a-z]{3,}", t)
+    """A message that only asks to change language ("en castellano", "in English please", "日本語で")."""
+    t = (text or "").lower()
+    if not any(re.search(p, t, re.I) for _, p in SWITCH):
+        return False
+    for _, p in SWITCH:
+        t = re.sub(p, "", t, flags=re.I)
+    t = re.sub(r"\b(en|in|em|auf|por favor|please|habla|hablame|háblame|speak|parle|sprich|parla)\b|で|お願い", "", t)
+    return not re.search(r"[a-zà-ÿ]{3,}", t)
 
 
 def _strings(msg) -> list[str]:
@@ -80,18 +101,18 @@ def _rebuild(msg, tr: dict[str, str]):
     return m
 
 
-SYSTEM = ("You translate WhatsApp messages from FarmPartner, a farm advisor, into clear, friendly Spanish for "
-          "farmers (use 'usted'). Keep every emoji, *bold* marker, line break, URL, number, unit (in, °F, in/yr) and "
+SYSTEM = ("You translate WhatsApp messages from FarmPartner, a farm advisor, into clear, friendly {lang} for "
+          "farmers (polite form). Keep every emoji, *bold* marker, line break, URL, number, unit (in, °F, in/yr) and "
           "proper name exactly. Keep 'FarmPartner', 'NASA', 'USDA', 'RESET', 'REPORT' and 'HELP' as they are. "
           "Very short strings are button labels: keep them short (max 20 characters). Return ONLY a JSON array of "
           "strings with the same length and order as the input.")
 
 
-def _translate_batch(texts: list[str]) -> list[str]:
+def _translate_batch(texts: list[str], lang: str) -> list[str]:
     from app.agent import claude_client
 
     resp = claude_client().beta.messages.create(
-        model=config.ANTHROPIC_MODEL, max_tokens=8000, system=SYSTEM,
+        model=config.ANTHROPIC_MODEL, max_tokens=8000, system=SYSTEM.format(lang=LANGS.get(lang, lang)),
         messages=[{"role": "user", "content": json.dumps(texts, ensure_ascii=False)}],
         output_config={"effort": "low"}, betas=["server-side-fallback-2026-07-01"], fallbacks="default")
     raw = "".join(b.text for b in resp.content if b.type == "text").strip()
@@ -103,19 +124,19 @@ def _translate_batch(texts: list[str]) -> list[str]:
 
 
 def translate(msgs: list, lang: str) -> list:
-    if lang != "es" or not msgs or not config.llm_enabled():
+    if lang in (None, "en") or lang not in LANGS or not msgs or not config.llm_enabled():
         return msgs
     wanted = list(dict.fromkeys(s for m in msgs for s in _strings(m) if s and s.strip()))
     with _lock:
-        missing = [s for s in wanted if s not in _cache]
+        missing = [s for s in wanted if (lang, s) not in _cache]
     if missing:
         try:
-            for src, dst in zip(missing, _translate_batch(missing)):
+            for src, dst in zip(missing, _translate_batch(missing, lang)):
                 with _lock:
-                    _cache[src] = dst
+                    _cache[(lang, src)] = dst
         except Exception:
             log.exception("translation failed; sending English")
             return msgs
     with _lock:
-        tr = {s: _cache[s] for s in wanted if s in _cache}
+        tr = {s: _cache[(lang, s)] for s in wanted if (lang, s) in _cache}
     return [_rebuild(m, tr) for m in msgs]

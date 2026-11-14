@@ -3,7 +3,7 @@ import re
 from dataclasses import dataclass
 from typing import Callable
 
-from app import agent, i18n, onboarding, service
+from app import agent, i18n, onboarding, service, units
 from app.data import maplinks
 from app.prompts import as_text
 from app.db import now, session
@@ -28,9 +28,22 @@ def inbound(phone: str, channel: str, text: str, lat: float | None = None, lon: 
             db.commit()
         farmer.language = lang
     if i18n.is_switch(text or ""):
-        reply = onboarding.current_step(farmer)
-        hello = "👍 De acuerdo, seguimos en español." if farmer.language == "es" else "👍 Sure, let's continue in English."
-        return _out(farmer.id, Turn(now=[hello] + reply, later=None), farmer.language)
+        hello = ("👍 Sure, let's continue in English." if farmer.language == "en"
+                 else f"👍 Sure — I'll write to you in {i18n.LANGS.get(farmer.language, farmer.language)}.")
+        return _out(farmer.id, Turn(now=[hello] + onboarding.current_step(farmer), later=None), farmer.language,
+                    units.preferred(farmer))
+    want_units = units.asked(text or "") if lat is None else None
+    if want_units:
+        with session() as db:
+            from app.db import Farmer
+            fm = db.get(Farmer, farmer.id)
+            fm.constraints = {**(fm.constraints or {}), "units": want_units}
+            db.commit()
+            farmer.constraints = fm.constraints
+        hello = ("👍 Got it — I'll use metric units: mm of rain and water, °C, hectares." if want_units == "metric"
+                 else "👍 Got it — I'll use inches, °F and acres.")
+        step = onboarding.current_step(farmer) if farmer.state != "ready" else []
+        return _out(farmer.id, Turn(now=[hello] + step, later=None), farmer.language, want_units)
 
     if (text or "").strip().lower() == "report":
         with session() as db:
@@ -56,8 +69,8 @@ def inbound(phone: str, channel: str, text: str, lat: float | None = None, lon: 
     if reply is None:  # onboarded: free conversation, answered in the background (LLM can take a few seconds)
         def later():
             return [agent.answer(farmer, text or "")]
-        return _out(farmer.id, Turn(now=[], later=later))  # Claude already answers in the farmer's language
-    return _out(farmer.id, Turn(now=reply.now, later=reply.later), farmer.language)
+        return _out(farmer.id, Turn(now=[], later=later))  # Claude already answers in the farmer's language and units
+    return _out(farmer.id, Turn(now=reply.now, later=reply.later), farmer.language, units.preferred(farmer))
 
 
 def photo(phone: str, channel: str, image: dict | None, caption: str, media_url: str | None = None) -> Turn:
@@ -68,24 +81,26 @@ def photo(phone: str, channel: str, image: dict | None, caption: str, media_url:
     if farmer.state != "ready":
         return _out(farmer.id, Turn(now=["📷 Got your photo! I can look at crop photos once your field is set up — "
                                          "let's finish that first. Send RESET if you want to start over."], later=None),
-                    farmer.language)
+                    farmer.language, units.preferred(farmer))
     if image is None:
         return _out(farmer.id, Turn(now=["📷 I couldn't open that file. Please send it as a normal photo (JPG or PNG)."],
-                                    later=None), farmer.language)
+                                    later=None), farmer.language, units.preferred(farmer))
 
     def later():
         return [agent.answer(farmer, caption, image=image)]
     return _out(farmer.id, Turn(now=i18n.translate(["📷 Got it — taking a look…"], farmer.language), later=later))
 
 
-def _out(farmer_id: int, turn: Turn, lang: str = "en") -> Turn:
-    """Wrap the turn so every outbound message is logged (the agent reads this history). lang="es" translates
-    FarmPartner's scripted messages into Spanish."""
-    if lang != "en":
-        turn = Turn(now=i18n.translate(turn.now, lang), later=turn.later)
+def _out(farmer_id: int, turn: Turn, lang: str = "en", unit: str = "imperial") -> Turn:
+    """Wrap the turn so every outbound message is logged (the agent reads this history). FarmPartner's scripted
+    messages are converted to metric (deterministically) and translated into the farmer's language."""
+    if lang != "en" or unit == "metric":
+        def localize(msgs):
+            return i18n.translate(units.convert(msgs) if unit == "metric" else msgs, lang)
+        turn = Turn(now=localize(turn.now), later=turn.later)
         if turn.later:
             inner_tr = turn.later
-            turn = Turn(now=turn.now, later=lambda: i18n.translate(inner_tr(), lang))
+            turn = Turn(now=turn.now, later=lambda: localize(inner_tr()))
     for m in turn.now:
         onboarding.record(farmer_id, "out", as_text(m))
     if turn.later is None:

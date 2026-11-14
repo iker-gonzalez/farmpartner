@@ -42,6 +42,8 @@ WELCOME = ("👋 Hi! I'm *FarmPartner*, your farm advisor powered by NASA satell
 KNOWN_CROPS = ("corn, soybeans, wheat, barley, oats, grain sorghum (milo), rice, cotton, alfalfa, sunflower, canola, "
                "field peas, dry beans, peanuts, potatoes, tomatoes and other vegetables, sugar beets, sugarcane, "
                "proso millet, triticale, and fallow")
+GREETINGS = {"hi", "hello", "hey", "hola", "buenas", "buenos días", "ola", "olá", "bonjour", "salut", "hallo", "ciao",
+             "start", "empezar", "comenzar", "こんにちは", "你好", "안녕하세요"}
 PRIORITY_KEYS = {"1": "save_water", "2": "soil_health", "3": "income", "4": "less_erosion", "5": "forage"}
 PRIORITY_WORDS = {"water": "save_water", "soil": "soil_health", "income": "income", "money": "income", "profit": "income",
                   "erosion": "less_erosion", "forage": "forage", "cattle": "forage", "livestock": "forage",
@@ -185,8 +187,13 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
         z = zip_to_point(t)
         if z:
             return _set_location(farmer, z[0], z[1], z[2])
+        if low.strip("!.¡ ") in GREETINGS:
+            return Reply(now=[WELCOME])
+        if re.fullmatch(r"\d{3,6}", t.replace(" ", "")):
+            return Reply(now=[f"I couldn't find ZIP code {t} — ZIP codes only work in the U.S. Anywhere else, send a "
+                              "pin (📎 → Location), paste a Google Maps link, or type coordinates like 41.39, 2.17."])
         return Reply(now=["I need your field's location to look it up. Tap 📎 → Location and send a pin on the field, "
-                          "or text a 5-digit ZIP code."])
+                          "paste a Google Maps link, type coordinates (e.g. 38.05, -100.75), or text a U.S. ZIP code."])
 
     if state == "awaiting_crops":
         with session() as db:

@@ -21,7 +21,7 @@ USDA data (crop maps, soil survey) into practical advice on crop rotations, wate
 
 Rules:
 - Keep replies short for a phone screen: at most 6 short lines, plain words, no tables, no markdown headers. \
-WhatsApp *bold* is fine. Use inches, °F and acres.
+WhatsApp *bold* is fine. Use the farmer's units (see the last rule).
 - Only state numbers that come from your tools. Never invent data. If a tool lacks something, say what is missing.
 - When the farmer reports something (rain, pests, planting, yields, irrigation), save it with log_observation and thank them.
 - When they change their goals, irrigation or crops, call update_farm_profile, then re-run compare_rotations if relevant.
@@ -209,8 +209,8 @@ WEB_TOOLS = [{"type": "web_search_20260209", "name": "web_search", "max_uses": 3
 _web = {"ok": True}  # switched off for this process if the account doesn't allow web search
 
 
-def _create(client, messages):
-    kw = dict(model=config.ANTHROPIC_MODEL, max_tokens=4000, system=SYSTEM, messages=messages,
+def _create(client, messages, system=SYSTEM):
+    kw = dict(model=config.ANTHROPIC_MODEL, max_tokens=4000, system=system, messages=messages,
               output_config={"effort": config.ANTHROPIC_EFFORT},
               betas=["server-side-fallback-2026-07-01"], fallbacks="default")
     if _web["ok"]:
@@ -224,8 +224,19 @@ def _create(client, messages):
     return client.beta.messages.create(tools=TOOLS, **kw)
 
 
+def _system_for(farmer_id: int) -> str:
+    from app import units
+    with session() as db:
+        fm = db.get(Farmer, farmer_id)
+        metric = fm is not None and units.preferred(fm) == "metric"
+    return SYSTEM + ("\n- Units: this farmer uses METRIC. Tools report inches, °F and acres: convert to mm, °C and "
+                     "hectares in your reply (1 in = 25.4 mm; °C = (°F − 32) × 5/9; 1 acre = 0.405 ha)." if metric else
+                     "\n- Units: inches, °F and acres.")
+
+
 def _answer_llm(farmer_id: int, image: dict | None = None) -> str:
     client = claude_client()
+    system = _system_for(farmer_id)
     messages = _history(farmer_id)
     while messages and messages[-1]["role"] == "assistant":
         messages.pop()  # e.g. "📷 Got it — taking a look…" sent while we work; the request must end on the farmer's turn
@@ -234,7 +245,7 @@ def _answer_llm(farmer_id: int, image: dict | None = None) -> str:
     if image:
         messages[-1]["content"] = [image, {"type": "text", "text": messages[-1]["content"]}]
     for _ in range(8):
-        resp = _create(client, messages)
+        resp = _create(client, messages, system)
         if resp.stop_reason == "pause_turn":  # a long web search: send the turn back and the server resumes it
             messages.append({"role": "assistant", "content": resp.content})
             continue
