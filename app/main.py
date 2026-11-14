@@ -67,18 +67,24 @@ async def twilio_webhook(request: Request, background: BackgroundTasks):
     if media_url and media_kind:  # voice notes and photos need downloading and processing: do it in the background
         background.add_task(_media_turn, sender, channel, media_url, media_kind, text, form.get("MessageSid"))
         return _twiml([])
-    turn = chat.inbound(sender, channel, text, lat, lon, form.get("MediaUrl0"))
-    if any(is_prompt(m) for m in turn.now):
-        # TwiML can't carry buttons: send this turn's messages in order through the API instead.
-        now = list(turn.now)
-        for m in now:  # what's ready goes out first; "typing…" covers the slow part
-            messaging.send(sender, m)
-        if turn.later:
-            background.add_task(_run_later, sender, turn.later, form.get("MessageSid"))
-        return _twiml([])
-    if turn.later:  # nothing instant to send (e.g. a question for Claude): show "typing…" right away
-        background.add_task(_run_later, sender, turn.later, form.get("MessageSid"), 2 if turn.now else 0)
-    return _twiml(turn.now)
+    # Everything else is answered in the background too and sent through the API: Twilio drops a webhook reply
+    # after 15 s, and a first-time translation or a slow lookup can take longer than that.
+    background.add_task(_text_turn, sender, channel, text, lat, lon, form.get("MessageSid"))
+    return _twiml([])
+
+
+def _text_turn(sender: str, channel: str, text: str, lat, lon, message_sid: str | None = None):
+    with messaging.typing_while(message_sid, first_after_s=0):  # "typing…" until the first reply is ready
+        try:
+            turn = chat.inbound(sender, channel, text, lat, lon)
+        except Exception:
+            log.exception("inbound message failed")
+            messaging.send(sender, "Sorry — something went wrong on my side. Please try again in a minute.")
+            return
+    for m in turn.now:
+        messaging.send(sender, m)
+    if turn.later:
+        _run_later(sender, turn.later, message_sid)
 
 
 def _media_turn(sender: str, channel: str, url: str, kind: str, caption: str, message_sid: str | None = None):

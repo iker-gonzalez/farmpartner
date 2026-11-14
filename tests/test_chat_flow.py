@@ -53,10 +53,16 @@ def test_reset(offline):
     assert "Starting over" in say(c, "d", text="reset")[0]
 
 
-def test_twilio_webhook_returns_twiml(offline):
+def test_twilio_webhook_acks_at_once_and_replies_via_api(offline, monkeypatch):
+    """The webhook answers Twilio with empty TwiML right away; the reply goes out through the API in the background
+    (a reply that takes > 15 s inside the webhook is dropped by Twilio with error 11200)."""
+    from app import messaging
+    sent = []
+    monkeypatch.setattr(messaging, "send", lambda to, m: sent.append((to, m)))
     c = _client()
-    r = c.post("/twilio/webhook", data={"From": "whatsapp:+15550001", "Body": "hi"})
-    assert r.status_code == 200 and "<Message>" in r.text
+    r = c.post("/twilio/webhook", data={"From": "whatsapp:+15550001", "Body": "hi", "MessageSid": "SM1"})
+    assert r.status_code == 200 and "<Message>" not in r.text
+    assert sent and sent[0][0] == "whatsapp:+15550001" and "Step 1 of 3" in sent[0][1]
 
 
 def test_landing_and_simulator_pages():
