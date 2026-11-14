@@ -1,5 +1,7 @@
+import datetime as dt
 import logging
 import os
+import re
 import threading
 
 from fastapi import BackgroundTasks, FastAPI, Form, HTTPException, Request
@@ -10,6 +12,7 @@ from pydantic import BaseModel
 from sqlalchemy import select
 
 from app import chat, config, landing, messaging, ratelimit, service
+from app.prompts import as_text, is_prompt
 from app.db import Farmer, Field, init_db, session
 from app.engine.explain import DISCLAIMER, SCORE_LABELS, evidence, gaps, inch, short_name
 from app.engine.scoring import PRIORITY_LABELS
@@ -56,7 +59,14 @@ async def twilio_webhook(request: Request, background: BackgroundTasks):
     channel = "whatsapp" if sender.startswith("whatsapp:") else "sms"
     lat = float(form["Latitude"]) if form.get("Latitude") else None
     lon = float(form["Longitude"]) if form.get("Longitude") else None
-    turn = chat.inbound(sender, channel, form.get("Body", ""), lat, lon, form.get("MediaUrl0"))
+    # A tapped button / list item arrives with its id; that id is the text the conversation understands.
+    text = form.get("ButtonPayload") or form.get("ListId") or form.get("Body", "")
+    turn = chat.inbound(sender, channel, text, lat, lon, form.get("MediaUrl0"))
+    if any(is_prompt(m) for m in turn.now):
+        # TwiML can't carry buttons: send this turn's messages in order through the API instead.
+        now = list(turn.now)
+        background.add_task(_run_later, sender, lambda: now + (turn.later() if turn.later else []))
+        return _twiml([])
     if turn.later:
         background.add_task(_run_later, sender, turn.later)
     return _twiml(turn.now)
@@ -86,6 +96,14 @@ def _deliver_later(key: str, later):
         _pending[key] -= 1
 
 
+def _api_messages(msgs: list, pending: bool = False) -> dict:
+    """messages: plain text (what SMS would show); actions: the tap-able choices for the simulator, if any."""
+    return {"messages": [as_text(m) for m in msgs],
+            "actions": [({k: v for k, v in m.items() if k != "text"} | {"text": m["text"]}) if is_prompt(m) else None
+                        for m in msgs],
+            "pending": pending}
+
+
 @app.post("/api/chat")
 def api_chat(msg: ChatIn, request: Request):
     """Chat for the web simulator, tests and demos without WhatsApp."""
@@ -99,11 +117,45 @@ def api_chat(msg: ChatIn, request: Request):
     out = list(turn.now)
     if turn.later and msg.wait:
         out += turn.later()
+        return _api_messages(out)
     elif turn.later:
         with _lock:
             _pending[key] = _pending.get(key, 0) + 1
         threading.Thread(target=_deliver_later, args=(key, turn.later), daemon=True).start()
-    return {"messages": out, "pending": _pending.get(key, 0) > 0}
+    return _api_messages(out, pending=_pending.get(key, 0) > 0)
+
+
+class OptIn(BaseModel):
+    phone: str
+    consent: bool = False
+
+
+@app.post("/api/optin")
+def api_optin(body: OptIn, request: Request):
+    """Landing-page opt-in: FarmPartner sends the approved welcome template to this WhatsApp number.
+    Falls back to a wa.me link (the farmer messages first) while the template is not approved."""
+    phone = "+" + re.sub(r"\D", "", body.phone)
+    if not re.fullmatch(r"\+[1-9]\d{7,14}", phone):
+        raise HTTPException(400, "Enter your WhatsApp number with country code.")
+    if not body.consent:
+        raise HTTPException(400, "Please tick the box to agree to receive WhatsApp messages.")
+    fallback = {"sent": False, "wa_url": landing.whatsapp_url()}
+    if messaging.welcome_status() != "approved":
+        return fallback
+    if not ratelimit.allow("optin-ip:" + ratelimit.client_ip(request), ratelimit.OPTIN_PER_IP):
+        raise HTTPException(429, "Too many requests — please try again later.")
+    to = "whatsapp:" + phone
+    with session() as db:
+        fm = service.get_or_create_farmer(db, to, "whatsapp")
+        if (fm.constraints or {}).get("opted_out"):
+            return fallback  # they replied STOP; only they can restart the conversation
+        fm.constraints = {**(fm.constraints or {}), "opted_in_at": dt.datetime.now(dt.UTC).isoformat()}
+        db.commit()
+    if not ratelimit.allow("optin:" + phone, ratelimit.OPTIN_PER_PHONE):
+        return {"sent": True, "again": True}  # already sent today: don't message them twice
+    if not messaging.send_welcome(to):
+        return fallback
+    return {"sent": True}
 
 
 @app.get("/api/poll")
@@ -111,7 +163,7 @@ def api_poll(phone: str):
     key = "web:" + phone
     with _lock:
         msgs = _outbox.pop(key, [])
-        return {"messages": msgs, "pending": _pending.get(key, 0) > 0}
+        return _api_messages(msgs, pending=_pending.get(key, 0) > 0)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -157,6 +209,7 @@ def build_sample(token: str = Form("")):
         db.commit()
         service.analyze_field(db, fld, with_ndvi=True)
         service.recommend(db, fm, fld)
+        threading.Thread(target=service.wait_for_satellite, args=(fld.id,), daemon=True).start()
         return {"report": service.report_url(fld)}
 
 
@@ -195,7 +248,7 @@ def _send_alerts(db) -> int:
     sent = 0
     for fm in db.scalars(select(Farmer).where(Farmer.state == "ready")):
         fld = service.main_field(fm)
-        if not fld or fm.phone.startswith("sample:"):
+        if not fld or fm.phone.startswith("sample:") or (fm.constraints or {}).get("opted_out"):
             continue
         for body in service.check_alerts(db, fld):
             if not fm.phone.startswith(("web:", "cli:")):
@@ -218,10 +271,23 @@ def _refresh_stale_fields(db, max_fields: int = 10, older_than_days: int = 7) ->
     for fld in stale:
         try:
             service.analyze_field(db, fld, with_ndvi=True)
+            service.request_satellite(db, fld)
             done += 1
         except Exception:
             log.exception("refresh failed for field %s", fld.id)
     return done
+
+
+def _collect_satellite(db) -> int:
+    n = 0
+    for fld in db.scalars(select(Field)):
+        if service.satellite_pending(fld.features or {}):
+            try:
+                if service.collect_satellite(db, fld) == "done":
+                    n += 1
+            except Exception:
+                log.exception("AppEEARS collect failed for field %s", fld.id)
+    return n
 
 
 def _authorized_job(request: Request, token: str) -> bool:
@@ -250,8 +316,9 @@ def daily_job(request: Request, token: str = Form("")):
     with session() as db:
         alerts = _send_alerts(db)
         refreshed = _refresh_stale_fields(db)
-    log.info("daily job: %s alerts, %s fields refreshed", alerts, refreshed)
-    return {"alerts": alerts, "refreshed": refreshed}
+        satellite = _collect_satellite(db)
+    log.info("daily job: %s alerts, %s fields refreshed, %s satellite results collected", alerts, refreshed, satellite)
+    return {"alerts": alerts, "refreshed": refreshed, "satellite_collected": satellite}
 
 
 @app.post("/admin/alerts/run")

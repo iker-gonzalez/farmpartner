@@ -14,6 +14,10 @@
   button { border:0; border-radius:20px; padding:8px 12px; background:#1f6b47; color:#fff; cursor:pointer } button.alt { background:#fff; color:#1f6b47; border:1px solid #1f6b47 }
   .pins { display:flex; gap:6px; padding:6px 8px; flex-wrap:wrap; background:#f7f7f7; font-size:.8rem }
   a { color:#1f6b47 }
+  .choices { align-self:flex-start; max-width:85%; display:flex; flex-direction:column; gap:4px; margin-top:-2px }
+  .choices button { background:#fff; color:#027eb5; border-radius:8px; padding:9px 12px; text-align:center; box-shadow:0 1px 1px #0001; font-weight:500 }
+  .choices button small { display:block; color:#667; font-weight:400; font-size:.78rem }
+  .choices.used button { opacity:.45; pointer-events:none }
 </style>
 </head>
 <body>
@@ -24,6 +28,7 @@
     <span>📍 Send pin:</span>
     <button class="alt" onclick="pin(38.05,-100.75,'Garden City, KS')">Garden City, KS</button>
     <button class="alt" onclick="pin(40.65,-98.30,'Hastings, NE')">Hastings, NE</button>
+    <button class="alt" onclick="pin(33.68,-102.25,'Lubbock, TX')">Lubbock, TX</button>
     <button class="alt" onclick="myLocation()">My location</button>
   </div>
   <div class="bar"><input id="t" placeholder="Type a message" autofocus><button onclick="send()">Send</button></div>
@@ -43,12 +48,30 @@
     add(label, 'out');
     const r = await fetch('/api/chat', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({phone, wait: false, ...body}) });
     if (r.status === 429) { add('⏳ Too many messages — please wait a minute.', 'sys'); return; }
-    const j = await r.json(); (j.messages || []).forEach(m => add(m, 'in'));
+    const j = await r.json(); render(j);
     if (j.pending) poll(add('⏳ working…', 'sys'));
+  }
+  // Messages with tap-able choices (same as the WhatsApp quick replies / list picker).
+  function render(j) {
+    (j.messages || []).forEach((m, i) => {
+      const a = (j.actions || [])[i];
+      if (!a) { add(m, 'in'); return; }
+      add(a.text, 'in');
+      const box = document.createElement('div'); box.className = 'choices';
+      const opts = a.buttons ? a.buttons.map(b => [b.id, b.title, ''])
+                             : a.list.items.map(it => [it.id, it.title, it.description]);
+      opts.forEach(([id, title, desc]) => {
+        const b = document.createElement('button');
+        b.innerHTML = title.replace(/</g, '&lt;') + (desc ? '<small>' + desc.replace(/</g, '&lt;') + '</small>' : '');
+        b.onclick = () => { box.classList.add('used'); post({text: id}, title); };
+        box.appendChild(b);
+      });
+      log.appendChild(box); requestAnimationFrame(() => box.scrollIntoView({block: 'end', behavior: 'smooth'}));
+    });
   }
   async function poll(waitEl) {
     const j = await (await fetch('/api/poll?phone=' + encodeURIComponent(phone))).json();
-    (j.messages || []).forEach(m => add(m, 'in'));
+    render(j);
     if (j.pending) { setTimeout(() => poll(waitEl), 1500); } else { waitEl.remove(); }
   }
   function newFarmer() { localStorage.fpPhone = 'demo-' + Math.random().toString(36).slice(2, 8); location.reload(); }

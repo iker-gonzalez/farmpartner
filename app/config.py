@@ -22,11 +22,17 @@ TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
 TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM", "whatsapp:+14155238886")  # Twilio sandbox number
 TWILIO_SMS_FROM = os.getenv("TWILIO_SMS_FROM", "")
+# NASA Earthdata for AppEEARS (SMAP soil moisture, ECOSTRESS stress): token, or username + password login.
+EARTHDATA_TOKEN = os.getenv("EARTHDATA_TOKEN", "")
+EARTHDATA_USERNAME = os.getenv("EARTHDATA_USERNAME", "")
+EARTHDATA_PASSWORD = os.getenv("EARTHDATA_PASSWORD", "")
 # Cloud Scheduler calls /internal/daily with a Google-signed OIDC token for this service account + audience.
 SCHEDULER_SA_EMAIL = os.getenv("SCHEDULER_SA_EMAIL", "")
 SCHEDULER_AUDIENCE = os.getenv("SCHEDULER_AUDIENCE", "")
 # First WhatsApp message prefilled by the landing page (sandbox: "join <code>").
 WHATSAPP_PREFILL = os.getenv("WHATSAPP_PREFILL", "hi")
+# Meta-approved WhatsApp template (scripts/welcome_template.py) that lets FarmPartner message first after a web opt-in.
+WELCOME_CONTENT_SID = os.getenv("WELCOME_CONTENT_SID", "")
 
 
 # Workload Identity Federation (Cloud Run): the service's Google identity is exchanged for a short-lived Claude

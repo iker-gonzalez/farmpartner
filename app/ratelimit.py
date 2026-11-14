@@ -11,6 +11,8 @@ _lock = threading.Lock()
 API_PER_IP = (30, 60)            # web simulator / API: per client IP
 API_PER_PHONE = (12, 60)         # per simulated phone
 WEBHOOK_PER_SENDER = (15, 60)    # WhatsApp/SMS messages per sender
+OPTIN_PER_IP = (5, 3600)          # web opt-ins (WhatsApp welcome sends) per IP per hour
+OPTIN_PER_PHONE = (1, 86400)     # one welcome per phone per day
 LLM_PER_FARMER_DAY = (150, 86400)  # Claude calls per farmer per day (cost cap)
 
 

@@ -17,6 +17,7 @@ DEMO_FARMS = {
     "Garden City, KS (demo pin, dryland wheat-sorghum-fallow)": (38.05, -100.75),
     "Hastings, NE (demo pin, irrigated corn)": (40.65, -98.30),
     "Hastings, NE (corn-soybeans)": (40.55, -98.40),
+    "Hockley County, TX near Lubbock (irrigated continuous cotton, GRACE decline)": (33.68, -102.25),
 }
 DEMO_ZIPS = ["67846", "68901"]  # simulator / SMS ZIP demos (Garden City KS, Hastings NE)
 

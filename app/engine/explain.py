@@ -18,6 +18,10 @@ def fahr(c):
     return None if c is None else round(c * 9 / 5 + 32)
 
 
+MONTH_NAMES = {"01": "January", "02": "February", "03": "March", "04": "April", "05": "May", "06": "June",
+               "07": "July", "08": "August", "09": "September", "10": "October", "11": "November", "12": "December"}
+
+
 def evidence(f: dict) -> list[dict]:
     c, soil, ndvi, g = f.get("climate") or {}, f.get("soil") or {}, f.get("ndvi") or {}, f.get("grace")
     ev = []
@@ -41,6 +45,34 @@ def evidence(f: dict) -> list[dict]:
         pct = round(100 * (c["soil_wetness_now"] / c["soil_wetness_normal"] - 1))
         ev.append({"metric": "Root-zone soil moisture (last 60 days)", "value": f'{pct:+d}% vs normal',
                    "source": "NASA GMAO MERRA-2 GWETROOT via POWER"})
+    sm = f.get("smap")
+    if sm and sm.get("rootzone_percentile") is not None:
+        pct = round(sm["rootzone_percentile"])
+        word = "drier" if pct < 50 else "wetter"
+        ev.append({"metric": f"Root-zone soil moisture (SMAP, 30 days to {sm['as_of']})",
+                   "value": f"{pct}th percentile — {word} than {pct if pct >= 50 else 100 - pct}% of the record",
+                   "source": "NASA SMAP L4 (9 km)"})
+    elif sm and sm.get("rootzone_m3m3") is not None:
+        # SMAP L4's percentile layer is often fill (-9999); report the measured water content and its trend.
+        now_pct = round(sm["rootzone_m3m3"] * 100)
+        monthly = sm.get("monthly_rootzone") or {}
+        first = next(iter(monthly.items()), None)
+        trend = ""
+        if first and first[1] is not None and len(monthly) >= 3:
+            then_pct = round(first[1] * 100)
+            month = MONTH_NAMES.get(first[0][5:7], first[0])
+            trend = (f", up from {then_pct}% in {month}" if now_pct > then_pct
+                     else f", down from {then_pct}% in {month}" if now_pct < then_pct else f", same as {month}")
+        ev.append({"metric": f"Root-zone soil moisture (SMAP, 30 days to {sm['as_of']})",
+                   "value": f"{now_pct}% water by volume{trend}",
+                   "source": "NASA SMAP L4 (9 km)"})
+    eco = f.get("ecostress")
+    if eco and eco.get("latest"):
+        summer = f", summer avg {eco['summer_mean_esi']}" if eco.get("summer_mean_esi") is not None else ""
+        ev.append({"metric": "Crop water stress (ECOSTRESS ESI: 1 = no stress, <0.4 = stressed)",
+                   "value": f"latest {eco['latest']['esi']} ({eco['latest']['date']}){summer}; "
+                            f"stressed in {round(eco['stressed_share'] * 100)}% of {eco['observations']} passes",
+                   "source": "NASA ECOSTRESS (70 m, your field)"})
     if ndvi.get("bare_months"):
         ev.append({"metric": "Months the field looks bare from space", "value": ", ".join(ndvi["bare_months"]),
                    "source": "NASA MODIS NDVI"})
@@ -144,6 +176,14 @@ def gaps(f: dict) -> list[str]:
         g.append("Crop history comes from 30 m satellite crop maps, which can mislabel some years.")
     if not f.get("ndvi"):
         g.append("Satellite vegetation (MODIS NDVI) was not available yet for this field.")
+    a = f.get("appeears") or {}
+    jobs = {} if "task_id" in a else a
+    waiting = [n for k, n in (("smap", "soil moisture (SMAP)"), ("eco", "field-level crop stress (ECOSTRESS)"))
+               if (jobs.get(k) or {}).get("status") in ("queued", "pending", "processing")]
+    if waiting:
+        g.append("Satellite " + " and ".join(waiting) + " still processing at NASA — check back soon.")
+    if not f.get("smap") and not f.get("ecostress") and not waiting:
+        g.append("Satellite soil moisture (SMAP) and crop stress (ECOSTRESS) not available for this field yet.")
     if not f.get("grace"):
         g.append("Groundwater trend (GRACE) not included for this location yet.")
     else:

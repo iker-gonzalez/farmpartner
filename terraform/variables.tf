@@ -162,3 +162,28 @@ variable "daily_schedule" {
   type        = string
   default     = "0 6 * * *"
 }
+
+# --- NASA Earthdata (AppEEARS: SMAP soil moisture, ECOSTRESS crop stress) --------------------------------
+# Set with scripts/set-earthdata.sh. Token mode if AppEEARS accepts the Earthdata token, else username/password.
+variable "earthdata_token" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "earthdata_username" {
+  type    = string
+  default = ""
+}
+
+variable "earthdata_password" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
+variable "welcome_content_sid" {
+  description = "Twilio Content SID of the Meta-approved WhatsApp welcome template (scripts/welcome_template.py). Empty disables the phone opt-in send."
+  type        = string
+  default     = ""
+}

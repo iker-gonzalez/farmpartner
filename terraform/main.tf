@@ -18,6 +18,8 @@ locals {
     "farmpartner-anthropic-api-key"  = var.anthropic_api_key
     "farmpartner-twilio-account-sid" = var.twilio_account_sid
     "farmpartner-twilio-auth-token"  = var.twilio_auth_token
+    "farmpartner-earthdata-token"    = var.earthdata_token
+    "farmpartner-earthdata-password" = var.earthdata_password
   }
   secrets = {
     "farmpartner-admin-token"        = { env = "ADMIN_TOKEN", has_value = true, mount = true }
@@ -25,6 +27,8 @@ locals {
     "farmpartner-anthropic-api-key"  = { env = "ANTHROPIC_API_KEY", has_value = nonsensitive(var.anthropic_api_key != ""), mount = nonsensitive(var.anthropic_api_key != "") }
     "farmpartner-twilio-account-sid" = { env = "TWILIO_ACCOUNT_SID", has_value = nonsensitive(var.twilio_account_sid != ""), mount = nonsensitive(var.twilio_account_sid != "") }
     "farmpartner-twilio-auth-token"  = { env = "TWILIO_AUTH_TOKEN", has_value = nonsensitive(var.twilio_auth_token != ""), mount = nonsensitive(var.twilio_auth_token != "") }
+    "farmpartner-earthdata-token"    = { env = "EARTHDATA_TOKEN", has_value = nonsensitive(var.earthdata_token != ""), mount = nonsensitive(var.earthdata_token != "") }
+    "farmpartner-earthdata-password" = { env = "EARTHDATA_PASSWORD", has_value = nonsensitive(var.earthdata_password != ""), mount = nonsensitive(var.earthdata_password != "") }
   }
   mounted   = { for k, v in local.secrets : k => v if v.mount }
   versioned = toset([for k, v in local.secrets : k if v.has_value])
@@ -35,7 +39,9 @@ locals {
     TWILIO_WHATSAPP_FROM = var.twilio_whatsapp_from
     TWILIO_SMS_FROM      = var.twilio_sms_from
     WHATSAPP_PREFILL     = var.whatsapp_prefill
+    WELCOME_CONTENT_SID  = var.welcome_content_sid
     CACHE_BUCKET         = google_storage_bucket.cache.name
+    EARTHDATA_USERNAME   = var.earthdata_username
     SCHEDULER_SA_EMAIL   = "farmpartner-scheduler@${var.project_id}.iam.gserviceaccount.com"
     SCHEDULER_AUDIENCE   = "${local.run_url}/internal/daily"
     }, { for k, v in {

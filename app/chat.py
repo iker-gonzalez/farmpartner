@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Callable
 
 from app import agent, onboarding, service
+from app.prompts import as_text
 from app.db import session
 
 
@@ -38,7 +39,7 @@ def inbound(phone: str, channel: str, text: str, lat: float | None = None, lon: 
 def _out(farmer_id: int, turn: Turn) -> Turn:
     """Wrap the turn so every outbound message is logged (the agent reads this history)."""
     for m in turn.now:
-        onboarding.record(farmer_id, "out", m)
+        onboarding.record(farmer_id, "out", as_text(m))
     if turn.later is None:
         return turn
     inner = turn.later
@@ -46,7 +47,7 @@ def _out(farmer_id: int, turn: Turn) -> Turn:
     def later():
         msgs = inner()
         for m in msgs:
-            onboarding.record(farmer_id, "out", m)
+            onboarding.record(farmer_id, "out", as_text(m))
         return msgs
 
     return Turn(now=turn.now, later=later)

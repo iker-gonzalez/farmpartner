@@ -1,5 +1,6 @@
 """Business logic shared by the chat agent, the onboarding flow, the web report and the alert job."""
 import datetime as dt
+import logging
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -29,8 +30,16 @@ def report_url(field: Field) -> str:
     return f"{PUBLIC_BASE_URL}/r/{field.public_id}"
 
 
+SATELLITE_KEYS = ("smap", "ecostress", "appeears", "ndvi")
+
+
 def analyze_field(db: Session, field: Field, with_ndvi: bool = False) -> dict:
     f = build_features(field.lat, field.lon, with_ndvi=with_ndvi)
+    for k in SATELLITE_KEYS:  # a refresh must not drop slower satellite results that already arrived
+        if (field.features or {}).get(k) and not f.get(k):
+            f[k] = field.features[k]
+    if (field.features or {}).get("ndvi") and f.get("ndvi") is None:
+        f["sources"] = sorted(set(f["sources"]) | {s for s in field.features.get("sources", []) if "MODIS" in s})
     field.features, field.features_at = f, now()
     rot = f.get("rotation") or {}
     db.query(CropHistory).filter(CropHistory.field_id == field.id, CropHistory.source == "cdl").delete()
@@ -123,8 +132,11 @@ def irrigation_advice(field: Field) -> dict:
         "farmer_reported_rain_last_7d_in": round(farmer_rain_in, 2),
         "deficit_in": ex.inch(max(deficit, 0)),
         "root_zone_soil_moisture_vs_normal_pct": round(100 * (wet_now / wet_norm - 1)) if wet_now and wet_norm else None,
+        "smap_root_zone_percentile": ((field.features or {}).get("smap") or {}).get("rootzone_percentile"),
+        "ecostress_latest_stress_index": (((field.features or {}).get("ecostress") or {}).get("latest") or {}).get("esi"),
         "advice": advice,
-        "sources": ["Open-Meteo 7-day forecast (FAO-56 ET0)", "NASA POWER GWETROOT soil wetness"],
+        "sources": ["Open-Meteo 7-day forecast (FAO-56 ET0)", "NASA POWER GWETROOT soil wetness",
+                    "NASA SMAP L4 root-zone soil moisture", "NASA ECOSTRESS evaporative stress"],
         "caveat": "Crop coefficient is generic; adjust for your crop stage and soil.",
     }
 
@@ -180,3 +192,99 @@ def check_alerts(db: Session, field: Field) -> list[str]:
             out.append(body)
     db.commit()
     return out
+
+
+# --- SMAP + ECOSTRESS via NASA AppEEARS (asynchronous) -------------------------------------------------
+SMAP_SOURCE = "NASA SMAP L4 soil moisture 9 km (AppEEARS)"
+ECO_SOURCE = "NASA ECOSTRESS Evaporative Stress Index 70 m (AppEEARS)"
+
+
+PENDING = ("queued", "pending", "processing")
+
+
+def _jobs(f: dict) -> dict:
+    a = f.get("appeears") or {}
+    return {} if "task_id" in a else dict(a)  # older single-job shape: resubmit as split jobs
+
+
+def satellite_pending(f: dict) -> bool:
+    return any((j or {}).get("status") in PENDING for j in _jobs(f).values())
+
+
+def request_satellite(db: Session, field: Field, max_age_days: int = 7) -> list[str]:
+    """Submit AppEEARS jobs (SMAP, ECOSTRESS) unless pending or fresh. Returns the ids of active jobs."""
+    from app.data import appeears
+
+    if not appeears.enabled():
+        return []
+    f = dict(field.features or {})
+    jobs = _jobs(f)
+    fresh_after = (now() - dt.timedelta(days=max_age_days)).isoformat()
+    active = []
+    for kind, (layers, days) in appeears.JOBS.items():
+        j = jobs.get(kind) or {}
+        if j.get("status") in PENDING or (j.get("status") == "done" and j.get("collected_at", "") > fresh_after):
+            active.append(j.get("task_id"))
+            continue
+        try:
+            tid = appeears.submit(field.lat, field.lon, f"farmpartner-{kind}-{field.public_id}", layers, days)
+        except Exception:
+            logging.getLogger(__name__).exception("AppEEARS submit failed (%s)", kind)
+            continue
+        jobs[kind] = {"task_id": tid, "status": "queued", "submitted_at": now().isoformat()}
+        active.append(tid)
+    f["appeears"] = jobs
+    field.features = f
+    db.commit()
+    return active
+
+
+def collect_satellite(db: Session, field: Field) -> str:
+    """Check pending AppEEARS jobs; store SMAP / ECOSTRESS features as each finishes.
+    Returns "processing" while any job is pending, else "done"."""
+    from app.data import appeears
+
+    f = dict(field.features or {})
+    jobs = _jobs(f)
+    for kind, j in jobs.items():
+        if not j or j.get("status") not in PENDING:
+            continue
+        j = dict(j)
+        j["status"] = appeears.status(j["task_id"])
+        if j["status"] == "done":
+            res = appeears.results(j["task_id"])
+            if kind == "smap":
+                feat, key, src = appeears.smap_features(res.get(appeears.SMAP, [])), "smap", SMAP_SOURCE
+            else:
+                feat, key, src = appeears.ecostress_features(res.get(appeears.ECO, [])), "ecostress", ECO_SOURCE
+            if feat:
+                f[key] = feat
+                f["sources"] = sorted(set(f.get("sources", [])) | {src})
+            j["collected_at"] = now().isoformat()
+        jobs[kind] = j
+    f["appeears"] = jobs
+    field.features = f
+    db.commit()
+    return "processing" if satellite_pending(f) else "done"
+
+
+def wait_for_satellite(field_id: int, timeout_s: int = 3600, every_s: int = 60) -> None:
+    """Background: submit (if needed) and poll until the AppEEARS task finishes or times out."""
+    import time
+
+    from app.db import session as new_session
+
+    deadline = time.time() + timeout_s
+    with new_session() as db:
+        fld = db.get(Field, field_id)
+        if not fld or not request_satellite(db, fld):
+            return
+    while time.time() < deadline:
+        time.sleep(every_s)
+        with new_session() as db:
+            fld = db.get(Field, field_id)
+            try:
+                if collect_satellite(db, fld) != "processing":
+                    return
+            except Exception:
+                logging.getLogger(__name__).exception("AppEEARS collect failed")

@@ -36,6 +36,7 @@
     padding: 22px 64px; background: #0a0a0bd9; border-bottom: 1px solid var(--line); backdrop-filter: blur(6px); }
   .logo { display: flex; align-items: center; gap: 10px; }
   .logo svg { width: 20px; height: 20px; }
+  .logo .orbi { width: 58px; height: 29px; margin: -6px 0; }
   .wordmark { font-family: "Space Grotesk", var(--sans); font-size: 20px; font-weight: 600; color: var(--ink); letter-spacing: -.6px; line-height: 1; }
   .wordmark b { font-weight: 600; color: var(--lime); }
   nav { display: flex; align-items: center; gap: 32px; }
@@ -51,13 +52,40 @@
   .kicker { font-family: var(--mono); font-size: 13px; color: var(--lime); }
   h1 { font-size: 60px; font-weight: 600; line-height: 1.12; letter-spacing: -1.2px; color: var(--ink); }
   .sub { font-size: 17px; line-height: 1.55; color: var(--ink-2); }
-  form.zip { display: flex; align-items: stretch; padding-top: 8px; }
-  form.zip input { width: 280px; padding: 15px 16px; background: #0a0a0bcc; border: 1px solid var(--line-2); border-right: 0;
+  form.optin { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 8px; }
+  form.optin .row { display: flex; align-items: stretch; }
+  form.optin .cc-btn, form.optin input[type=tel] { background: #0a0a0bcc; border: 1px solid var(--line-2); border-right: 0;
     color: var(--ink); font-family: var(--mono); font-size: 14px; outline: none; border-radius: 0; }
-  form.zip input::placeholder { color: var(--ink-3); }
-  form.zip input:focus { border-color: var(--lime); }
-  form.zip .btn { padding: 15px 20px; }
-  form.zip .btn svg { width: 18px; height: 18px; }
+  form.optin .row { position: relative; }
+  .cc { display: flex; }
+  .cc-btn { display: flex; align-items: center; gap: 7px; padding: 0 12px; cursor: pointer; white-space: nowrap; }
+  .cc-btn .f, .cc-list .f { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-size: 16px; line-height: 1; }
+  .cc-btn .car { color: var(--ink-3); font-size: 10px; }
+  .cc-btn[aria-expanded=true] { border-color: var(--lime); }
+  .cc-pop { position: absolute; z-index: 20; top: calc(100% + 6px); left: 0; width: 320px; max-width: calc(100vw - 40px);
+    background: #0f0f11f2; backdrop-filter: blur(12px); border: 1px solid var(--line-2); box-shadow: 0 18px 50px #000a; text-align: left; }
+  .cc-search { width: 100%; padding: 13px 14px; background: transparent; border: 0; border-bottom: 1px solid var(--line-2);
+    color: var(--ink); font-family: var(--mono); font-size: 13px; outline: none; }
+  .cc-search::placeholder { color: var(--ink-3); }
+  .cc-list { list-style: none; margin: 0; padding: 6px 0; max-height: 300px; overflow-y: auto; scrollbar-width: thin; }
+  .cc-list li { display: flex; align-items: center; gap: 10px; padding: 8px 14px; cursor: pointer; font-size: 14px; color: var(--ink-2); }
+  .cc-list li .n { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cc-list li .d { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+  .cc-list li.on { background: #a8f32614; color: var(--ink); box-shadow: inset 2px 0 0 var(--lime); }
+  .cc-list li.on .d { color: var(--lime); }
+  .cc-list li[aria-selected=true] .n::after { content: "  ✓"; color: var(--lime); }
+  .cc-list li.none { cursor: default; font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+  form.optin input[type=tel] { width: 230px; padding: 15px 16px; }
+  form.optin input::placeholder { color: var(--ink-3); }
+  form.optin .cc-btn:focus-visible, form.optin input:focus { border-color: var(--lime); }
+  form.optin .btn { padding: 15px 20px; border: 0; cursor: pointer; }
+  form.optin .btn svg { width: 18px; height: 18px; }
+  form.optin .btn[disabled] { opacity: .6; cursor: wait; }
+  form.optin label { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 12px; color: var(--ink-2); cursor: pointer; }
+  form.optin label input { accent-color: var(--lime); width: 15px; height: 15px; }
+  .status { min-height: 1.2em; font-family: var(--mono); font-size: 13px; color: var(--lime); }
+  .status.err { color: #fca5a5; }
+  .status a { text-decoration: underline; text-underline-offset: 3px; }
   .meta { font-family: var(--mono); font-size: 13px; color: #f4f4f5e6; }
   .meta a { text-decoration: underline; text-underline-offset: 3px; }
 
@@ -102,9 +130,12 @@
     h1 { font-size: 38px; line-height: 1.1; letter-spacing: -1.2px; }
     h1 br { display: none; }
     .sub { font-size: 15.5px; }
-    form.zip { flex-direction: column; width: 100%; padding-top: 4px; }
-    form.zip input { width: 100%; border-right: 1px solid var(--line-2); border-bottom: 0; }
-    form.zip .btn { justify-content: center; padding: 16px 20px; }
+    form.optin { width: 100%; padding-top: 4px; }
+    form.optin .row { flex-wrap: wrap; width: 100%; }
+    form.optin .cc-btn { height: 100%; border-bottom: 0; }
+    form.optin input[type=tel] { flex: 1; min-width: 0; width: auto; border-right: 1px solid var(--line-2); border-bottom: 0; }
+    form.optin .btn { width: 100%; justify-content: center; padding: 16px 20px; }
+    form.optin label { font-size: 11px; text-align: left; }
     .meta { font-size: 12px; line-height: 1.7; }
     .meta .nl { display: block; }
     .meta .sep { display: none; }
@@ -126,7 +157,7 @@
   <section class="hero">
     <header>
       <a class="logo" href="/" aria-label="FarmPartner home">
-        <svg viewBox="0 0 28 28" aria-hidden="true"><path fill="#a8f326" fill-rule="evenodd" d="M0 0h8v8h-8zM10 0h8v2h-8zM10 3h8v2h-8zM10 6h8v2h-8zM20 0h2v8h-2zM23 0h2v8h-2zM26 0h2v8h-2zM0 10h8v2h-8zM0 13h8v2h-8zM0 16h8v2h-8zM10 10h8v8h-8zM20 10h8v2h-8zM20 13h8v2h-8zM20 16h8v2h-8zM0 20h2v8h-2zM3 20h2v8h-2zM6 20h2v8h-2zM10 20h8v2h-8zM10 23h8v2h-8zM10 26h8v2h-8zM20 20h8v8h-8zM21.5 24a2.5 2.5 0 1 0 5.0 0a2.5 2.5 0 1 0 -5.0 0z"/></svg>
+        <img class="orbi" src="/static/brand/orbi.svg" alt="" width="58" height="29">
         <span class="wordmark">farm<b>partner</b></span>
       </a>
       <nav>
@@ -143,14 +174,20 @@
       <p class="kicker">● NASA SPACE APPS 2026<span class="sep"> · </span><span class="nl">FIELD SHIFT CHALLENGE</span></p>
       <h1>The farm advisor that <br>reads your field from space.</h1>
       <p class="sub">Send a location pin on WhatsApp. FarmPartner reads 20 years of NASA climate, soil-moisture and vegetation data for that field, then compares your crop rotation with two that fit your climate — with the evidence and the risks to check locally.</p>
-      <form class="zip" action="/chat" method="get">
-        <input name="zip" inputmode="numeric" autocomplete="postal-code" placeholder="ZIP code or 📍 pin" aria-label="ZIP code — press Enter to try the web demo">
-        <a class="btn" href="{{ whatsapp }}" target="_blank" rel="noopener">
-          <svg viewBox="0 0 14.6453 14.6344" aria-hidden="true"><path transform="matrix(1 -0.000029 0.000029 1 -1.6875 -1.687)" fill="#0a0a0b" d="{{ whatsapp_path }}"/></svg>
-          {{ wa.cta }}
-        </a>
+      <form class="optin" novalidate>
+        <div class="row">
+          <div class="cc" data-picker><input type="hidden" name="cc" value="1"></div>
+          <input type="tel" name="phone" inputmode="tel" autocomplete="tel-national" placeholder="Your WhatsApp number" aria-label="Your WhatsApp number" required>
+          <button class="btn" type="submit">
+            <svg viewBox="0 0 14.6453 14.6344" aria-hidden="true"><path transform="matrix(1 -0.000029 0.000029 1 -1.6875 -1.687)" fill="#0a0a0b" d="{{ whatsapp_path }}"/></svg>
+            SEND ME A WHATSAPP →
+          </button>
+        </div>
+        <label><input type="checkbox" name="consent" required> I agree to receive WhatsApp messages from FarmPartner. Reply STOP anytime.</label>
+        <p class="status" role="status" aria-live="polite"></p>
       </form>
-      <p class="meta">Free · WhatsApp &amp; SMS · No app to install<span class="sep"> · </span><span class="nl">Open source (MIT) · <a href="/sample">See a sample report →</a></span></p>
+      <p class="meta">or <a href="{{ whatsapp }}" target="_blank" rel="noopener">open WhatsApp yourself</a><span class="sep"> · </span><span class="nl">or <a href="/chat">try it in your browser →</a></span></p>
+      <p class="meta">Free · No app to install · Open source (MIT) · <a href="/sample">Sample report →</a></p>
     </div>
   </section>
 
@@ -180,10 +217,31 @@
       </div>
     </div>
   </footer>
+  <script src="/static/landing/country-picker.js" defer></script>
   <script>
-    // ZIP field: Enter opens the web demo pre-filled with that ZIP.
-    document.querySelector("form.zip").addEventListener("submit", e => {
-      if (!e.target.zip.value.trim()) { e.preventDefault(); location.href = "/chat"; }
+    // Phone opt-in: FarmPartner sends the first WhatsApp message (approved template). If it can't yet,
+    // open WhatsApp with "hi" prefilled so the farmer starts the chat instead.
+    const form = document.querySelector("form.optin"), status = form.querySelector(".status");
+    const say = (html, err) => { status.innerHTML = html; status.classList.toggle("err", !!err); };
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const raw = form.phone.value.trim();
+      const digits = raw.replace(/\D/g, "");
+      if (digits.length < 6) return say("Enter your WhatsApp number.", true);
+      if (!form.consent.checked) return say("Tick the box so we can message you on WhatsApp.", true);
+      const phone = raw.startsWith("+") || !form.cc.value ? "+" + digits : "+" + form.cc.value + digits.replace(/^0+/, "");
+      const btn = form.querySelector("button"); btn.disabled = true; say("Sending…");
+      try {
+        const r = await fetch("/api/optin", {method: "POST", headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({phone, consent: true})});
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok) say(d.detail || "Something went wrong — try again.", true);
+        else if (d.sent) say(d.again ? "Already sent — check WhatsApp for FarmPartner’s message. 📲"
+                                     : "✓ Check WhatsApp — FarmPartner just messaged you. Tap <b>Get started</b>. 📲");
+        else { say(`Opening WhatsApp — just send the “hi” message. <a href="${d.wa_url}" target="_blank" rel="noopener">Didn’t open?</a>`);
+               setTimeout(() => { location.href = d.wa_url; }, 600); }
+      } catch { say("Network error — try again.", true); }
+      btn.disabled = false;
     });
   </script>
 </body>

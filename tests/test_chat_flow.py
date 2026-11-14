@@ -16,9 +16,10 @@ def test_full_onboarding_with_pin_then_questions(offline):
     c = _client()
     assert "location" in say(c, "a", text="hi")[0].lower()
     msgs = say(c, "a", lat=38.05, lon=-100.75)
-    assert "NASA" in msgs[-1] and "Winter wheat → Grain sorghum → Fallow" in msgs[-1]
-    assert "Finney County" in msgs[-1]
-    assert "Save water" in say(c, "a", text="yes it's dryland")[0]
+    text = "\n".join(msgs)
+    assert "NASA" in text and "Winter wheat → Grain sorghum → Fallow" in text
+    assert "Finney County" in text and "Step 2 of 3" in msgs[-1]
+    assert "Save water" in "\n".join(say(c, "a", text="yes it's dryland"))
     msgs = say(c, "a", text="2")
     summary = next(m for m in msgs if "Option 1" in m)
     assert "/r/" in summary
@@ -39,7 +40,7 @@ def test_sms_zip_onboarding_and_farmer_corrects_crops(offline):
     c = _client()
     say(c, "b", text="hello")
     msgs = say(c, "b", text="my zip is 67846")
-    assert "Garden City" in msgs[-1]
+    assert "Garden City" in "\n".join(msgs)
     out = say(c, "b", text="no, we grow corn and soybeans, irrigated with a pivot")[0]
     assert "Corn → Soybeans (irrigated)" in out
 
@@ -108,6 +109,42 @@ def test_landing_copy_follows_whatsapp_prefill(monkeypatch):
     c = _client()
     monkeypatch.setattr(config, "WHATSAPP_PREFILL", "join shelter-gently")
     page = c.get("/").text
-    assert "JOIN ON WHATSAPP" in page and "text=join%20shelter-gently" in page
+    assert "Scan to join on WhatsApp" in page and "text=join%20shelter-gently" in page
     monkeypatch.setattr(config, "WHATSAPP_PREFILL", "hi")
-    assert "TEXT “HI” ON WHATSAPP" in c.get("/").text
+    page = c.get("/").text
+    assert "Text “hi” on WhatsApp" in page and "SEND ME A WHATSAPP" in page and 'name="consent"' in page
+
+
+
+def test_buttons_guide_onboarding(offline):
+    c = _client()
+    r = c.post("/api/chat", json={"phone": "btn", "text": "hi"}).json()
+    assert "Step 1 of 3" in r["messages"][0] and r["actions"] == [None]
+    r = c.post("/api/chat", json={"phone": "btn", "lat": 38.05, "lon": -100.75}).json()
+    crops = r["actions"][-1]
+    assert [b["id"] for b in crops["buttons"]] == ["yes irrigated", "yes dryland", "different crops"]
+    r = c.post("/api/chat", json={"phone": "btn", "text": "different crops"}).json()  # tapped "Different crops"
+    assert "which crops" in r["messages"][0].lower()
+    r = c.post("/api/chat", json={"phone": "btn", "text": "sorghum, wheat"}).json()   # irrigation unknown -> asked
+    assert [b["id"] for b in r["actions"][-1]["buttons"]] == ["irrigated", "dryland"]
+    r = c.post("/api/chat", json={"phone": "btn", "text": "dryland"}).json()
+    goals = r["actions"][-1]["list"]["items"]
+    assert [g["id"] for g in goals] == ["1", "2", "3", "4", "5"]
+    r = c.post("/api/chat", json={"phone": "btn", "text": "2"}).json()
+    assert r["actions"][-1]["buttons"][2]["id"] == "report"
+    assert "/r/" in c.post("/api/chat", json={"phone": "btn", "text": "report"}).json()["messages"][0]
+
+
+def test_webhook_sends_button_turns_via_api(offline, monkeypatch):
+    from app import main, messaging
+
+    sent = []
+    monkeypatch.setattr(messaging, "send", lambda to, m: sent.append(m))
+    c = _client()
+    c.post("/twilio/webhook", data={"From": "whatsapp:+15550009", "Body": "hi"})
+    r = c.post("/twilio/webhook", data={"From": "whatsapp:+15550009", "Latitude": "38.05", "Longitude": "-100.75"})
+    assert r.status_code == 200
+    assert any(isinstance(m, dict) and "buttons" in m for m in sent)
+    sent.clear()
+    c.post("/twilio/webhook", data={"From": "whatsapp:+15550009", "Body": "Yes, dryland", "ButtonPayload": "yes dryland"})
+    assert any(isinstance(m, dict) and "list" in m for m in sent)  # the goal picker
