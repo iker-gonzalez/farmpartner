@@ -31,7 +31,8 @@ def offline(monkeypatch):
     """Stub every network call with the saved real-data fixtures."""
     from app import onboarding, ratelimit, service
     ratelimit.reset()
-    from app.data import forecast
+    from app.data import forecast, landcheck
+    monkeypatch.setattr(landcheck, "problem", lambda features: None)
 
     def fake_build(lat, lon, with_ndvi=True):
         return load("garden_city_ks" if lat < 39 else "hastings_ne")

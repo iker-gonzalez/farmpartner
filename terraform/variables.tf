@@ -187,3 +187,9 @@ variable "welcome_content_sid" {
   type        = string
   default     = ""
 }
+
+variable "min_instances" {
+  description = "Warm instances. 0 = scale to zero (default); 1 for demo/judging days so nobody waits for a cold start."
+  type        = number
+  default     = 0
+}

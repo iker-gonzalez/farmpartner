@@ -90,11 +90,12 @@ def get_json(url: str, params: dict | None = None, ttl_s: float = 0, headers: di
     return cached(key, ttl_s, fetch, keep)
 
 
-def get_text(url: str, params: dict | None = None, ttl_s: float = 0, keep=None):
+def get_text(url: str, params: dict | None = None, ttl_s: float = 0, keep=None, timeout: float | None = None):
     key = "text:" + url + "?" + json.dumps(params or {}, sort_keys=True)
 
     def fetch():
-        r = _client.get(url, params=params)
+        kw = {"timeout": timeout} if timeout else {}
+        r = _client.get(url, params=params, **kw)
         r.raise_for_status()
         return r.text
 

@@ -11,7 +11,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from sqlalchemy import select
 
-from app import chat, config, landing, messaging, ratelimit, service
+from app import chat, config, landing, media, messaging, ratelimit, service
 from app.prompts import as_text, is_prompt
 from app.db import Farmer, Field, init_db, session
 from app.engine.explain import DISCLAIMER, SCORE_LABELS, evidence, gaps, inch, short_name
@@ -61,6 +61,10 @@ async def twilio_webhook(request: Request, background: BackgroundTasks):
     lon = float(form["Longitude"]) if form.get("Longitude") else None
     # A tapped button / list item arrives with its id; that id is the text the conversation understands.
     text = form.get("ButtonPayload") or form.get("ListId") or form.get("Body", "")
+    media_url, media_kind = form.get("MediaUrl0"), media.kind(form.get("MediaContentType0"))
+    if media_url and media_kind:  # voice notes and photos need downloading and processing: do it in the background
+        background.add_task(_media_turn, sender, channel, media_url, media_kind, text)
+        return _twiml([])
     turn = chat.inbound(sender, channel, text, lat, lon, form.get("MediaUrl0"))
     if any(is_prompt(m) for m in turn.now):
         # TwiML can't carry buttons: send this turn's messages in order through the API instead.
@@ -70,6 +74,30 @@ async def twilio_webhook(request: Request, background: BackgroundTasks):
     if turn.later:
         background.add_task(_run_later, sender, turn.later)
     return _twiml(turn.now)
+
+
+def _media_turn(sender: str, channel: str, url: str, kind: str, caption: str):
+    try:
+        data, content_type = media.download(url)
+    except Exception:
+        log.exception("media download failed")
+        messaging.send(sender, "Sorry, I couldn't open that file. Could you send it again?")
+        return
+    if kind == "audio":
+        try:
+            heard = media.transcribe(data, content_type)
+        except Exception:
+            log.exception("transcription failed")
+            heard = None
+        if not heard:
+            messaging.send(sender, "🎙️ Sorry, I couldn't make out that voice note. Could you type it, or send a "
+                                   "shorter note (under a minute)?")
+            return
+        messaging.send(sender, f"🎙️ I heard: “{heard}”")
+        turn = chat.inbound(sender, channel, heard, None, None, url)
+    else:
+        turn = chat.photo(sender, channel, media.image_block(data, content_type), caption, url)
+    _run_later(sender, lambda: list(turn.now) + (turn.later() if turn.later else []))
 
 
 class ChatIn(BaseModel):

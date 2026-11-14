@@ -36,6 +36,23 @@ def inbound(phone: str, channel: str, text: str, lat: float | None = None, lon: 
     return _out(farmer.id, Turn(now=reply.now, later=reply.later))
 
 
+def photo(phone: str, channel: str, image: dict | None, caption: str, media_url: str | None = None) -> Turn:
+    """A photo from the farmer (WhatsApp). Read by Claude once the field is set up."""
+    with session() as db:
+        farmer = service.get_or_create_farmer(db, phone, channel)
+    onboarding.record(farmer.id, "in", ("[sent a photo] " + caption).strip(), media_url=media_url)
+    if farmer.state != "ready":
+        return _out(farmer.id, Turn(now=["📷 Got your photo! I can look at crop photos once your field is set up — "
+                                         "let's finish that first. Send RESET if you want to start over."], later=None))
+    if image is None:
+        return _out(farmer.id, Turn(now=["📷 I couldn't open that file. Please send it as a normal photo (JPG or PNG)."],
+                                    later=None))
+
+    def later():
+        return [agent.answer(farmer, caption, image=image)]
+    return _out(farmer.id, Turn(now=["📷 Got it — taking a look…"], later=later))
+
+
 def _out(farmer_id: int, turn: Turn) -> Turn:
     """Wrap the turn so every outbound message is logged (the agent reads this history)."""
     for m in turn.now:

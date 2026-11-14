@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from typing import Callable
 
 from app import service
+from app.data import landcheck
 from app.data.geocode import county_name, zip_to_point
 from app.db import Farmer, Field, Message, now, session
 from app.engine import explain as ex
@@ -101,9 +102,16 @@ def _first_insight(field: Field) -> list:
     return ["\n".join(lines)]
 
 
+REPIN = ("🤔 That pin looks like {what}, not a farm field. Please drop the pin right on your field: tap 📎 → "
+         "*Location*, move the map until the pin sits on the field, then tap *Send this location*. "
+         "(Or text the field's ZIP code.)")
+
+
 def _set_location(farmer: Farmer, lat: float, lon: float, place: str | None) -> Reply:
+    check_pin = place is None  # a ZIP gives the town's centre on purpose; only exact pins are checked
     with session() as db:
         fm = db.get(Farmer, farmer.id)
+        prev_state = fm.state
         place = place or county_name(lat, lon) or f"{lat:.3f}, {lon:.3f}"
         fld = Field(farmer_id=fm.id, lat=lat, lon=lon, place=place)
         db.add(fld)
@@ -115,9 +123,17 @@ def _set_location(farmer: Farmer, lat: float, lon: float, place: str | None) -> 
         with session() as db:
             fld = db.get(Field, field_id)
             service.analyze_field(db, fld, with_ndvi=False)
-            return _first_insight(fld)
+            what = landcheck.problem(fld.features or {}) if check_pin else None
+            if not what:
+                return _first_insight(fld)
+            db.delete(fld)
+            fm = db.get(Farmer, farmer.id)
+            fm.state = "ready" if prev_state == "ready" else "awaiting_location"
+            db.commit()
+        return [REPIN.format(what=what)]
 
-    return Reply(now=["📡 Got your field! Pulling 20 years of NASA satellite & weather data for it — about 30 seconds…"],
+    return Reply(now=["📡 Got your pin! Checking it's on a field and pulling 20 years of NASA satellite & weather data "
+                      "for it — about 30 seconds…"],
                  later=later)
 
 

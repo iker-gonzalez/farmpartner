@@ -3,6 +3,10 @@
 **A WhatsApp/SMS farm advisor built on open NASA Earth data.** Built for NASA Space Apps 2026, challenge
 *Field Shift: Adapting Farms with NASA Data*.
 
+**Try it:** [farmpartner.space](https://farmpartner.space). Enter your WhatsApp number and FarmPartner messages you
+first, or text "hi" to **+1 620 318 1728** on WhatsApp, or use the [browser simulator](https://farmpartner.space/chat),
+or open a [sample field report](https://farmpartner.space/sample).
+
 A farmer sends a location pin (or a ZIP code over SMS). FarmPartner pulls 20 years of NASA climate, soil-moisture and
 vegetation data for that field and reads the field's crop history from USDA satellite crop maps. It then compares the
 farmer's **current rotation with two alternatives** chosen for their climate and their goal. For each strategy it shows
@@ -12,22 +16,30 @@ Their reports are stored as ground truth next to the satellite data.
 
 > FarmPartner supports, and does not replace, farmer judgment and local agronomic expertise.
 
-## Onboarding in three messages
+## Onboarding in three steps
+
+Every choice is a WhatsApp tap-button or list. The same prompts arrive as numbered text over SMS.
 
 ```
-Farmer: hi
-Bot:    👋 … share your field location (📎 → Location) or text your ZIP code
-Farmer: 📍 (pin)
-Bot:    🛰️ Here's what NASA sees at Finney County, KS: ~21.5 in rain vs ~51 in evaporation demand,
-        48 days >95°F a year lately (was 45) … Satellite crop maps show 2021 fallow, 2022 wheat, 2023 sorghum…
-        Looks like Winter wheat → Grain sorghum → Fallow. Is that right? Add "irrigated" or "dryland".
-Farmer: yes, dryland
-Bot:    What matters most? 1 Save water 2 Soil health 3 Income 4 Less erosion 5 Forage
-Farmer: 2
-Bot:    Today: Wheat → Sorghum → Fallow — 48/100
-        Option 1: Wheat + summer cover → Sorghum — 69/100 · Better soil health (+43) · ⚠️ check sorghum buyers
-        Option 2: Wheat → Canola → Sorghum — 62/100 …  Full report: https://…/r/<id>
+FarmPartner: 👋 Hi! I'm FarmPartner… [Get started] [Not now]      ← approved template, after the web opt-in
+Farmer:      Get started
+FarmPartner: 📍 Step 1 of 3: send your field location (📎 → Location) or text your ZIP code
+Farmer:      📍 (pin)
+FarmPartner: 🛰️ Here's what NASA sees at Finney County, KS: ~21.5 in rain vs ~51 in evaporation demand,
+             48 days >95°F a year lately (was 45) · water storage falling 0.34 in/yr since 2002 (GRACE) …
+             Satellite crop maps show 2021 fallow, 2022 wheat, 2023 sorghum…
+             Step 2 of 3 — is that your rotation?  [Yes, irrigated] [Yes, dryland] [Different crops]
+Farmer:      Yes, dryland
+FarmPartner: Step 3 of 3 — what matters most?  [Choose a goal ▾] Save water · Soil health · Income · Less erosion · Forage
+Farmer:      Build soil health
+FarmPartner: Today: Wheat → Sorghum → Fallow — 48/100
+             Option 1: Wheat + summer cover → Sorghum — 69/100 · Better soil health (+43) · ⚠️ check sorghum buyers
+             Option 2: Wheat → Canola → Sorghum — 62/100 …  Full report: https://farmpartner.space/r/<id>
+             [Should I water?] [Frost coming?] [My field report]
 ```
+
+About 20–30 minutes later, the field's SMAP soil-moisture and ECOSTRESS crop-stress results come in from NASA
+AppEEARS. They are added to the report and to the watering advice.
 
 ## Data sources
 
@@ -37,7 +49,9 @@ Bot:    Today: Wheat → Sorghum → Fallow — 48/100
 | **NASA MODIS MOD13Q1** NDVI 250 m (ORNL DAAC) | Months the field is bare (the cover-crop window), crop vigor timeline | REST, no key (slow, fetched in background) |
 | **USDA NASS Cropland Data Layer** 30 m | Crop history per year → auto-detects the current rotation | REST, no key |
 | **USDA NRCS SSURGO** (Soil Data Access, behind Web Soil Survey) | Organic matter, texture, slope, erodibility (K), drainage | REST, no key |
-| **NASA GRACE/GRACE-FO** | Water storage / groundwater trend | Optional: drop `data/grace_trends.csv` (`lat,lon,trend_cm_per_yr,period`); otherwise listed as a gap |
+| **NASA SMAP L4** (SPL4SMGP, 9 km) via AppEEARS | Root-zone and surface soil moisture over the last 120 days and its monthly trend: "25% water by volume, up from 18% in July" | Earthdata login; async job per field |
+| **NASA ECOSTRESS** ESI (ECO_L4T_ESI, 70 m) via AppEEARS | Field-scale crop water stress (actual vs. potential evapotranspiration) over the last year | Earthdata login; async job per field |
+| **NASA GRACE/GRACE-FO** JPL mascon RL06.3 | Long-term water-storage (groundwater) trend in in/yr, a key Ogallala risk signal | Precomputed grid in `data/grace_trends.csv` (`scripts/get-grace.sh` + `precompute_grace.py`) |
 | Open-Meteo forecast | 7-day rain, ET₀, frost and heat for alerts and irrigation advice | REST, no key |
 | U.S. Census geocoder, Zippopotam | County name, ZIP → location | REST, no key |
 
@@ -46,14 +60,20 @@ Only derived features are stored, never raw rasters.
 ## How it works
 
 ```
+farmpartner.space ─► phone opt-in ─► POST /api/optin ─► Twilio Content API: approved welcome template
 WhatsApp / SMS ─► Twilio ─► POST /twilio/webhook ─► app/chat.py
-                                                     ├─ onboarding.py   (pin/ZIP → confirm crops → goal)
-                                                     └─ agent.py        (Claude + 6 tools, or a keyword fallback)
-                                                          │
-                     service.py ──► engine/features.py   (NASA/USDA fetchers in parallel, disk cache)
+                                                     ├─ onboarding.py   (pin/ZIP → confirm crops → goal; tap-buttons)
+                                                     └─ agent.py        (Claude via Workload Identity Federation + 6 tools,
+                                                                         or a keyword fallback)
+                     service.py ──► engine/features.py   (NASA/USDA fetchers in parallel)
+                                ──► data/appeears.py     (SMAP + ECOSTRESS async jobs, collected in the background)
                                 ──► engine/scoring.py    (rule-based rotation scoring; 7 sub-scores)
                                 ──► engine/explain.py    (why / evidence / benefits / gaps / risks, inches & °F)
-                                ──► db.py                (farmer, field, crop_history, observation, recommendation, message, alert)
+                                ──► db.py                (Supabase Postgres: farmer, field, crop_history, observation,
+                                                          recommendation, message, alert)
+data/http.py  two-level raw-data cache: /tmp → Cloud Storage bucket (survives restarts and deploys)
+Cloud Scheduler 06:00 CT ─► POST /internal/daily (OIDC): frost/heat/irrigation alerts, refresh week-old fields,
+                                                         collect finished satellite jobs
 GET /r/<id>  field report (Leaflet map, rain-vs-ET₀ chart, NDVI chart, 3 strategy cards)
 GET /        landing page · GET /chat  WhatsApp-style web simulator · GET /sample  demo field report
 ```
@@ -84,12 +104,18 @@ open http://localhost:8000          # landing page; web chat simulator at /chat
 uv run pytest                       # offline tests using real-data fixtures
 ```
 
-**WhatsApp:** in the Twilio console, set up the WhatsApp Sandbox. Expose the server with `ngrok http 8000`, then set
-the sandbox "When a message comes in" URL to `https://<ngrok>/twilio/webhook` and set `PUBLIC_BASE_URL` to that ngrok
-URL. Farmers join with the sandbox code. **SMS:** point a Twilio number's messaging webhook at the same URL.
-**Alerts:** a daily cron calls `curl -X POST -d token=$ADMIN_TOKEN https://<host>/admin/alerts/run` to send frost,
-heat and irrigation alerts. WhatsApp only allows free-form messages within 24 h of the farmer's last message;
-production needs approved templates.
+**WhatsApp:** production uses a branded WhatsApp Business sender ("FarmPartner", +1 620 318 1728) whose webhook
+is `https://farmpartner.space/twilio/webhook`. To develop locally, use the Twilio WhatsApp Sandbox and an ngrok URL
+as its webhook, with `PUBLIC_BASE_URL` set to that URL and `WHATSAPP_PREFILL="join <code>"`. **SMS:** point a Twilio
+number's messaging webhook at the same URL.
+
+**Business-initiated first message:** WhatsApp only lets a business message first with a Meta-approved template.
+`scripts/welcome_template.py` creates the welcome template (Get started / Not now), submits it and prints its status.
+Put its SID in `welcome_content_sid`. Until Meta approves it, the landing form falls back to opening WhatsApp with
+"hi" prefilled. Farmers can reply STOP to opt out.
+
+**Alerts:** Cloud Scheduler calls `/internal/daily` every morning. Free-form alerts only reach farmers who messaged
+in the last 24 h (a WhatsApp rule).
 
 ## Deploy (Cloud Run + Supabase, Terraform)
 
@@ -108,6 +134,12 @@ PLAN_ONLY=1 ./scripts/deploy.sh
   (with a Supabase access token) to adopt the project into state with `prevent_destroy`.
 - **Optional secrets:** set `anthropic_api_key`, `twilio_account_sid`, `twilio_auth_token` in
   `terraform/terraform.tfvars` (gitignored); they are mounted only when set.
+- **More secrets:** `earthdata_username`/`earthdata_password` for AppEEARS (`./scripts/set-earthdata.sh <user>`), and the
+  Claude Workload Identity Federation IDs (`anthropic_federation_*`). With federation, the Cloud Run service account
+  signs in to Claude, so no API key is stored.
+- **Demo day:** `min_instances = 1` keeps one instance warm, so nobody waits for a cold start. Set it back to `0` afterwards.
+- **Rate limits:** per IP, per phone and per WhatsApp sender, plus a daily Claude-call cap per farmer and one
+  web opt-in message per phone per day.
 - **Service shape:** public, scales to zero, max 1 instance (the simulator's poll outbox is in memory), CPU kept
   allocated after responses so background NASA fetches and Twilio pushes finish. Health check: `/health`
   (Cloud Run reserves paths ending in `z`).
@@ -121,7 +153,8 @@ PLAN_ONLY=1 ./scripts/deploy.sh
 - No prices or yields yet. "Income" is a relative index, and the bot asks farmers for local prices and buyers.
 - U.S.-deepest: CDL and SSURGO are U.S.-only. Climate, NDVI and the forecast work worldwide, and outside the U.S. the
   farmer types their crops.
-- SMAP (9 km soil moisture) and ECOSTRESS (ET) need Earthdata login and are not wired in yet. POWER's GWETROOT stands
-  in for soil moisture.
+- SMAP is a 9 km grid. ECOSTRESS passes are irregular, and clouds leave gaps. Both arrive 20–30 minutes after
+  onboarding (AppEEARS is asynchronous), and until then the report lists them as "processing".
+- GRACE is a ~300 km signal. It shows the regional aquifer trend, not one well.
 
 MIT licensed.

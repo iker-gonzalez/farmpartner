@@ -29,7 +29,13 @@ WhatsApp *bold* is fine. Use inches, °F and acres.
 - You support, not replace, the farmer's judgment: when you recommend a change, remind them to check with their local \
 extension agent or agronomist. Do not lecture.
 - Reply in the language the farmer writes in (many U.S. farm workers write in Spanish).
-- Share the report link when they want details, maps or charts."""
+- Share the report link when they want details, maps or charts.
+- Voice notes reach you already transcribed; answer them like any message.
+- When the farmer sends a crop photo: say what you can actually see (crop, growth stage, color, visible wilting, \
+spots, insects or damage) as a visual impression, not a diagnosis. Name the 1-2 most likely causes, what to check in \
+the field to confirm (e.g. underside of leaves, how many plants, roots), and when it matters, connect it to their \
+field data with a tool (e.g. heat or dry soil → irrigation_advice). Save clear pest or disease sightings with \
+log_observation. If the photo is unclear or not a crop, ask for a closer photo of the affected plants."""
 
 PRIORITY_ENUM = ["save_water", "soil_health", "income", "less_erosion", "forage"]
 
@@ -131,17 +137,21 @@ def _history(farmer_id: int, limit: int = 12) -> list[dict]:
     return turns
 
 
-def answer(farmer: Farmer, text: str) -> str:
-    """The inbound message must already be recorded in the message table (it is the last user turn)."""
+def answer(farmer: Farmer, text: str, image: dict | None = None) -> str:
+    """The inbound message must already be recorded in the message table (it is the last user turn).
+    image: a Claude image content block (app/media.image_block) attached to that turn."""
     from app import ratelimit
 
     if config.llm_enabled() and ratelimit.allow(f"llm:{farmer.id}", ratelimit.LLM_PER_FARMER_DAY):
         try:
-            return _answer_llm(farmer.id)
+            return _answer_llm(farmer.id, image)
         except Exception as e:
             log.exception("LLM failed; falling back to rules")
             if config.federation_enabled() and "Token exchange failed" in str(e):
                 _log_identity_claims()
+    if image:
+        return ("📷 Thanks, I saved your photo. Reading photos needs my AI assistant, which is offline right now. "
+                "Tell me in words what you see (e.g. \"yellow leaves\", \"aphids\") and I'll log it.")
     return _answer_rules(farmer.id, text)
 
 
@@ -191,11 +201,13 @@ def claude_client():
     return _client
 
 
-def _answer_llm(farmer_id: int) -> str:
+def _answer_llm(farmer_id: int, image: dict | None = None) -> str:
     client = claude_client()
     messages = _history(farmer_id)
     if not messages:
         return HELP
+    if image and messages[-1]["role"] == "user":
+        messages[-1]["content"] = [image, {"type": "text", "text": messages[-1]["content"]}]
     for _ in range(6):
         resp = client.beta.messages.create(
             model=config.ANTHROPIC_MODEL, max_tokens=4000, system=SYSTEM, tools=TOOLS, messages=messages,

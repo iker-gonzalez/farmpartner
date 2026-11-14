@@ -108,7 +108,7 @@ resource "google_cloud_run_v2_service" "app" {
     labels                           = local.labels
 
     scaling {
-      min_instance_count = 0 # costs nothing while idle
+      min_instance_count = var.min_instances # 0 costs nothing idle; 1 keeps a warm instance for demo day
       max_instance_count = var.max_instances
     }
 
@@ -169,4 +169,11 @@ resource "google_cloud_run_v2_service_iam_member" "public" {
   name     = google_cloud_run_v2_service.app.name
   role     = "roles/run.invoker"
   member   = "allUsers"
+}
+
+# Voice notes → text (app/media.py). Uses the runtime service account; no key.
+resource "google_project_service" "speech" {
+  project            = var.project_id
+  service            = "speech.googleapis.com"
+  disable_on_destroy = false
 }
