@@ -61,9 +61,28 @@ def test_dryland_filter_excludes_corn_soy_in_semi_arid(garden_city):
 
 
 def test_priorities_change_the_answer(hastings):
-    a = compare(hastings, ["soil_health"], irrigated=True)["strategies"][1]["id"]
-    b = compare(hastings, ["save_water"], irrigated=True)["strategies"][1]["id"]
-    assert a != b
+    soil = compare(hastings, ["soil_health"], irrigated=True)["strategies"]
+    water = compare(hastings, ["save_water"], irrigated=True)["strategies"]
+    income = compare(hastings, ["income"], irrigated=True)["strategies"]
+    assert soil[1]["total"] != water[1]["total"]  # the goal score always reflects the goal
+    # a plan that wins on almost everything may top several goals (overall score counts too), but not all of them
+    assert [s["id"] for s in soil[1:]] != [s["id"] for s in income[1:]]
+
+
+def test_search_goes_beyond_templates_with_seasonal_second_crops(garden_city):
+    from app.engine.explain import season_plan
+    res = compare(garden_city, ["soil_health"], irrigated=False, current=["winter_wheat", "sorghum", "fallow"])
+    cur, opts = res["strategies"][0], res["strategies"][1:]
+    assert any(s["generated"] for s in opts) and all(s["overall"] > cur["overall"] for s in opts)
+    assert len(set(opts[0]["years"]) & set(opts[1]["years"])) <= 1             # two genuinely different plans
+    assert "Yr 1:" in season_plan(opts[0]) and "–" in season_plan(opts[0])     # month-by-month calendar
+    # gap crops must leave before the next crop: no clover (to April) before peas sown in March
+    from app.engine.knowledge import crops
+    from app.engine.scoring import _gap_options
+    C = crops()
+    assert "clover" not in _gap_options(C["winter_wheat"], C["field_peas"])
+    assert "dbl_soybeans" not in _gap_options(C["winter_wheat"], C["canola"])
+    assert "dbl_soybeans" in _gap_options(C["winter_wheat"], C["corn"])
 
 
 def test_chat_summary_is_short(hastings):

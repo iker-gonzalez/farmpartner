@@ -78,6 +78,12 @@ def score_rotation(rot: dict, f: dict, irrigated: bool | None) -> dict:
             issues.append(f"{c['name']} needs ~{c['gdd_c']} growing degree days; this site gets ~{gdd}")
     if not irrigated and rain < rot.get("min_rain_mm", 0):
         issues.append(f"needs ~{rot['min_rain_mm']} mm rain/yr without irrigation; this site averages {rain:.0f} mm")
+    for cv in set(cover_map.values()):
+        g = covers()[cv]
+        if g.get("min_gdd_c") and gdd < g["min_gdd_c"]:
+            issues.append(f"{g['name']} needs a longer season (~{g['min_gdd_c']} growing degree days; this site ~{gdd})")
+        if g.get("min_rain_mm") and not irrigated and rain < g["min_rain_mm"]:
+            issues.append(f"{g['name']} needs ~{g['min_rain_mm']} mm rain/yr without irrigation")
 
     # Water: seasonal crop water need vs effective rainfall
     cover_water = sum(covers()[cv]["water_use_mm"] for cv in cover_map.values()) / n
@@ -130,12 +136,15 @@ def score_rotation(rot: dict, f: dict, irrigated: bool | None) -> dict:
     resilience = clamp(sum(res_vals) / len(res_vals) if res_vals else 50)
 
     # Income proxy (relative only; no prices) discounted by climate risk
-    income = clamp(sum(c["income"] for c in main) / n * 20 * (0.75 + resilience / 400))
-    forage = clamp((sum(c["forage"] for c in main) / n + (1.5 if rot.get("extra_forage") else 0)) * 20)
+    gap = [covers()[cv] for cv in cover_map.values() if covers()[cv].get("harvested")]  # double crops, grazed forage
+    income = clamp((sum(c["income"] for c in main) + 0.6 * sum(g["income"] for g in gap)) / n * 20
+                   * (0.75 + resilience / 400))
+    forage = clamp(((sum(c["forage"] for c in main) + 0.6 * sum(g["forage"] for g in gap)) / n
+                    + (1.5 if rot.get("extra_forage") else 0)) * 20)
 
     return {
         "id": rot["id"], "name": rot["name"], "years": years, "covers": cover_map,
-        "feasible": not issues, "issues": issues,
+        "feasible": not issues, "issues": issues, "generated": rot.get("generated", False),
         "scores": {k: round(v) for k, v in {"water": water, "soil": soil, "erosion": erosion, "pest": pest,
                                              "income": income, "resilience": resilience, "forage": forage}.items()},
         "metrics": {"water_need_mm_per_yr": round(need), "effective_rain_mm": round(eff),
@@ -168,6 +177,91 @@ def canonical_cycle(pattern: list[str]) -> list[str]:
     return list(match["years"]) if match else list(pattern)
 
 
+SPECIALTY = {"potatoes", "tomatoes", "vegetables", "sugarbeets", "rice", "sugarcane"}
+NOT_IN_SEARCH = {"alfalfa"}  # multi-year stands are left to the hand-written templates
+GOAL_SHARE = 0.6  # ranking = 60 % the farmer's goals, 40 % the balanced overall score
+
+
+def overall(scores: dict) -> float:
+    return total(scores, BASE_WEIGHTS)
+
+
+def rank_key(s: dict, weights: dict) -> float:
+    return GOAL_SHARE * total(s["scores"], weights) + (1 - GOAL_SHARE) * overall(s["scores"])
+
+
+def _gap_options(c: dict, nxt: dict) -> list:
+    """Second crops / covers that fit the gap after crop c and are out of the field before the next crop nxt is
+    planted (e.g. no clover running to April before peas sown in March, no double crop before canola in September)."""
+    if c["id"] == "fallow" or c["season"] == "perennial":
+        return [None]
+    nxt_plant = nxt["plant_month"] or 13 if nxt["id"] != "fallow" else 13  # fallow: the field is free
+    fall_sown_next = nxt["season"] == "cool" and nxt["plant_month"] >= 9
+    opts = [None]
+    if c["harvest_month"] and c["harvest_month"] <= 7:  # wheat, barley, oats, peas, canola: summer is free
+        if not fall_sown_next or nxt_plant >= 10:      # summer mix is out by September
+            opts.append("summer_mix")
+        if not fall_sown_next or nxt_plant >= 10:      # double crops are harvested in October
+            opts += ["dbl_soybeans", "dbl_sorghum"]
+        if not fall_sown_next and nxt_plant >= 5:      # clover runs to April
+            opts.append("clover")
+        return opts
+    if not fall_sown_next and nxt_plant >= 5:          # summer crop → winter free until a May+ planting
+        opts += ["cereal_rye", "winter_forage"]
+    return opts
+
+
+def _make_rot(years: list[str], cover_map: dict) -> dict:
+    C, CV = crops(), covers()
+    n = len(years)
+    need = (sum(C[c]["water_need_mm"] for c in years) + sum(CV[v]["water_use_mm"] for v in cover_map.values())) / n
+    parts = [C[c]["name"] + (f" + {CV[cover_map[str(i)]]['short']}" if str(i) in cover_map else "")
+             for i, c in enumerate(years)]
+    return {"id": "gen:" + "-".join(years) + ":" + ",".join(f"{k}{v}" for k, v in sorted(cover_map.items())),
+            "name": " → ".join(parts), "years": list(years), "covers": dict(cover_map),
+            "min_rain_mm": round(need * 1.15), "generated": True}
+
+
+def generate(f: dict, irrigated: bool | None, current: list[str], weights: dict, keep: int = 12) -> list[dict]:
+    """Search beyond the templates: every 2- and 3-year sequence of crops that fit this site, each year's gap
+    filled with the best second crop or cover (one pass of coordinate ascent). Returns the best scored ones."""
+    import itertools
+
+    C = crops()
+    clim = f.get("climate") or {}
+    gdd = clim.get("season_gdd_c") or 2500
+    pool = [cid for cid, c in C.items() if cid not in NOT_IN_SEARCH
+            and (cid not in SPECIALTY or cid in (current or []))
+            and not (c["gdd_c"] and c["gdd_c"] > gdd * 0.95)]
+    seen, out = set(), []
+    for n in (2, 3):
+        for seq in itertools.product(pool, repeat=n):
+            if any(seq[i] == seq[(i + 1) % n] for i in range(n)) or seq.count("fallow") > 1:
+                continue
+            canon = min(tuple(seq[i:] + seq[:i]) for i in range(n))
+            if canon in seen:
+                continue
+            seen.add(canon)
+            years = list(canon)
+            best = score_rotation(_make_rot(years, {}), f, irrigated)
+            cover_map: dict = {}
+            for i in range(n):
+                for opt in _gap_options(C[years[i]], C[years[(i + 1) % n]])[1:]:
+                    trial = {**cover_map, str(i): opt}
+                    s = score_rotation(_make_rot(years, trial), f, irrigated)
+                    if s["feasible"] and (not best["feasible"] or rank_key(s, weights) > rank_key(best, weights)):
+                        best, cover_map = s, trial
+            if best["feasible"]:
+                out.append(best)
+    out.sort(key=lambda s: rank_key(s, weights), reverse=True)
+    return out[:keep]
+
+
+def _distinct(a: dict, b: dict) -> bool:
+    """Two plans worth showing side by side share at most one main crop (not a one-crop swap)."""
+    return len(set(a["years"]) & set(b["years"]) - {"fallow"}) <= 1
+
+
 def compare(f: dict, priorities: list[str], irrigated: bool | None, current: list[str] | None = None,
             n_alternatives: int = 2) -> dict:
     """Score the farmer's current rotation plus the best alternatives. Returns 3 strategies by default."""
@@ -186,6 +280,7 @@ def compare(f: dict, priorities: list[str], irrigated: bool | None, current: lis
         cur = score_rotation(cur_rot, f, irrigated)
         cur["is_current"] = True
         cur["total"] = total(cur["scores"], weights)
+        cur["overall"] = overall(cur["scores"])
     cands = []
     for r in rotations():
         if current and _same_cycle(r["years"], current) and not r.get("covers"):
@@ -195,10 +290,15 @@ def compare(f: dict, priorities: list[str], irrigated: bool | None, current: lis
         s = score_rotation(r, f, irrigated)
         if not s["feasible"]:
             continue
+        cands.append(s)
+    for s in generate(f, irrigated, current, weights):
+        if not (current and _same_cycle(s["years"], current) and not s["covers"]):
+            cands.append(s)
+    for s in cands:
         s["is_current"] = False
         s["total"] = total(s["scores"], weights)
-        cands.append(s)
-    cands.sort(key=lambda s: s["total"], reverse=True)
+        s["overall"] = overall(s["scores"])
+    cands.sort(key=lambda s: rank_key(s, weights), reverse=True)
     specialty_ids = {r["id"] for r in rotations() if r.get("requires_any")}
     specialty = [s for s in cands if s["id"] in specialty_ids]
     if len(specialty) >= 2:  # a vegetable/beet/rice grower gets options that keep their crop
@@ -212,9 +312,10 @@ def compare(f: dict, priorities: list[str], irrigated: bool | None, current: lis
         picked.append(best)
         base_soil = (cur["scores"]["soil"] + cur["scores"]["erosion"]) / 2 if cur else 0
         builders = [s for s in cands[1:] if (s["scores"]["soil"] + s["scores"]["erosion"]) / 2 >= base_soil + 10
-                    and s["total"] >= best["total"] - 15]
+                    and s["total"] >= best["total"] - 15 and _distinct(s, best)]
         builders.sort(key=lambda s: (s["scores"]["soil"] + s["scores"]["erosion"]) / 2 + s["total"] / 2, reverse=True)
-        second = builders[0] if builders else (cands[1] if len(cands) > 1 else None)
+        others = [s for s in cands[1:] if _distinct(s, best)]  # a genuinely different plan, not a near-copy
+        second = builders[0] if builders else (others[0] if others else (cands[1] if len(cands) > 1 else None))
         if second:
             second["role"] = "Best soil builder" if builders else "Runner-up"
             picked.append(second)

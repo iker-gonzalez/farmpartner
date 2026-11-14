@@ -95,6 +95,8 @@ def _why(s: dict, cur: dict | None, priorities: list[str]) -> list[str]:
         for d, k in deltas[:3]:
             if d >= 8:
                 out.append(f"Better {SCORE_LABELS[k]} than today (+{d} points).")
+    if cur and s.get("overall") is not None and s["overall"] - cur.get("overall", 0) >= 3:
+        out.append(f"Better overall too: {s['overall']:.0f}/100 vs {cur['overall']:.0f} today.")
     if priorities:
         out.append("Ranked high for your goal: " + ", ".join(PRIORITY_LABELS.get(p, p) for p in priorities) + ".")
     return out or ["Scores close to your current rotation on most measures."]
@@ -144,6 +146,13 @@ def _risks(s: dict, f: dict, irrigated: bool | None) -> list[str]:
     C = crops()
     ids = set(s["years"])
     r = list(s.get("issues", []))
+    if s.get("generated"):
+        r.insert(0, "A new combination found by FarmPartner's search, not a standard rotation: less field-tested, "
+                    "so try it on part of a field first and check it with your extension agent.")
+    dbl = [covers()[cv]["short"] for cv in set(s.get("covers", {}).values()) if covers()[cv].get("harvested")]
+    if dbl:
+        r.append(f"{', '.join(sorted(dbl)).capitalize()}: tight timing after the first harvest — plant fast, and "
+                 "check herbicide carryover and local demand.")
     decline = _grace_decline(f)
     if decline and irrigated and s["metrics"]["water_need_mm_per_yr"] >= 450:
         r.append(f"NASA GRACE shows water storage here falling ~{decline} in/yr since 2002 — a thirsty irrigated "
@@ -214,15 +223,43 @@ def short_name(s: dict) -> str:
     return s["name"].replace("Your current rotation: ", "")
 
 
+MONTHS = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+
+def season_plan(s: dict) -> str:
+    """The rotation season by season: "Yr 1: Winter wheat Oct–Jun, double-crop soybeans Jul–Oct · Yr 2: …"."""
+    C, CV = crops(), covers()
+    parts = []
+    for i, cid in enumerate(s["years"]):
+        c = C[cid]
+        if cid == "fallow":
+            seg = "fallow (no crop)"
+        elif c["season"] == "perennial":
+            seg = f"{c['name']} all year"
+        else:
+            seg = f"{c['name']} {MONTHS[c['plant_month']]}–{MONTHS[c['harvest_month']]}"
+        cv = s.get("covers", {}).get(str(i))
+        if cv:
+            m = CV[cv]["months"]
+            seg += f", {CV[cv]['short']} {MONTHS[m[0]]}–{MONTHS[m[-1]]}"
+        parts.append(f"Yr {i + 1}: {seg}")
+    return " · ".join(parts)
+
+
 def chat_summary(comparison: dict, report_url: str | None = None) -> str:
-    """≤ ~8 short lines for WhatsApp/SMS."""
+    """Short lines for WhatsApp/SMS: each option with its goal and overall score and its season calendar."""
     lines = []
     for i, s in enumerate(comparison["strategies"]):
         tag = "Today" if s.get("is_current") else f"Option {i}"
-        lines.append(f"*{tag}: {short_name(s)}* — score {s['total']:.0f}/100")
+        overall = s.get("overall", s["total"])
+        lines.append(f"*{tag}: {short_name(s)}* — {s['total']:.0f}/100 for your goals · {overall:.0f}/100 overall")
         if not s.get("is_current"):
+            lines.append("  📅 " + season_plan(s))
             lines.append("  " + (s["why"][0] if s["why"] else ""))
-            lines.append("  ⚠️ " + (s["risks"][0] if s["risks"] else "Review locally before switching."))
+            if s.get("generated"):
+                lines.append("  🧪 New combination from FarmPartner's search — try it on part of a field first.")
+            risks = [r for r in s["risks"] if not r.startswith("A new combination")]
+            lines.append("  ⚠️ " + (risks[0] if risks else "Review locally before switching."))
     if report_url:
         lines.append(f"Full comparison with the NASA data: {report_url}")
     lines.append(DISCLAIMER)

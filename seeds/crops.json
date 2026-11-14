@@ -134,7 +134,7 @@
       "season": "warm",
       "plant_month": 5,
       "harvest_month": 11,
-      "gdd_c": 1600,
+      "gdd_c": 2100,
       "water_need_mm": 600,
       "drought_tolerance": 4,
       "heat_tolerance": 5,
@@ -345,7 +345,7 @@
       "season": "warm",
       "plant_month": 5,
       "harvest_month": 10,
-      "gdd_c": 1700,
+      "gdd_c": 2300,
       "water_need_mm": 500,
       "drought_tolerance": 3,
       "heat_tolerance": 4,
@@ -441,7 +441,7 @@
       "season": "warm",
       "plant_month": 4,
       "harvest_month": 9,
-      "gdd_c": 1700,
+      "gdd_c": 2100,
       "water_need_mm": 1000,
       "drought_tolerance": 1,
       "heat_tolerance": 4,
@@ -565,7 +565,8 @@
       "water_use_mm": 80,
       "n_fixing": false,
       "residue": 3,
-      "note": "Holds soil over winter, scavenges leftover nitrogen, suppresses weeds."
+      "note": "Holds soil over winter, scavenges leftover nitrogen, suppresses weeds.",
+      "short": "rye cover"
     },
     {
       "id": "clover",
@@ -582,7 +583,8 @@
       "water_use_mm": 70,
       "n_fixing": true,
       "residue": 2,
-      "note": "Fixes nitrogen for the next crop; frost-seeded or planted after small grains."
+      "note": "Fixes nitrogen for the next crop; frost-seeded or planted after small grains.",
+      "short": "clover cover"
     },
     {
       "id": "summer_mix",
@@ -596,7 +598,72 @@
       "water_use_mm": 100,
       "n_fixing": true,
       "residue": 3,
-      "note": "Fills the bare window after wheat harvest; radish breaks compaction, cowpea adds N."
+      "note": "Fills the bare window after wheat harvest; radish breaks compaction, cowpea adds N.",
+      "short": "summer cover mix"
+    },
+    {
+      "id": "dbl_soybeans",
+      "name": "Double-crop soybeans",
+      "short": "double-crop soybeans",
+      "family": "legume",
+      "months": [
+        7,
+        8,
+        9,
+        10
+      ],
+      "water_use_mm": 380,
+      "n_fixing": true,
+      "residue": 2,
+      "harvested": true,
+      "income": 3,
+      "forage": 1,
+      "min_gdd_c": 2500,
+      "min_rain_mm": 700,
+      "note": "A second cash crop in the same year, planted right after the wheat harvest; needs good rain or irrigation."
+    },
+    {
+      "id": "dbl_sorghum",
+      "name": "Double-crop sorghum (grain or forage)",
+      "short": "double-crop sorghum",
+      "family": "grass",
+      "months": [
+        7,
+        8,
+        9,
+        10
+      ],
+      "water_use_mm": 300,
+      "n_fixing": false,
+      "residue": 3,
+      "harvested": true,
+      "income": 2,
+      "forage": 4,
+      "min_gdd_c": 2100,
+      "min_rain_mm": 550,
+      "note": "A second harvest after wheat — grain or hay/silage — on drier ground than double-crop soybeans."
+    },
+    {
+      "id": "winter_forage",
+      "name": "Winter cereal forage (rye/triticale, grazed or baled)",
+      "short": "winter forage",
+      "family": "grass",
+      "months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3,
+        4
+      ],
+      "water_use_mm": 120,
+      "n_fixing": false,
+      "residue": 3,
+      "harvested": true,
+      "income": 1,
+      "forage": 4,
+      "note": "Covers the soil over winter and feeds cattle in spring (grazing or hay) before the next summer crop."
     }
   ]
 }
