@@ -51,14 +51,20 @@ def parse_irrigated(text: str) -> bool | None:
 def _first_insight(field: Field) -> str:
     f = field.features or {}
     c = f.get("climate") or {}
-    lines = [f"🛰️ Here's what NASA sees at {field.place or 'your field'}:"]
+    where = field.place if field.place and not field.place[0].isdigit() and not field.place.startswith("-") else "your field"
+    lines = [f"🛰️ Here's what NASA sees at {where}:"]
     if c:
         lines.append(f"• Rain: ~{ex.inch(c['annual_precip_mm'])} in/yr vs ~{ex.inch(c['annual_et0_mm'])} in/yr of evaporation "
                      f"demand → water is the main limit here." if c["water_balance_mm"] < -250 else
                      f"• Rain: ~{ex.inch(c['annual_precip_mm'])} in/yr, about what crops can use.")
-        if c.get("heat_days_recent5") is not None:
+        if (c.get("heat_days_recent5") or 0) >= 1:
             lines.append(f"• Days above 95°F: {c['heat_days_recent5']:.0f}/yr lately (was {c['heat_days_early']:.0f}).")
-        lines.append(f"• Frost-free season: {c['median_last_spring_frost']} → {c['median_first_fall_frost']}.")
+        else:
+            lines.append("• Extreme heat (>95°F) is rare here.")
+        if c.get("median_last_spring_frost") and c.get("median_first_fall_frost"):
+            lines.append(f"• Frost-free season: {c['median_last_spring_frost']} → {c['median_first_fall_frost']}.")
+        else:
+            lines.append("• Frost is rare here in a typical year.")
     rot = f.get("rotation") or {}
     if rot.get("is_cropland") and field.current_rotation:
         seq = [s for s in rot["sequence"] if s.get("crop")][-5:]
@@ -67,7 +73,10 @@ def _first_insight(field: Field) -> str:
         lines.append(f"Looks like *{rotation_label(field.current_rotation)}*. Is that right?")
         lines.append("Reply YES, or tell me what you grow (e.g. \"corn and soybeans\"). Add \"irrigated\" or \"dryland\".")
     else:
-        lines.append("\nI couldn't see crops at that spot from space. What do you grow there, and is it irrigated?")
+        outside_us = not (f.get("soil") or (f.get("rotation") or {}).get("sequence"))
+        lines.append("\n" + ("Crop-history maps only cover the U.S., so I can't see your past crops from space here. "
+                              if outside_us else "I couldn't see crops at that spot from space. ")
+                     + "What do you grow there (e.g. \"wheat, corn\"), and is it irrigated or dryland?")
     return "\n".join(lines)
 
 

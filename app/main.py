@@ -1,5 +1,6 @@
 import logging
 import os
+import threading
 
 from fastapi import BackgroundTasks, FastAPI, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, Response
@@ -62,16 +63,46 @@ class ChatIn(BaseModel):
     text: str = ""
     lat: float | None = None
     lon: float | None = None
+    wait: bool = True  # False: return the immediate reply now and deliver slow follow-ups via /api/poll
+
+
+_outbox: dict[str, list[str]] = {}
+_pending: dict[str, int] = {}
+_lock = threading.Lock()
+
+
+def _deliver_later(key: str, later):
+    try:
+        msgs = later()
+    except Exception:
+        log.exception("background job failed")
+        msgs = ["Sorry — something went wrong fetching your data. Please try again in a minute."]
+    with _lock:
+        _outbox.setdefault(key, []).extend(msgs)
+        _pending[key] -= 1
 
 
 @app.post("/api/chat")
 def api_chat(msg: ChatIn):
-    """Synchronous chat for the web simulator, tests and demos without WhatsApp."""
-    turn = chat.inbound("web:" + msg.phone, "web", msg.text, msg.lat, msg.lon)
+    """Chat for the web simulator, tests and demos without WhatsApp."""
+    key = "web:" + msg.phone
+    turn = chat.inbound(key, "web", msg.text, msg.lat, msg.lon)
     out = list(turn.now)
-    if turn.later:
+    if turn.later and msg.wait:
         out += turn.later()
-    return {"messages": out}
+    elif turn.later:
+        with _lock:
+            _pending[key] = _pending.get(key, 0) + 1
+        threading.Thread(target=_deliver_later, args=(key, turn.later), daemon=True).start()
+    return {"messages": out, "pending": _pending.get(key, 0) > 0}
+
+
+@app.get("/api/poll")
+def api_poll(phone: str):
+    key = "web:" + phone
+    with _lock:
+        msgs = _outbox.pop(key, [])
+        return {"messages": msgs, "pending": _pending.get(key, 0) > 0}
 
 
 @app.get("/", response_class=HTMLResponse)

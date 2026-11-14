@@ -18,7 +18,7 @@
 </head>
 <body>
 <div class="phone">
-  <div class="top">FarmPartner 🌾<small>WhatsApp simulator · same backend as the real bot</small></div>
+  <div class="top">FarmPartner 🌾 <button class="alt" style="float:right;padding:4px 10px;font-size:.8rem" onclick="newFarmer()">New farmer</button><small>WhatsApp simulator · same backend as the real bot</small></div>
   <div id="log"></div>
   <div class="pins">
     <span>📍 Send pin:</span>
@@ -39,14 +39,21 @@
     log.appendChild(d); requestAnimationFrame(() => d.scrollIntoView({block: 'end', behavior: 'smooth'})); return d;
   }
   async function post(body, label) {
-    add(label, 'out'); const w = add('…', 'sys');
-    const r = await fetch('/api/chat', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({phone, ...body}) });
-    w.remove(); const j = await r.json(); (j.messages || []).forEach(m => add(m, 'in'));
+    add(label, 'out');
+    const r = await fetch('/api/chat', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({phone, wait: false, ...body}) });
+    const j = await r.json(); (j.messages || []).forEach(m => add(m, 'in'));
+    if (j.pending) poll(add('⏳ working…', 'sys'));
   }
+  async function poll(waitEl) {
+    const j = await (await fetch('/api/poll?phone=' + encodeURIComponent(phone))).json();
+    (j.messages || []).forEach(m => add(m, 'in'));
+    if (j.pending) { setTimeout(() => poll(waitEl), 1500); } else { waitEl.remove(); }
+  }
+  function newFarmer() { localStorage.fpPhone = 'demo-' + Math.random().toString(36).slice(2, 8); location.reload(); }
   function send() { const v = t.value.trim(); if (!v) return; t.value = ''; post({text: v}, v); }
   function pin(lat, lon, name) { post({lat, lon, text: ''}, '📍 Location: ' + name); }
   function myLocation() { navigator.geolocation.getCurrentPosition(p => pin(p.coords.latitude, p.coords.longitude, 'my location')); }
-  add('Say "hi" to start, or tap RESET anytime by typing it.', 'sys');
+  add('Say "hi" to start. Type RESET to start over, or tap "New farmer" for a fresh session.', 'sys');
 </script>
 </body>
 </html>
