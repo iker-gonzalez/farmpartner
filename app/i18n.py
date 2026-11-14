@@ -101,6 +101,11 @@ def detect(text: str) -> str | None:
             return code
     if re.search(r"[ñ¿¡]", t):
         return "es"
+    first = re.sub(r"[^\wáéíóúñü]", "", t.lower().split()[0]) if t.split() else ""
+    greeting = {"hola": "es", "buenas": "es", "olá": "pt", "oi": "pt", "bonjour": "fr", "salut": "fr", "ciao": "it",
+                "hallo": "de", "kaixo": "eu", "bon": "ca"}.get(first)
+    if greeting and len(t.split()) <= 3:
+        return greeting
     words = re.findall(r"[a-záàâãéèêíóôõúüçñäöß]+", t.lower())
     scores = sorted(((sum(w in ws for w in words), code) for code, ws in WORDS.items()), reverse=True)
     (best, code), (second, _) = scores[0], scores[1]

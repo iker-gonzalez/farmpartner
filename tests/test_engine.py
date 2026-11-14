@@ -99,3 +99,25 @@ def test_grace_decline_shows_in_evidence_benefits_and_risks(hastings):
     assert any(e["source"] == "NASA GRACE/GRACE-FO" and "in/yr" in e["value"] for e in s[0]["evidence"])
     assert any("GRACE" in r for r in s[0]["risks"])  # thirsty irrigated corn today
     assert any("regional signal" in g for g in s[0]["gaps"])
+
+
+def test_research_evidence_country_and_trials(hastings):
+    from app.engine import research
+    assert research.rotation_effect(["corn", "soybeans"]) == {"yield_gain_pct": 18.0, "legume_to_cereal": True}
+    assert research.rotation_effect(["corn", "corn"])["yield_gain_pct"] == 0
+    assert research.country_crops(41.65, -0.88)["country"] == "Spain"           # Zaragoza
+    assert "rice" in research.country_crops(36.3, 138.0)["grown_crop_ids"]       # Japan
+    assert research.country_of(35.0, -140.0) is None                            # open Pacific
+    res = explain(compare(hastings, ["soil_health"], irrigated=True, current=["corn", "soybeans"]), hastings)
+    txt = chat_summary(res)
+    assert "Mudare et al. 2025" in txt and "tested since" in txt and "DRIVES" in txt
+    assert any("Long-term rotation trial" in e["metric"] for e in res["strategies"][0]["evidence"])
+
+
+def test_search_outside_us_uses_country_crops(garden_city):
+    f = dict(garden_city, lat=41.65, lon=-0.88)   # same climate, but pretend the field is in Spain
+    f.pop("country", None)
+    res = compare(f, ["soil_health"], irrigated=False, current=["winter_wheat", "barley"])
+    grown = {"barley", "canola", "corn", "cotton", "field_peas", "oats", "potatoes", "rice", "sunflower", "tomatoes",
+             "triticale", "vegetables", "winter_wheat", "fallow"}
+    assert all(set(s["years"]) <= grown for s in res["strategies"])

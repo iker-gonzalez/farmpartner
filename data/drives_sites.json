@@ -1,0 +1,2672 @@
+[
+ {
+  "site_id": "CanONLTRT_El",
+  "name": "Elora Long-term Rotation and Tillage Trial",
+  "institution": "University of Guelph",
+  "city": "Elora",
+  "state": "ON",
+  "country": "CAN",
+  "start_year": "1980",
+  "lat": 43.6406,
+  "lon": -80.4103,
+  "map_mm": 902.0,
+  "mat_c": 6.1,
+  "doi": "10.1371/journal.pone.0113261",
+  "rotations": [
+   {
+    "id": "CanONLTRT_El_A",
+    "years": [
+     "alfalfa",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": []
+   },
+   {
+    "id": "CanONLTRT_El_C",
+    "years": [
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "CanONLTRT_El_C-C-A-A",
+    "years": [
+     "corn",
+     "corn",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": []
+   },
+   {
+    "id": "CanONLTRT_El_C-C-Ba-Ba",
+    "years": [
+     "corn",
+     "corn",
+     "barley",
+     "barley"
+    ],
+    "covers": []
+   },
+   {
+    "id": "CanONLTRT_El_C-C-Ba/rc-Ba/rc",
+    "years": [
+     "corn",
+     "corn",
+     "barley",
+     "barley"
+    ],
+    "covers": [
+     "red clover"
+    ]
+   },
+   {
+    "id": "CanONLTRT_El_C-C-O-Ba",
+    "years": [
+     "corn",
+     "corn",
+     "oats",
+     "barley"
+    ],
+    "covers": []
+   },
+   {
+    "id": "CanONLTRT_El_C-C-O/rc-Ba/rc",
+    "years": [
+     "corn",
+     "corn",
+     "oats",
+     "barley"
+    ],
+    "covers": [
+     "red clover"
+    ]
+   },
+   {
+    "id": "CanONLTRT_El_C-C-S-S",
+    "years": [
+     "corn",
+     "corn",
+     "soybeans",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "CanONLTRT_El_C-C-S-W",
+    "years": [
+     "corn",
+     "corn",
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "CanONLTRT_El_C-C-S-W/rc",
+    "years": [
+     "corn",
+     "corn",
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": [
+     "red clover"
+    ]
+   },
+   {
+    "id": "CanONLTRT_El_C-C-SG-SG",
+    "years": [
+     "corn",
+     "corn",
+     "oats",
+     "oats"
+    ],
+    "covers": []
+   },
+   {
+    "id": "CanONLTRT_El_C-C-SG/rc-SG/rc",
+    "years": [
+     "corn",
+     "corn",
+     "oats",
+     "oats"
+    ],
+    "covers": [
+     "red clover"
+    ]
+   }
+  ]
+ },
+ {
+  "site_id": "CanONLTRT_Ri",
+  "name": "Ridgetown Long-term Rotation and Tillage Trial",
+  "institution": "University of Guelph",
+  "city": "Ridgetown",
+  "state": "ON",
+  "country": "CAN",
+  "start_year": "1995",
+  "lat": 42.4506,
+  "lon": -81.8912,
+  "map_mm": 871.0,
+  "mat_c": 9.0,
+  "doi": "10.1016/j.still.2021.105121",
+  "rotations": [
+   {
+    "id": "CanONLTRT_Ri_C",
+    "years": [
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "CanONLTRT_Ri_C-S",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "CanONLTRT_Ri_C-S-W",
+    "years": [
+     "corn",
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "CanONLTRT_Ri_C-S-W/rc",
+    "years": [
+     "corn",
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": [
+     "red clover"
+    ]
+   },
+   {
+    "id": "CanONLTRT_Ri_S",
+    "years": [
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "CanONLTRT_Ri_S-W",
+    "years": [
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "CanONLTRT_Ri_S-W/rc",
+    "years": [
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": [
+     "red clover"
+    ]
+   }
+  ]
+ },
+ {
+  "site_id": "CATCE",
+  "name": "The Century Experiment",
+  "institution": "University of California Davis",
+  "city": "Davis",
+  "state": "CA",
+  "country": "USA",
+  "start_year": "1993",
+  "lat": 38.5429,
+  "lon": -121.8744,
+  "map_mm": 485.0,
+  "mat_c": 16.6,
+  "doi": "10.1002/ecy.2105",
+  "rotations": [
+   {
+    "id": "CATCE_C-To",
+    "years": [
+     "corn",
+     "tomatoes"
+    ],
+    "covers": []
+   },
+   {
+    "id": "CATCE_C-To/cov",
+    "years": [
+     "corn",
+     "tomatoes"
+    ],
+    "covers": [
+     "annual legume-only mix"
+    ]
+   },
+   {
+    "id": "CATCE_C-To/p+hv",
+    "years": [
+     "corn",
+     "tomatoes",
+     "field_peas"
+    ],
+    "covers": [
+     "annual legume-only mix",
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "CATCE_C/bb+hv+o-To/bb+hv+o",
+    "years": [
+     "corn",
+     "oats",
+     "tomatoes",
+     "oats"
+    ],
+    "covers": [
+     "annual grass-legume mix",
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "CATCE_C/cov-To/cov",
+    "years": [
+     "corn",
+     "tomatoes"
+    ],
+    "covers": [
+     "annual grass-legume mix"
+    ]
+   },
+   {
+    "id": "CATCE_C/p+hv-To/p+hv",
+    "years": [
+     "corn",
+     "field_peas",
+     "tomatoes",
+     "field_peas"
+    ],
+    "covers": [
+     "annual legume-only mix",
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "CATCE_To-C-To-A-A-A",
+    "years": [
+     "tomatoes",
+     "corn",
+     "tomatoes",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": []
+   },
+   {
+    "id": "CATCE_To-W",
+    "years": [
+     "tomatoes",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "CATCE_W-bb+hv+o",
+    "years": [
+     "winter_wheat",
+     "oats"
+    ],
+    "covers": [
+     "annual grass-legume mix",
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "CATCE_W-cov",
+    "years": [
+     "winter_wheat"
+    ],
+    "covers": [
+     "annual grass-legume mix"
+    ]
+   },
+   {
+    "id": "CATCE_W-fallow",
+    "years": [
+     "winter_wheat",
+     "fallow"
+    ],
+    "covers": []
+   },
+   {
+    "id": "CATCE_W-p+hv",
+    "years": [
+     "winter_wheat",
+     "field_peas"
+    ],
+    "covers": [
+     "annual legume-only mix",
+     "hairy vetch"
+    ]
+   }
+  ]
+ },
+ {
+  "site_id": "IAMFE",
+  "name": "Marsden Farm Long-term Rotation Study",
+  "institution": "Iowa State University",
+  "city": "Marsden",
+  "state": "IA",
+  "country": "USA",
+  "start_year": "2001",
+  "lat": 42.0137,
+  "lon": -93.7842,
+  "map_mm": 871.0,
+  "mat_c": 10.0,
+  "doi": "10.1371/journal.pone.0047149",
+  "rotations": [
+   {
+    "id": "IAMFE_C-S",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "IAMFE_C-S-SG/A-A",
+    "years": [
+     "corn",
+     "soybeans",
+     "oats",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": []
+   },
+   {
+    "id": "IAMFE_C-S-SG/rc",
+    "years": [
+     "corn",
+     "soybeans",
+     "oats"
+    ],
+    "covers": [
+     "red clover"
+    ]
+   },
+   {
+    "id": "IAMFE_C-S-T/A-A",
+    "years": [
+     "corn",
+     "soybeans",
+     "triticale",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": []
+   },
+   {
+    "id": "IAMFE_C-S-T/rc",
+    "years": [
+     "corn",
+     "soybeans",
+     "triticale"
+    ],
+    "covers": [
+     "red clover"
+    ]
+   }
+  ]
+ },
+ {
+  "site_id": "MDLCBFSP",
+  "name": "Farming Systems Project",
+  "institution": "Beltsville Agriculture Research Center, USDA-ARS",
+  "city": "Beltsville",
+  "state": "MD",
+  "country": "USA",
+  "start_year": "1996",
+  "lat": 39.0287,
+  "lon": -76.897,
+  "map_mm": 1064.0,
+  "mat_c": 13.2,
+  "doi": "10.2134/agronj2006.0373",
+  "rotations": [
+   {
+    "id": "MDLCBFSP_C/r-S-W-A-A-A",
+    "years": [
+     "corn",
+     "soybeans",
+     "winter_wheat",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": [
+     "winter cereal rye"
+    ]
+   },
+   {
+    "id": "MDLCBFSP_C/r-S-W-rc+or",
+    "years": [
+     "corn",
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": [
+     "red clover",
+     "winter cereal rye"
+    ]
+   },
+   {
+    "id": "MDLCBFSP_C/r-S-W-S",
+    "years": [
+     "corn",
+     "soybeans",
+     "winter_wheat",
+     "soybeans"
+    ],
+    "covers": [
+     "winter cereal rye"
+    ]
+   },
+   {
+    "id": "MDLCBFSP_C/r-S-W/hv",
+    "years": [
+     "corn",
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": [
+     "hairy vetch",
+     "winter cereal rye"
+    ]
+   },
+   {
+    "id": "MDLCBFSP_C/r-S/hv",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": [
+     "hairy vetch",
+     "winter cereal rye"
+    ]
+   }
+  ]
+ },
+ {
+  "site_id": "MexCIMMYT_D5",
+  "name": "D5 Trial",
+  "institution": "International Maize and Wheat Improvement Center",
+  "city": "Texcoco",
+  "state": "Mexico",
+  "country": "MEX",
+  "start_year": "1991",
+  "lat": 19.532,
+  "lon": -98.8477,
+  "map_mm": 615.0,
+  "mat_c": 15.5,
+  "doi": "10.1002/ldr.3894",
+  "rotations": [
+   {
+    "id": "MexCIMMYT_D5_C-T/gp",
+    "years": [
+     "corn",
+     "triticale"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MexCIMMYT_D5_C-W-W",
+    "years": [
+     "corn",
+     "oats",
+     "oats"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MexCIMMYT_D5_C_rr-W_kr",
+    "years": [
+     "corn",
+     "oats"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MexCIMMYT_D5_C_rr",
+    "years": [
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MexCIMMYT_D5_W-Be",
+    "years": [
+     "oats",
+     "dry_beans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MexCIMMYT_D5_W-Be-C",
+    "years": [
+     "oats",
+     "dry_beans",
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MexCIMMYT_D5_W_rr",
+    "years": [
+     "oats"
+    ],
+    "covers": []
+   }
+  ]
+ },
+ {
+  "site_id": "MexCIMMYT_Me",
+  "name": "Metepec Trial",
+  "institution": "International Maize and Wheat Improvement Center",
+  "city": "Metepec",
+  "state": "Mexico",
+  "country": "MEX",
+  "start_year": "2014",
+  "lat": 19.2271,
+  "lon": -99.5505,
+  "map_mm": 884.0,
+  "mat_c": 13.7,
+  "doi": "10.1002/ldr.3894",
+  "rotations": [
+   {
+    "id": "MexCIMMYT_Me_C",
+    "years": [
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MexCIMMYT_Me_C-T",
+    "years": [
+     "corn",
+     "triticale"
+    ],
+    "covers": []
+   }
+  ]
+ },
+ {
+  "site_id": "MexCIMMYT_Tl",
+  "name": "Tlaltizapan Trial",
+  "institution": "International Maize and Wheat Improvement Center",
+  "city": "Tlaltizap\u00e1n de Zapata",
+  "state": "Morelos",
+  "country": "MEX",
+  "start_year": "2011",
+  "lat": 18.68,
+  "lon": -99.1297,
+  "map_mm": 881.0,
+  "mat_c": 24.4,
+  "doi": "",
+  "rotations": [
+   {
+    "id": "MexCIMMYT_Tl_C/cov",
+    "years": [
+     "corn"
+    ],
+    "covers": [
+     "annual grass-legume-forb mix"
+    ]
+   },
+   {
+    "id": "MexCIMMYT_Tl_C/mu-cov",
+    "years": [
+     "corn",
+     "sunflower",
+     "sorghum"
+    ],
+    "covers": [
+     "annual grass-legume-forb mix",
+     "radish"
+    ]
+   },
+   {
+    "id": "MexCIMMYT_Tl_C/sh",
+    "years": [
+     "corn"
+    ],
+    "covers": [
+     "sunn hemp"
+    ]
+   },
+   {
+    "id": "MexCIMMYT_Tl_C_rr",
+    "years": [
+     "corn"
+    ],
+    "covers": []
+   }
+  ]
+ },
+ {
+  "site_id": "MIKBSLFL",
+  "name": "Living Field Lab",
+  "institution": "Kellog Biological Station",
+  "city": "Hickory Corners",
+  "state": "MI",
+  "country": "USA",
+  "start_year": "1993",
+  "lat": 42.4175,
+  "lon": -85.3731,
+  "map_mm": 886.0,
+  "mat_c": 9.3,
+  "doi": "doi:10.6073/pasta/76c22606a2a67cbca8f33149d3b5dfb6",
+  "rotations": [
+   {
+    "id": "MIKBSLFL_C",
+    "years": [
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MIKBSLFL_C-C-S-W",
+    "years": [
+     "corn",
+     "corn",
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MIKBSLFL_C-S",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MIKBSLFL_C-S-SG+A",
+    "years": [
+     "corn",
+     "soybeans",
+     "triticale",
+     "alfalfa"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MIKBSLFL_C-S-W",
+    "years": [
+     "corn",
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MIKBSLFL_C/cc",
+    "years": [
+     "corn"
+    ],
+    "covers": [
+     "crimson clover"
+    ]
+   },
+   {
+    "id": "MIKBSLFL_C/cc-C/rg-S-W/rc",
+    "years": [
+     "corn",
+     "corn",
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": [
+     "crimson clover",
+     "red clover",
+     "ryegrass"
+    ]
+   },
+   {
+    "id": "MIKBSLFL_C/cov",
+    "years": [
+     "corn"
+    ],
+    "covers": [
+     "winter annual cover crop"
+    ]
+   },
+   {
+    "id": "MIKBSLFL_C/r",
+    "years": [
+     "corn"
+    ],
+    "covers": [
+     "winter cereal rye"
+    ]
+   },
+   {
+    "id": "MIKBSLFL_C/r-S/r",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": [
+     "winter cereal rye"
+    ]
+   },
+   {
+    "id": "MIKBSLFL_C/r-S/r-SG+A",
+    "years": [
+     "corn",
+     "soybeans",
+     "triticale",
+     "alfalfa"
+    ],
+    "covers": [
+     "winter cereal rye"
+    ]
+   },
+   {
+    "id": "MIKBSLFL_C/r-S/r-W/rc",
+    "years": [
+     "corn",
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": [
+     "red clover",
+     "winter cereal rye"
+    ]
+   },
+   {
+    "id": "MIKBSLFL_IW+A",
+    "years": [
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": []
+   }
+  ]
+ },
+ {
+  "site_id": "MNLTAR_Gr",
+  "name": "Long-term Agricultural Research Network, Grand Rapids",
+  "institution": "University of Minnesota",
+  "city": "Grand Rapids",
+  "state": "MN",
+  "country": "USA",
+  "start_year": "2015",
+  "lat": 47.2425,
+  "lon": -93.4951,
+  "map_mm": 689.0,
+  "mat_c": 5.2,
+  "doi": "",
+  "rotations": [
+   {
+    "id": "MNLTAR_Gr_C-C-A-A-A",
+    "years": [
+     "corn",
+     "corn",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MNLTAR_Gr_C-S",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MNLTAR_Gr_C-S-W",
+    "years": [
+     "corn",
+     "soybeans",
+     "oats"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MNLTAR_Gr_C/pc-S",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": [
+     "pennycress"
+    ]
+   },
+   {
+    "id": "MNLTAR_Gr_C/r-S/r",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": [
+     "winter cereal rye"
+    ]
+   }
+  ]
+ },
+ {
+  "site_id": "MNLTAR_La",
+  "name": "Long-term Agricultural Research Network, Lamberton",
+  "institution": "University of Minnesota",
+  "city": "Lamberton",
+  "state": "MN",
+  "country": "USA",
+  "start_year": "2014",
+  "lat": 44.2375,
+  "lon": -95.3085,
+  "map_mm": 721.0,
+  "mat_c": 7.3,
+  "doi": "",
+  "rotations": [
+   {
+    "id": "MNLTAR_La_C-C-A-A-A",
+    "years": [
+     "corn",
+     "corn",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MNLTAR_La_C-S",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MNLTAR_La_C-S-W",
+    "years": [
+     "corn",
+     "soybeans",
+     "oats"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MNLTAR_La_C/pc-S",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": [
+     "pennycress"
+    ]
+   },
+   {
+    "id": "MNLTAR_La_C/r-S/r",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": [
+     "winter cereal rye"
+    ]
+   }
+  ]
+ },
+ {
+  "site_id": "MNLTAR_Wa",
+  "name": "Long-term Agricultural Research Network, Waseca",
+  "institution": "University of Minnesota",
+  "city": "Waseca",
+  "state": "MN",
+  "country": "USA",
+  "start_year": "2014",
+  "lat": 44.0692,
+  "lon": -93.5287,
+  "map_mm": 920.0,
+  "mat_c": 7.3,
+  "doi": "",
+  "rotations": [
+   {
+    "id": "MNLTAR_Wa_C-C-A-A-A",
+    "years": [
+     "corn",
+     "corn",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MNLTAR_Wa_C-S",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MNLTAR_Wa_C-S-W",
+    "years": [
+     "corn",
+     "soybeans",
+     "oats"
+    ],
+    "covers": []
+   },
+   {
+    "id": "MNLTAR_Wa_C/pc-S",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": [
+     "pennycress"
+    ]
+   },
+   {
+    "id": "MNLTAR_Wa_C/r-S/r",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": [
+     "winter cereal rye"
+    ]
+   }
+  ]
+ },
+ {
+  "site_id": "MOSF",
+  "name": "Sanborn Field Experiment",
+  "institution": "University of Missouri",
+  "city": "Columbia",
+  "state": "MO",
+  "country": "USA",
+  "start_year": "1888",
+  "lat": 38.9426,
+  "lon": -92.3205,
+  "map_mm": null,
+  "mat_c": null,
+  "doi": "10.2134/agronj2010.0221s",
+  "rotations": []
+ },
+ {
+  "site_id": "NELITCSE",
+  "name": "Long-term Tillage and Cropping Systems Experiment",
+  "institution": "Agroecosystem Management Research Unit, USDA-ARS",
+  "city": "Lincoln",
+  "state": "NE",
+  "country": "USA",
+  "start_year": "1981",
+  "lat": 40.847,
+  "lon": -96.4669,
+  "map_mm": 739.0,
+  "mat_c": 11.0,
+  "doi": "",
+  "rotations": [
+   {
+    "id": "NELITCSE_C",
+    "years": [
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "NELITCSE_C-S",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "NELITCSE_C/cov",
+    "years": [
+     "corn"
+    ],
+    "covers": [
+     "annual grass-legume-forb mix",
+     "hairy vetch",
+     "winter cereal rye"
+    ]
+   },
+   {
+    "id": "NELITCSE_S",
+    "years": [
+     "soybeans"
+    ],
+    "covers": []
+   }
+  ]
+ },
+ {
+  "site_id": "NEMLTCRS",
+  "name": "Long-term Crop Rotation Study",
+  "institution": "Agroecosystem Management Research Unit, USDA-ARS",
+  "city": "Ithaca",
+  "state": "NE",
+  "country": "USA",
+  "start_year": "1983",
+  "lat": 41.1668,
+  "lon": -96.4187,
+  "map_mm": 707.0,
+  "mat_c": 10.0,
+  "doi": "",
+  "rotations": [
+   {
+    "id": "NEMLTCRS_C",
+    "years": [
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "NEMLTCRS_C-O/cl-So-S",
+    "years": [
+     "corn",
+     "oats",
+     "sorghum",
+     "soybeans"
+    ],
+    "covers": [
+     "red clover"
+    ]
+   },
+   {
+    "id": "NEMLTCRS_C-S",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "NEMLTCRS_C-S-So-O/cl",
+    "years": [
+     "corn",
+     "soybeans",
+     "sorghum",
+     "oats"
+    ],
+    "covers": [
+     "red clover"
+    ]
+   },
+   {
+    "id": "NEMLTCRS_S",
+    "years": [
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "NEMLTCRS_So",
+    "years": [
+     "sorghum"
+    ],
+    "covers": []
+   },
+   {
+    "id": "NEMLTCRS_So-S",
+    "years": [
+     "sorghum",
+     "soybeans"
+    ],
+    "covers": []
+   }
+  ]
+ },
+ {
+  "site_id": "OHTVD_Ho",
+  "name": "Triplett-Van Doren Long-term Tillage and Crop Rotation Study, Hoytville",
+  "institution": "Ohio State University",
+  "city": "Hoytville",
+  "state": "OH",
+  "country": "USA",
+  "start_year": "1963",
+  "lat": 41.217,
+  "lon": -83.7607,
+  "map_mm": 856.0,
+  "mat_c": 10.0,
+  "doi": "",
+  "rotations": [
+   {
+    "id": "OHTVD_Ho_C-F-F",
+    "years": [
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "OHTVD_Ho_C-O-F",
+    "years": [
+     "corn",
+     "oats"
+    ],
+    "covers": []
+   },
+   {
+    "id": "OHTVD_Ho_C-S",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": []
+   }
+  ]
+ },
+ {
+  "site_id": "OHTVD_Wo",
+  "name": "Triplett-Van Doren Long-term Tillage and Crop Rotation Study, Wooster",
+  "institution": "Ohio State University",
+  "city": "Wooster",
+  "state": "OH",
+  "country": "USA",
+  "start_year": "1962",
+  "lat": 40.7637,
+  "lon": -81.9061,
+  "map_mm": 977.0,
+  "mat_c": 10.0,
+  "doi": "",
+  "rotations": [
+   {
+    "id": "OHTVD_Wo_C-F-F",
+    "years": [
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "OHTVD_Wo_C-O-F",
+    "years": [
+     "corn",
+     "oats"
+    ],
+    "covers": []
+   },
+   {
+    "id": "OHTVD_Wo_C-S",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": []
+   }
+  ]
+ },
+ {
+  "site_id": "PADCS",
+  "name": "Dairy Cropping Systems Trial",
+  "institution": "Pennsylvania State University",
+  "city": "Rock Springs",
+  "state": "PA",
+  "country": "USA",
+  "start_year": "2010",
+  "lat": 40.7231,
+  "lon": -77.9219,
+  "map_mm": 990.0,
+  "mat_c": 9.8,
+  "doi": "",
+  "rotations": [
+   {
+    "id": "PADCS_C-S",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "PADCS_ForageEra1HV",
+    "years": [
+     "corn",
+     "winter_wheat",
+     "corn",
+     "canola",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "PADCS_ForageEra1RC",
+    "years": [
+     "corn",
+     "winter_wheat",
+     "corn",
+     "canola",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": [
+     "red clover"
+    ]
+   },
+   {
+    "id": "PADCS_ForageEra2A",
+    "years": [
+     "corn",
+     "corn",
+     "corn",
+     "oats",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": [
+     "annual grass-legume mix",
+     "cereal rye",
+     "clover mix",
+     "sorghum sudangrass",
+     "winter cereal rye"
+    ]
+   },
+   {
+    "id": "PADCS_ForageEra2B",
+    "years": [
+     "corn",
+     "corn",
+     "corn",
+     "oats",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": [
+     "annual grass-legume mix",
+     "cereal rye",
+     "clover mix",
+     "crimson clover",
+     "sorghum sudangrass",
+     "winter cereal rye"
+    ]
+   },
+   {
+    "id": "PADCS_ForageEra2C",
+    "years": [
+     "corn",
+     "corn",
+     "corn",
+     "oats",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": [
+     "annual grass-legume mix",
+     "cereal rye",
+     "clover mix",
+     "red clover",
+     "winter cereal rye"
+    ]
+   },
+   {
+    "id": "PADCS_GrainEra1AlfMix",
+    "years": [
+     "canola",
+     "soybeans",
+     "corn",
+     "alfalfa",
+     "alfalfa",
+     "triticale",
+     "field_peas",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": [
+     "winter cereal rye"
+    ]
+   },
+   {
+    "id": "PADCS_GrainEra1AlfMono",
+    "years": [
+     "canola",
+     "soybeans",
+     "corn",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": [
+     "winter cereal rye"
+    ]
+   },
+   {
+    "id": "PADCS_GrainEra1OatAlfMix",
+    "years": [
+     "canola",
+     "oats",
+     "soybeans",
+     "corn",
+     "alfalfa",
+     "alfalfa",
+     "triticale",
+     "field_peas",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": [
+     "winter cereal rye"
+    ]
+   },
+   {
+    "id": "PADCS_GrainEra1OatAlfMono",
+    "years": [
+     "canola",
+     "oats",
+     "soybeans",
+     "corn",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": [
+     "winter cereal rye"
+    ]
+   },
+   {
+    "id": "PADCS_GrainEra2BAU",
+    "years": [
+     "corn",
+     "corn",
+     "corn",
+     "oats",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": [
+     "winter cereal rye"
+    ]
+   },
+   {
+    "id": "PADCS_GrainEra2IWM",
+    "years": [
+     "corn",
+     "soybeans",
+     "alfalfa",
+     "alfalfa",
+     "oats",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": [
+     "sorghum sudangrass",
+     "winter cereal rye"
+    ]
+   },
+   {
+    "id": "PADCS_GrainEra2STD",
+    "years": [
+     "corn",
+     "corn",
+     "soybeans",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": [
+     "winter cereal rye"
+    ]
+   }
+  ]
+ },
+ {
+  "site_id": "TNLTSS_Mi",
+  "name": "Long-term Systems Study, Milan",
+  "institution": "University of Tennessee",
+  "city": "Milan",
+  "state": "TN",
+  "country": "USA",
+  "start_year": "2002",
+  "lat": 35.9347,
+  "lon": -88.728,
+  "map_mm": 1396.0,
+  "mat_c": 15.2,
+  "doi": "",
+  "rotations": [
+   {
+    "id": "TNLTSS_Mi_(C-C-S-Co)/ca",
+    "years": [
+     "corn",
+     "canola",
+     "corn",
+     "canola",
+     "soybeans",
+     "canola",
+     "cotton",
+     "canola"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(C-C-S-Co)/hv",
+    "years": [
+     "corn",
+     "corn",
+     "soybeans",
+     "cotton"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_Mi_(C-C-S-Co)/w",
+    "years": [
+     "corn",
+     "winter_wheat",
+     "corn",
+     "winter_wheat",
+     "soybeans",
+     "winter_wheat",
+     "cotton",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(C-C-S-Co)/wp",
+    "years": [
+     "corn",
+     "field_peas",
+     "corn",
+     "field_peas",
+     "soybeans",
+     "field_peas",
+     "cotton",
+     "field_peas"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(C-Co-S-C)/ca",
+    "years": [
+     "corn",
+     "canola",
+     "cotton",
+     "canola",
+     "soybeans",
+     "canola",
+     "corn",
+     "canola"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(C-Co-S-C)/hv",
+    "years": [
+     "corn",
+     "cotton",
+     "soybeans",
+     "corn"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_Mi_(C-Co-S-C)/w",
+    "years": [
+     "corn",
+     "winter_wheat",
+     "cotton",
+     "winter_wheat",
+     "soybeans",
+     "winter_wheat",
+     "corn",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(C-Co-S-C)/wp",
+    "years": [
+     "corn",
+     "field_peas",
+     "cotton",
+     "field_peas",
+     "soybeans",
+     "field_peas",
+     "corn",
+     "field_peas"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(C-S)/ca",
+    "years": [
+     "canola",
+     "corn",
+     "canola",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(C-S)/hv",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_Mi_(C-S)/w",
+    "years": [
+     "corn",
+     "winter_wheat",
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(C-S)/wp",
+    "years": [
+     "corn",
+     "field_peas",
+     "soybeans",
+     "field_peas"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(Co-C-Co-S)/ca",
+    "years": [
+     "cotton",
+     "canola",
+     "corn",
+     "canola",
+     "cotton",
+     "canola",
+     "soybeans",
+     "canola"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(Co-C-Co-S)/hv",
+    "years": [
+     "cotton",
+     "corn",
+     "cotton",
+     "soybeans"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_Mi_(Co-C-Co-S)/w",
+    "years": [
+     "cotton",
+     "winter_wheat",
+     "corn",
+     "winter_wheat",
+     "cotton",
+     "winter_wheat",
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(Co-C-Co-S)/wp",
+    "years": [
+     "cotton",
+     "field_peas",
+     "corn",
+     "field_peas",
+     "cotton",
+     "field_peas",
+     "soybeans",
+     "field_peas"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(Co-C)/ca",
+    "years": [
+     "canola",
+     "cotton",
+     "canola",
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(Co-C)/hv",
+    "years": [
+     "cotton",
+     "corn"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_Mi_(Co-C)/w",
+    "years": [
+     "cotton",
+     "winter_wheat",
+     "corn",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(Co-C)/wp",
+    "years": [
+     "cotton",
+     "field_peas",
+     "corn",
+     "field_peas"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(Co-S-C-Co)/ca",
+    "years": [
+     "cotton",
+     "canola",
+     "soybeans",
+     "canola",
+     "corn",
+     "canola",
+     "cotton",
+     "canola"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(Co-S-C-Co)/hv",
+    "years": [
+     "cotton",
+     "soybeans",
+     "corn",
+     "cotton"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_Mi_(Co-S-C-Co)/w",
+    "years": [
+     "cotton",
+     "winter_wheat",
+     "soybeans",
+     "winter_wheat",
+     "corn",
+     "winter_wheat",
+     "cotton",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(Co-S-C-Co)/wp",
+    "years": [
+     "cotton",
+     "field_peas",
+     "soybeans",
+     "field_peas",
+     "corn",
+     "field_peas",
+     "cotton",
+     "field_peas"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(Co-S-Co-C)/ca",
+    "years": [
+     "cotton",
+     "canola",
+     "soybeans",
+     "canola",
+     "cotton",
+     "canola",
+     "corn",
+     "canola"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(Co-S-Co-C)/hv",
+    "years": [
+     "cotton",
+     "soybeans",
+     "cotton",
+     "corn"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_Mi_(Co-S-Co-C)/w",
+    "years": [
+     "cotton",
+     "winter_wheat",
+     "soybeans",
+     "winter_wheat",
+     "cotton",
+     "winter_wheat",
+     "corn",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(Co-S-Co-C)/wp",
+    "years": [
+     "cotton",
+     "field_peas",
+     "soybeans",
+     "field_peas",
+     "cotton",
+     "field_peas",
+     "corn",
+     "field_peas"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(S-Co-C-S)/ca",
+    "years": [
+     "soybeans",
+     "canola",
+     "cotton",
+     "canola",
+     "corn",
+     "canola",
+     "soybeans",
+     "canola"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(S-Co-C-S)/hv",
+    "years": [
+     "soybeans",
+     "cotton",
+     "corn",
+     "soybeans"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_Mi_(S-Co-C-S)/w",
+    "years": [
+     "soybeans",
+     "winter_wheat",
+     "cotton",
+     "winter_wheat",
+     "corn",
+     "winter_wheat",
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(S-Co-C-S)/wp",
+    "years": [
+     "soybeans",
+     "field_peas",
+     "cotton",
+     "field_peas",
+     "corn",
+     "field_peas",
+     "soybeans",
+     "field_peas"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(S-Co)/ca",
+    "years": [
+     "canola",
+     "soybeans",
+     "canola",
+     "cotton"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(S-Co)/hv",
+    "years": [
+     "soybeans",
+     "cotton"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_Mi_(S-Co)/w",
+    "years": [
+     "soybeans",
+     "winter_wheat",
+     "cotton",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(S-Co)/wp",
+    "years": [
+     "soybeans",
+     "field_peas",
+     "cotton",
+     "field_peas"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(S-S-C-Co)/ca",
+    "years": [
+     "soybeans",
+     "canola",
+     "soybeans",
+     "canola",
+     "corn",
+     "canola",
+     "cotton",
+     "canola"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(S-S-C-Co)/hv",
+    "years": [
+     "soybeans",
+     "soybeans",
+     "corn",
+     "cotton"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_Mi_(S-S-C-Co)/w",
+    "years": [
+     "soybeans",
+     "winter_wheat",
+     "soybeans",
+     "winter_wheat",
+     "corn",
+     "winter_wheat",
+     "cotton",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_(S-S-C-Co)/wp",
+    "years": [
+     "soybeans",
+     "field_peas",
+     "soybeans",
+     "field_peas",
+     "corn",
+     "field_peas",
+     "cotton",
+     "field_peas"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_C",
+    "years": [
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_C-C-S-Co",
+    "years": [
+     "corn",
+     "corn",
+     "soybeans",
+     "cotton"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_C-Co-S-C",
+    "years": [
+     "corn",
+     "cotton",
+     "soybeans",
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_C-S",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_C/ca",
+    "years": [
+     "corn",
+     "canola"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_C/hv",
+    "years": [
+     "corn"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_Mi_C/w",
+    "years": [
+     "corn",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_C/wp",
+    "years": [
+     "corn",
+     "field_peas"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_Co",
+    "years": [
+     "cotton"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_Co-C",
+    "years": [
+     "cotton",
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_Co-C-Co-S",
+    "years": [
+     "cotton",
+     "corn",
+     "cotton",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_Co-S-C-Co",
+    "years": [
+     "cotton",
+     "soybeans",
+     "corn",
+     "cotton"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_Co-S-Co-C",
+    "years": [
+     "cotton",
+     "soybeans",
+     "cotton",
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_Co/ca",
+    "years": [
+     "canola",
+     "cotton"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_Co/hv",
+    "years": [
+     "cotton"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_Mi_Co/w",
+    "years": [
+     "cotton",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_Co/wp",
+    "years": [
+     "cotton",
+     "field_peas"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_S",
+    "years": [
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_S-Co",
+    "years": [
+     "soybeans",
+     "cotton"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_S-Co-C-S",
+    "years": [
+     "soybeans",
+     "cotton",
+     "corn",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_S-S-C-Co",
+    "years": [
+     "soybeans",
+     "soybeans",
+     "corn",
+     "cotton"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_S/ca",
+    "years": [
+     "canola",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_S/hv",
+    "years": [
+     "soybeans"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_Mi_S/w",
+    "years": [
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_Mi_S/wp",
+    "years": [
+     "soybeans",
+     "field_peas"
+    ],
+    "covers": []
+   }
+  ]
+ },
+ {
+  "site_id": "TNLTSS_SH",
+  "name": "Long-term Systems Study, Spring Hill",
+  "institution": "University of Tennessee",
+  "city": "Spring Hill",
+  "state": "TN",
+  "country": "USA",
+  "start_year": "2002",
+  "lat": 35.7186,
+  "lon": -86.9652,
+  "map_mm": 1344.0,
+  "mat_c": 15.0,
+  "doi": "",
+  "rotations": [
+   {
+    "id": "TNLTSS_SH_(C-C-S-C)/ca",
+    "years": [
+     "corn",
+     "canola",
+     "corn",
+     "canola",
+     "soybeans",
+     "canola",
+     "corn",
+     "canola"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_(C-C-S-C)/hv",
+    "years": [
+     "corn",
+     "corn",
+     "soybeans",
+     "corn"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_SH_(C-C-S-C)/w",
+    "years": [
+     "corn",
+     "winter_wheat",
+     "corn",
+     "winter_wheat",
+     "soybeans",
+     "winter_wheat",
+     "corn",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_(C-C-S-C)/wp",
+    "years": [
+     "corn",
+     "field_peas",
+     "corn",
+     "field_peas",
+     "soybeans",
+     "field_peas",
+     "corn",
+     "field_peas"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_(C-S-S-C)/ca",
+    "years": [
+     "corn",
+     "canola",
+     "soybeans",
+     "canola",
+     "soybeans",
+     "canola",
+     "corn",
+     "canola"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_(C-S-S-C)/hv",
+    "years": [
+     "corn",
+     "soybeans",
+     "soybeans",
+     "corn"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_SH_(C-S-S-C)/w",
+    "years": [
+     "corn",
+     "winter_wheat",
+     "soybeans",
+     "winter_wheat",
+     "soybeans",
+     "winter_wheat",
+     "corn",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_(C-S-S-C)/wp",
+    "years": [
+     "corn",
+     "field_peas",
+     "soybeans",
+     "field_peas",
+     "soybeans",
+     "field_peas",
+     "corn",
+     "field_peas"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_(C-S)/ca",
+    "years": [
+     "corn",
+     "canola",
+     "soybeans",
+     "canola"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_(C-S)/hv",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_SH_(C-S)/w",
+    "years": [
+     "corn",
+     "winter_wheat",
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_(C-S)/wp",
+    "years": [
+     "corn",
+     "field_peas",
+     "soybeans",
+     "field_peas"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_(S-S-C-S)/ca",
+    "years": [
+     "soybeans",
+     "canola",
+     "soybeans",
+     "canola",
+     "corn",
+     "canola",
+     "soybeans",
+     "canola"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_(S-S-C-S)/hv",
+    "years": [
+     "soybeans",
+     "soybeans",
+     "corn",
+     "soybeans"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_SH_(S-S-C-S)/w",
+    "years": [
+     "soybeans",
+     "winter_wheat",
+     "soybeans",
+     "winter_wheat",
+     "corn",
+     "winter_wheat",
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_(S-S-C-S)/wp",
+    "years": [
+     "soybeans",
+     "field_peas",
+     "soybeans",
+     "field_peas",
+     "corn",
+     "field_peas",
+     "soybeans",
+     "field_peas"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_C",
+    "years": [
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_C-C-S-C",
+    "years": [
+     "corn",
+     "corn",
+     "soybeans",
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_C-S",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_C-S-S-C",
+    "years": [
+     "corn",
+     "soybeans",
+     "soybeans",
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_C/ca",
+    "years": [
+     "corn",
+     "canola"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_C/hv",
+    "years": [
+     "corn"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_SH_C/w",
+    "years": [
+     "corn",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_C/wp",
+    "years": [
+     "corn",
+     "field_peas"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_S",
+    "years": [
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_S-S-C-S",
+    "years": [
+     "soybeans",
+     "soybeans",
+     "corn",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_S/ca",
+    "years": [
+     "soybeans",
+     "canola"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_S/hv",
+    "years": [
+     "soybeans"
+    ],
+    "covers": [
+     "hairy vetch"
+    ]
+   },
+   {
+    "id": "TNLTSS_SH_S/w",
+    "years": [
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": []
+   },
+   {
+    "id": "TNLTSS_SH_S/wp",
+    "years": [
+     "soybeans",
+     "field_peas"
+    ],
+    "covers": []
+   }
+  ]
+ },
+ {
+  "site_id": "WICST_ARS",
+  "name": "Wisconsin Integrated Cropping Systems Trial, Arlington Agricultural Research Station",
+  "institution": "University of Wisconsin-Madison",
+  "city": "Arlington",
+  "state": "WI",
+  "country": "USA",
+  "start_year": "1990",
+  "lat": 43.3048,
+  "lon": -89.3311,
+  "map_mm": 796.0,
+  "mat_c": 7.3,
+  "doi": "",
+  "rotations": [
+   {
+    "id": "WICST_ARS_C",
+    "years": [
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "WICST_ARS_C-A-A-A",
+    "years": [
+     "corn",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": []
+   },
+   {
+    "id": "WICST_ARS_C-O+A-A",
+    "years": [
+     "corn",
+     "oats",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": []
+   },
+   {
+    "id": "WICST_ARS_C-S",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "WICST_ARS_C-S-W/cov",
+    "years": [
+     "corn",
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": [
+     "annual grass-legume mix"
+    ]
+   },
+   {
+    "id": "WICST_ARS_C-S-W/rc",
+    "years": [
+     "corn",
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": [
+     "red clover"
+    ]
+   }
+  ]
+ },
+ {
+  "site_id": "WICST_LAC",
+  "name": "Wisconsin Integrated Cropping Systems Trial, Lakeland Agricultural Complex",
+  "institution": "University of Wisconsin-Madison",
+  "city": "Lakeland",
+  "state": "WI",
+  "country": "USA",
+  "start_year": "1990",
+  "lat": 42.6592,
+  "lon": -88.4872,
+  "map_mm": 851.0,
+  "mat_c": 9.0,
+  "doi": "",
+  "rotations": [
+   {
+    "id": "WICST_LAC_C",
+    "years": [
+     "corn"
+    ],
+    "covers": []
+   },
+   {
+    "id": "WICST_LAC_C-A-A",
+    "years": [
+     "corn",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": []
+   },
+   {
+    "id": "WICST_LAC_C-A-A-A",
+    "years": [
+     "corn",
+     "alfalfa",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": []
+   },
+   {
+    "id": "WICST_LAC_C-O+A-A",
+    "years": [
+     "corn",
+     "oats",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": []
+   },
+   {
+    "id": "WICST_LAC_C-S",
+    "years": [
+     "corn",
+     "soybeans"
+    ],
+    "covers": []
+   },
+   {
+    "id": "WICST_LAC_C-S-O+A-A",
+    "years": [
+     "corn",
+     "soybeans",
+     "oats",
+     "alfalfa",
+     "alfalfa"
+    ],
+    "covers": []
+   },
+   {
+    "id": "WICST_LAC_C-S-W/rc",
+    "years": [
+     "corn",
+     "soybeans",
+     "winter_wheat"
+    ],
+    "covers": [
+     "red clover"
+    ]
+   }
+  ]
+ }
+]

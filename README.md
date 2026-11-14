@@ -52,6 +52,10 @@ AppEEARS. They are added to the report and to the watering advice.
 | **NASA SMAP L4** (SPL4SMGP, 9 km) via AppEEARS | Root-zone and surface soil moisture over the last 120 days and its monthly trend: "25% water by volume, up from 18% in July" | Earthdata login; async job per field |
 | **NASA ECOSTRESS** ESI (ECO_L4T_ESI, 70 m) via AppEEARS | Field-scale crop water stress (actual vs. potential evapotranspiration) over the last year | Earthdata login; async job per field |
 | **NASA GRACE/GRACE-FO** JPL mascon RL06.3 | Long-term water-storage (groundwater) trend in in/yr, a key Ogallala risk signal | Precomputed grid in `data/grace_trends.csv` (`scripts/get-grace.sh` + `precompute_grace.py`) |
+| **Mudare et al. 2025**, *Nature Communications* 16:9552 — meta-analysis of 3,663 field trials | Expected yield gain of each crop from its pre-crop (+23 % after legumes, +16 % after other crops, 0 in monoculture), legume N savings (41–46 %); feeds the income score and the 📚 lines | `app/engine/research.py` |
+| **FAOSTAT** crops (FAO, 2020–24, CC BY-NC-SA 3.0 IGO) | What each country actually grows: the main crops shown outside the U.S., and the crops the rotation search may use there | `data/fao_country_crops.csv` (built by `scripts/build_reference_data.py`) |
+| **DRIVES** long-term rotation experiments (drives-network.org) | "✅ Tested since 1981 at Lincoln, NE": rotations run for decades at 22 sites in the U.S., Canada and Mexico near the field | `data/drives_sites.json` (experiment metadata; cite the DRIVES repository) |
+| GeoNames towns (CC BY 4.0) | Pin → country, offline | `data/country_points.csv` |
 | Open-Meteo forecast | 7-day rain, ET₀, frost and heat for alerts and irrigation advice | REST, no key |
 | U.S. Census geocoder, Zippopotam | County name, ZIP → location | REST, no key |
 

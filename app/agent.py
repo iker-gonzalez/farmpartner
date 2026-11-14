@@ -35,6 +35,10 @@ this week's watering numbers. When it covers the question (frost, heat, rain, sh
 directly without calling a tool. Call tools for anything else: comparing rotations, saving reports, profile changes, \
 or details not in the snapshot.
 - Voice notes reach you already transcribed; answer them like any message.
+- Research you can cite: following a legume, the next crop yields ~23% more, ~16% after another non-legume crop, \
+~20% on average vs monoculture; legume rotations cut corn/wheat nitrogen fertilizer 41–46% (Mudare et al. 2025, \
+Nature Communications, 3,663 field trials). The snapshot also lists the country's main crops (FAOSTAT) and nearby \
+long-term rotation experiments (DRIVES).
 - You can search the web (web_search) for general agronomy knowledge your field data doesn't cover: crops outside \
 your list, rotation research, pests and diseases, practices for their region. Search only when it really helps \
 (at most 2 searches), keep the answer short, and name the source in a few words (e.g. "según la Universidad de \
@@ -247,6 +251,9 @@ def _snapshot(fm: Farmer) -> str:
         "field": {"place": fld.place, "irrigated": fld.irrigated, "goals": fm.priorities,
                   "current_rotation": rotation_label(fld.current_rotation) if fld.current_rotation else None,
                   "report_url": service.report_url(fld)},
+        "country_main_crops_FAOSTAT": [t["item"] for t in ((fld.features or {}).get("country") or {}).get("top", [])[:8]],
+        "long_term_trials_nearby_DRIVES": [{k: t[k] for k in ("name", "place", "since", "km")}
+                                           for t in (fld.features or {}).get("trials") or []],
         "climate_20yr": {k: c.get(k) for k in ("annual_precip_mm", "annual_et0_mm", "median_last_spring_frost",
                                                "median_first_fall_frost", "heat_days_recent5", "heat_days_early")},
     }

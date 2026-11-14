@@ -206,6 +206,13 @@ def build_features(lat: float, lon: float, with_ndvi: bool = True) -> dict:
     if res["grace"]:
         out["sources"].append("NASA GRACE/GRACE-FO terrestrial water storage")
     out["elevation_m"] = res["elev"]
+    from app.engine import research
+    out["country"] = research.country_crops(lat, lon)
+    out["trials"] = research.nearby_trials(lat, lon, (out.get("climate") or {}).get("annual_precip_mm"))
+    if out["country"] and out["country"]["m49"] != research.US_M49:
+        out["sources"].append(f"FAOSTAT crop statistics for {out['country']['country']} (2020–24)")
+    if out["trials"]:
+        out["sources"].append("DRIVES long-term rotation experiments (U.S., Canada, Mexico)")
     if with_ndvi:
         _set_ndvi(out, res.get("ndvi"))
     return out

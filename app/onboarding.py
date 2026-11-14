@@ -144,6 +144,10 @@ def _first_insight(field: Field) -> list:
         return ["\n".join(lines), CROPS_PROMPT]
     else:
         outside_us = not (f.get("soil") or (f.get("rotation") or {}).get("sequence"))
+        c = f.get("country")
+        if outside_us and c and c.get("top"):
+            names = ", ".join(t["item"].split(",")[0].split(" (")[0].lower() for t in c["top"][:6])
+            lines.append(f"\n🌾 Main crops in {c['country']} (FAOSTAT): {names}.")
         lines.append("\n" + ("Crop-history maps only cover the U.S., so I can't see your past crops from space here. "
                               if outside_us else "I couldn't see crops at that spot from space. ")
                      + "*Step 2 of 3:* what do you grow there? E.g. \"wheat, corn\" — and is it irrigated or dryland?")

@@ -2,6 +2,8 @@
 
 Farmers in the U.S. think in inches, °F and acres, so everything user-facing is converted here.
 """
+import re
+from app.engine import research
 from app.engine.knowledge import covers, crops
 from app.engine.scoring import PRIORITY_LABELS
 
@@ -20,6 +22,33 @@ def fahr(c):
 
 MONTH_NAMES = {"01": "January", "02": "February", "03": "March", "04": "April", "05": "May", "06": "June",
                "07": "July", "08": "August", "09": "September", "10": "October", "11": "November", "12": "December"}
+
+
+def _country(f: dict) -> dict | None:
+    if "country" in f:
+        return f["country"]
+    return research.country_crops(f["lat"], f["lon"]) if f.get("lat") is not None else None
+
+
+def _trials(f: dict) -> list[dict]:
+    if "trials" in f:
+        return f["trials"] or []
+    if f.get("lat") is None:
+        return []
+    return research.nearby_trials(f["lat"], f["lon"], (f.get("climate") or {}).get("annual_precip_mm"))
+
+
+def research_evidence(f: dict) -> list[dict]:
+    ev = []
+    c = _country(f)
+    if c and c["m49"] != research.US_M49:
+        top = ", ".join(t["item"].split(",")[0].split(" (")[0].lower() for t in c["top"][:6])
+        ev.append({"metric": f"Main crops in {c['country']}", "value": top, "source": c["source"]})
+    for t in _trials(f)[:1]:
+        rots = "; ".join(" → ".join(crops()[x]["name"] for x in r) for r in t["rotations"] if len(r) > 1)[:160]
+        ev.append({"metric": f"Long-term rotation trial {t['km']} km away",
+                   "value": f"{t['name']}, {t['place']} (since {t['since']}): {rots}", "source": t["source"]})
+    return ev
 
 
 def evidence(f: dict) -> list[dict]:
@@ -205,14 +234,25 @@ def gaps(f: dict) -> list[str]:
 def explain(comparison: dict, f: dict) -> dict:
     strategies = comparison["strategies"]
     cur = next((s for s in strategies if s.get("is_current")), None)
-    ev = evidence(f)
+    ev = evidence(f) + research_evidence(f)
     gap_list = gaps(f)
+    trials = _trials(f)
     for s in strategies:
         s["why"] = _why(s, cur, comparison["priorities"])
         s["benefits"] = _benefits(s, f)
         wb = _water_benefit(s, cur, f)
         if wb:
             s["benefits"].insert(0, wb)
+        eff = {"yield_gain_pct": s["metrics"].get("yield_gain_pct", 0),
+               "legume_to_cereal": s["metrics"].get("legume_to_cereal", False)}
+        s["research"] = research.effect_lines(eff, bool(s.get("is_current")))
+        t = research.tested_at(s["years"], trials)
+        if t:
+            names = " + ".join(crops()[c]["name"].lower() for c in dict.fromkeys(s["years"]) if c != "fallow")
+            s["tested"] = True
+            s["research"].insert(0, f"✅ {names.capitalize()} rotation tested since {t['since']} at {t['place']} "
+                                    f"({t['km']} km away; {t['name']}, {t['source']}).")
+        s["benefits"] = s["research"] + s["benefits"]
         s["risks"] = _risks(s, f, comparison["irrigated"])
         s["gaps"] = gap_list
         s["evidence"] = ev
@@ -246,6 +286,13 @@ def season_plan(s: dict) -> str:
     return " · ".join(parts)
 
 
+def _short_research(line: str) -> str:
+    """Chat-sized version of a research line (the report keeps the full citation)."""
+    line = re.sub(r" \(([0-9,]+ km away); [^)]*\)\.$", r" (\1, DRIVES long-term trials).", line)
+    return (line.replace(f" ({research.MUDARE})", " (Mudare et al. 2025, Nature Communications)")
+            .replace("Field trials worldwide: crops in this rotation yield", "3,663 field trials: crops in this rotation yield"))
+
+
 def chat_summary(comparison: dict, report_url: str | None = None) -> str:
     """Short lines for WhatsApp/SMS: each option with its goal and overall score and its season calendar."""
     lines = []
@@ -256,7 +303,11 @@ def chat_summary(comparison: dict, report_url: str | None = None) -> str:
         if not s.get("is_current"):
             lines.append("  📅 " + season_plan(s))
             lines.append("  " + (s["why"][0] if s["why"] else ""))
-            if s.get("generated"):
+            if s.get("research"):
+                lines.append("  " + _short_research(s["research"][0]))
+            if s.get("generated") and s.get("tested"):
+                lines.append("  🧪 The second crops are FarmPartner's addition — try them on part of a field first.")
+            elif s.get("generated"):
                 lines.append("  🧪 New combination from FarmPartner's search — try it on part of a field first.")
             risks = [r for r in s["risks"] if not r.startswith("A new combination")]
             lines.append("  ⚠️ " + (risks[0] if risks else "Review locally before switching."))

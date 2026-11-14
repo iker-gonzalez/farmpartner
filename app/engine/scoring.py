@@ -3,6 +3,7 @@
 Every sub-score is 0-100 and is computed from a handful of named features, so each number can be traced back to
 the data source in the explanation. The LLM never invents these numbers; it only rephrases them.
 """
+from app.engine import research
 from app.engine.knowledge import covers, crops, rotations
 
 SUBSCORES = ["water", "soil", "erosion", "pest", "income", "resilience", "forage"]
@@ -137,8 +138,9 @@ def score_rotation(rot: dict, f: dict, irrigated: bool | None) -> dict:
 
     # Income proxy (relative only; no prices) discounted by climate risk
     gap = [covers()[cv] for cv in cover_map.values() if covers()[cv].get("harvested")]  # double crops, grazed forage
+    effect = research.rotation_effect(years, cover_map)  # meta-analysis: yield gain of each crop from its pre-crop
     income = clamp((sum(c["income"] for c in main) + 0.6 * sum(g["income"] for g in gap)) / n * 20
-                   * (0.75 + resilience / 400))
+                   * (0.75 + resilience / 400) * (1 + effect["yield_gain_pct"] / 200))
     forage = clamp(((sum(c["forage"] for c in main) + 0.6 * sum(g["forage"] for g in gap)) / n
                     + (1.5 if rot.get("extra_forage") else 0)) * 20)
 
@@ -149,7 +151,8 @@ def score_rotation(rot: dict, f: dict, irrigated: bool | None) -> dict:
                                              "income": income, "resilience": resilience, "forage": forage}.items()},
         "metrics": {"water_need_mm_per_yr": round(need), "effective_rain_mm": round(eff),
                     "bare_months_per_yr": round(bare_per_year, 1), "fallow_share": round(fallow_share, 2),
-                    "families": sorted(families), "erosion_risk": round(risk, 1), "erosion_reasons": risk_reasons},
+                    "families": sorted(families), "erosion_risk": round(risk, 1), "erosion_reasons": risk_reasons,
+                    "yield_gain_pct": effect["yield_gain_pct"], "legume_to_cereal": effect["legume_to_cereal"]},
     }
 
 
@@ -180,6 +183,13 @@ def canonical_cycle(pattern: list[str]) -> list[str]:
 SPECIALTY = {"potatoes", "tomatoes", "vegetables", "sugarbeets", "rice", "sugarcane"}
 NOT_IN_SEARCH = {"alfalfa"}  # multi-year stands are left to the hand-written templates
 GOAL_SHARE = 0.6  # ranking = 60 % the farmer's goals, 40 % the balanced overall score
+
+
+def country_pool(f: dict) -> set[str] | None:
+    country = f.get("country")
+    if country is None and f.get("lat") is not None and "country" not in f:
+        country = research.country_crops(f["lat"], f["lon"])
+    return research.crop_pool(country)
 
 
 def overall(scores: dict) -> float:
@@ -230,8 +240,11 @@ def generate(f: dict, irrigated: bool | None, current: list[str], weights: dict,
     C = crops()
     clim = f.get("climate") or {}
     gdd = clim.get("season_gdd_c") or 2500
+    grown = country_pool(f)  # outside the U.S.: only crops the country actually grows (FAOSTAT)
+    cur = set(current or [])
     pool = [cid for cid, c in C.items() if cid not in NOT_IN_SEARCH
-            and (cid not in SPECIALTY or cid in (current or []))
+            and (cid not in SPECIALTY or cid in cur or (grown is not None and cid in grown))
+            and (grown is None or cid in grown or cid in cur)
             and not (c["gdd_c"] and c["gdd_c"] > gdd * 0.95)]
     seen, out = set(), []
     for n in (2, 3):
@@ -285,8 +298,11 @@ def compare(f: dict, priorities: list[str], irrigated: bool | None, current: lis
     for r in rotations():
         if current and _same_cycle(r["years"], current) and not r.get("covers"):
             continue
-        if r.get("requires_any") and not set(r["requires_any"]) & set(current or []):
-            continue  # specialty rotations (vegetables, beets, rice...) only for farmers who already grow those crops
+        grown = country_pool(f)
+        if r.get("requires_any") and not set(r["requires_any"]) & (set(current or []) | (grown or set())):
+            continue  # specialty rotations (vegetables, beets, rice...) only where those crops are grown
+        if grown is not None and not set(r["years"]) <= grown | set(current or []):
+            continue  # a template built on crops this country doesn't grow
         s = score_rotation(r, f, irrigated)
         if not s["feasible"]:
             continue
