@@ -36,7 +36,10 @@ def zip_to_point(text: str, country: str = "us") -> tuple[float, float, str] | N
 STOPWORDS = {"i", "im", "live", "living", "my", "our", "we", "farm", "field", "is", "am", "are", "the", "a", "at",
              "near", "close", "to", "from", "mi", "mis", "campo", "finca", "parcela", "vivo", "estoy", "soy", "es",
              "el", "la", "los", "las", "de", "del", "cerca", "por", "aqui", "here", "there", "nire", "naiz", "ma",
-             "mon", "je", "suis", "habite", "près", "pres", "minha", "meu", "fazenda", "moro", "ich", "wohne", "bei"}
+             "mon", "je", "suis", "habite", "près", "pres", "minha", "meu", "fazenda", "moro", "ich", "wohne", "bei",
+             "hello", "hi", "hey", "hola", "buenas", "kaixo", "ola", "bonjour", "ciao", "hallo", "thanks", "thank",
+             "you", "gracias", "ok", "okay", "yes", "no", "si", "sí", "bai", "ez", "please", "porfa", "vale", "good",
+             "morning", "afternoon", "dias", "días", "tardes", "what", "how", "que", "qué", "como", "cómo"}
 
 
 def _plain(x: str) -> str:
