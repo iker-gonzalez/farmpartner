@@ -204,9 +204,11 @@ def claude_client():
 def _answer_llm(farmer_id: int, image: dict | None = None) -> str:
     client = claude_client()
     messages = _history(farmer_id)
+    while messages and messages[-1]["role"] == "assistant":
+        messages.pop()  # e.g. "📷 Got it — taking a look…" sent while we work; the request must end on the farmer's turn
     if not messages:
         return HELP
-    if image and messages[-1]["role"] == "user":
+    if image:
         messages[-1]["content"] = [image, {"type": "text", "text": messages[-1]["content"]}]
     for _ in range(6):
         resp = client.beta.messages.create(
