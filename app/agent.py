@@ -28,7 +28,8 @@ WhatsApp *bold* is fine. Use the farmer's units (see the last rule).
 - For rotation questions, call compare_rotations and explain the top options: why, one benefit, one risk to check locally.
 - You support, not replace, the farmer's judgment: when you recommend a change, remind them to check with their local \
 extension agent or agronomist. Do not lecture.
-- Reply in the language the farmer writes in (many U.S. farm workers write in Spanish).
+- Reply in the language the farmer writes in (many U.S. farm workers write in Spanish). In Spanish say "secano" \
+for dryland and "regadío" for irrigated (never "temporal"), "soja", and "técnico agrícola" for extension agent.
 - Share the report link when they want details, maps or charts.
 - Below these rules you get a snapshot of THIS farmer's field: profile, climate, the 7-day weather outlook and \
 this week's watering numbers. When it covers the question (frost, heat, rain, should I water…), answer from it \
@@ -39,6 +40,9 @@ or details not in the snapshot.
 ~20% on average vs monoculture; legume rotations cut corn/wheat nitrogen fertilizer 41–46% (Mudare et al. 2025, \
 Nature Communications, 3,663 field trials). The snapshot also lists the country's main crops (FAOSTAT) and nearby \
 long-term rotation experiments (DRIVES).
+- For practical how-to (cover crops, soil building, rotation planning, pests and diseases, organic methods) search \
+your library first (search_library). Paraphrase what it says in your own short words and cite it briefly, e.g. \
+"(SARE, Managing Cover Crops Profitably, p. 85)". Never copy long passages.
 - You can search the web (web_search) for general agronomy knowledge your field data doesn't cover: crops outside \
 your list, rotation research, pests and diseases, practices for their region. Search only when it really helps \
 (at most 2 searches), keep the answer short, and name the source in a few words (e.g. "según la Universidad de \
@@ -99,7 +103,24 @@ def _slim_comparison(res: dict, url: str) -> dict:
         "disclaimer": ex.DISCLAIMER}
 
 
+TOOLS.append({
+    "name": "search_library",
+    "description": "Search FarmPartner's agronomy library for practical, expert how-to: SARE handbooks (Managing Cover "
+                   "Crops Profitably; Building Soils for Better Crops; Crop Rotation on Organic Farms), Best4Soil's "
+                   "rotation guide, a good-agricultural-practices manual (UNLP) and an organic vegetable-rotation "
+                   "article. Use it for cover-crop choice, seeding and termination, soil organic matter, compaction, "
+                   "rotation planning, crop families, pest/disease/nematode breaks, organic practices. Returns "
+                   "passages with title and page. Put key words in English AND Spanish in the query.",
+    "input_schema": {"type": "object", "properties": {
+        "query": {"type": "string", "description": "Key words, e.g. 'hairy vetch termination corn / veza terminación maíz'"}},
+        "required": ["query"], "additionalProperties": False}})
+
+
 def run_tool(name: str, args: dict, farmer_id: int) -> dict:
+    if name == "search_library":
+        from app import library
+        hits = library.search(args.get("query", ""))
+        return {"passages": hits} if hits else {"passages": [], "note": "Nothing relevant in the library."}
     with session() as db:
         farmer = db.get(Farmer, farmer_id)
         field = service.main_field(farmer)

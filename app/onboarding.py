@@ -139,7 +139,7 @@ def classify_goal(text: str) -> list[str]:
 
 def parse_irrigated(text: str) -> bool | None:
     t = text.lower()
-    if re.search(r"\b(dry ?land|rain[- ]?fed|not irrigated|no irrigation|no water|secano|sin riego|de temporal|no riego|lehor\w*|ureztatu gabe\w*)\b", t):
+    if re.search(r"\b(dry ?land|rain[- ]?fed|not irrigated|no irrigation|no water|secano|sin riego|de temporal|temporal|no riego|lehor\w*|ureztatu gabe\w*)\b", t):
         return False
     if re.search(r"irrigat|pivot|\bwell\b|sprinkler|drip|flood|riego|regad|irrigad|goteo|aspersi|pivote|pozo|ureztat", t):
         return True

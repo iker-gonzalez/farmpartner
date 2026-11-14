@@ -19,8 +19,11 @@ _lock = threading.Lock()
 _loaded: set[str] = set()
 
 
+CACHE_VERSION = 3  # bump when the glossary or prompt changes, so cached translations are redone
+
+
 def _store_name(lang: str) -> str:
-    return f"translations-{lang}.json"
+    return f"translations-v{CACHE_VERSION}-{lang}.json"
 
 
 def _load(lang: str) -> None:
@@ -156,13 +159,20 @@ SYSTEM = ("You translate WhatsApp messages from FarmPartner, a farm advisor, int
           "farmers (polite form). Keep every emoji, *bold* marker, line break, URL, number, unit (in, °F, in/yr) and "
           "proper name exactly. Keep 'FarmPartner', 'NASA', 'USDA', 'RESET', 'REPORT' and 'HELP' as they are. "
           "Very short strings are button labels: keep them short (max 20 characters). Return ONLY a JSON array of "
-          "strings with the same length and order as the input.")
+          "strings with the same length and order as the input.{glossary}")
+GLOSSARY = {
+    "es": " Always address the farmer as \"usted\" (never \"tú\"), consistently in every string. Use these farming terms (Spain's usage, understood everywhere): dryland = secano (\"de secano\"), "
+          "irrigated = regadío (\"de regadío\"), rain-fed = secano (never \"temporal\"), soybeans = soja, "
+          "corn = maíz, elevators/buyers = cooperativas o compradores, ZIP code = código postal, extension agent = "
+          "técnico agrícola o agrónomo, cover crop = cubierta vegetal o cultivo de cobertura, fallow = barbecho.",
+}
 
 
 def _translate_batch(texts: list[str], lang: str) -> list[str]:
     from app.agent import quick
 
-    raw = quick(SYSTEM.format(lang=LANGS.get(lang, lang)), json.dumps(texts, ensure_ascii=False), max_tokens=8000)
+    raw = quick(SYSTEM.format(lang=LANGS.get(lang, lang), glossary=GLOSSARY.get(lang, "")),
+                json.dumps(texts, ensure_ascii=False), max_tokens=8000)
     raw = re.sub(r"^```(?:json)?|```$", "", raw).strip()
     out = json.loads(raw)
     if not (isinstance(out, list) and len(out) == len(texts) and all(isinstance(x, str) for x in out)):

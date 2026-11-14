@@ -95,3 +95,21 @@ def test_cached_prefix_and_field_snapshot(offline, monkeypatch):
     assert system[0]["cache_control"] == {"type": "ephemeral"} and system[0]["text"] == agent.SYSTEM
     assert "FIELD SNAPSHOT" in system[1]["text"] and "weather_next_7_days" in system[1]["text"]
     assert len(seen) == 1  # answered from the snapshot: one Claude call, no tool round trip
+
+
+def test_library_search_tool(monkeypatch):
+    from app import agent, library
+    docs = [{"source": "Managing Cover Crops Profitably (SARE, 3rd ed.)", "page": 144, "lang": "en",
+             "text": "Hairy vetch provides its maximum nitrogen by safe corn planting date when terminated at bloom."},
+            {"source": "Building Soils for Better Crops (SARE, 4th ed., 2021)", "page": 243, "lang": "en",
+             "text": "Addressing compaction: reduce traffic on wet soil and add organic matter."},
+            {"source": "Rotación de cultivos (Best4Soil)", "page": 6, "lang": "es",
+             "text": "Los nematodos sobreviven si se repite el cultivo hospedador; rote con especies no hospedadoras."}]
+    library._index.clear()
+    monkeypatch.setattr(library, "_load", lambda: docs)
+    hits = library.search("vetch termination corn")
+    assert hits[0]["page"] == 144
+    assert library.search("nematodos rotación")[0]["source"].startswith("Rotación")    # accents ignored
+    out = agent.run_tool("search_library", {"query": "compaction organic matter"}, farmer_id=0)
+    assert out["passages"][0]["page"] == 243
+    library._index.clear()

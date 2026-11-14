@@ -20,7 +20,7 @@ def _db():
 
 def _run():
     t0 = time.monotonic()
-    for name, step in (("database", _db), ("claude", _claude), ("translations", _translations)):
+    for name, step in (("database", _db), ("library", _library), ("claude", _claude), ("translations", _translations)):
         try:
             step()
         except Exception:
@@ -32,6 +32,11 @@ def _run():
             _claude()
         except Exception:
             log.info("prompt-cache keep-alive failed", exc_info=True)
+
+
+def _library():
+    from app import library
+    library.available()
 
 
 def _claude():
