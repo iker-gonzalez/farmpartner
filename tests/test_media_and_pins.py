@@ -231,3 +231,19 @@ def test_browser_demo_voice_photo_and_locale(offline, monkeypatch, tmp_path):
                                    "caption": "what is this bug?", "wait": True}).json()
     assert seen == ["image"] and any("aphids" in m for m in j["messages"])
     assert c.post("/api/media", json={"phone": "p1", "kind": "video", "data": jpg, "content_type": "x"}).status_code == 400
+
+
+def test_transcript_skips_silent_stretches(monkeypatch):
+    from app import media
+
+    class R:
+        status_code = 200
+
+        def json(self):
+            return {"results": [{"alternatives": [{}]}, {"alternatives": [{"transcript": " should I water "}]}, {}]}
+
+    monkeypatch.setattr(media.httpx, "post", lambda *a, **k: R())
+    monkeypatch.setattr(media, "_google_headers", lambda: {})
+    assert media.transcribe(b"RIFF\x00\x00\x00\x00WAVE", "audio/wav", ["en"]) == "should I water"
+    R.json = lambda self: {"results": [{"alternatives": [{}]}]}
+    assert media.transcribe(b"x", "audio/wav", ["en"]) is None

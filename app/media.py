@@ -95,7 +95,8 @@ def transcribe(data: bytes, content_type: str, langs: list[str] | None = None) -
     if r.status_code >= 400:
         log.warning("speech-to-text %s: %s", r.status_code, r.text[:300])
         r.raise_for_status()
-    parts = [res["alternatives"][0]["transcript"].strip() for res in r.json().get("results", []) if res.get("alternatives")]
+    # a silent stretch comes back as a result whose alternative has no transcript: skip it, keep the rest
+    parts = [(res.get("alternatives") or [{}])[0].get("transcript", "").strip() for res in r.json().get("results", [])]
     if not parts:
         log.warning("speech-to-text heard nothing (%s, %d bytes, %s)", content_type, len(data), codes[:4])
     return " ".join(p for p in parts if p) or None
