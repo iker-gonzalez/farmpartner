@@ -49,6 +49,7 @@
     text-decoration: underline; text-underline-offset: 3px; }
 
   .data .card h3 { font-family: var(--mono); font-size: 18px; font-weight: 600; letter-spacing: 0; }
+  .data a.card:hover h3 { color: var(--lime); }
 
   .channels { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; padding: 0; list-style: none; font-family: var(--mono); font-size: 13px; }
   .channels li { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--line); color: var(--ink-3); }
@@ -157,7 +158,7 @@
         <ol class="steps">
           <li><span class="n">01</span><div><h3>Tell us about your farm</h3><p>Share basic information about your land: location, water availability, current crops and farming priorities. You can also correct or adjust the environmental data so it better reflects the real conditions of your field.</p></div></li>
           <li><span class="n">02</span><div><h3>We read NASA data for your field</h3><p>The platform brings together several NASA datasets, harmonizes them and adds local weather forecasts, combining long-term environmental patterns with short-term information.</p><a class="more" href="#nasa-data">See the datasets ↓</a></div></li>
-          <li><span class="n">03</span><div><h3>AI analyzes and recommends</h3><p>AI weighs the environmental data alongside your farm’s details to identify suitable crops and propose alternative rotation strategies. You get your current rotation compared with at least two alternatives, with explanations, supporting data, expected benefits, possible risks and confidence levels.</p><a class="more" href="#sample-report">See a sample report ↓</a></div></li>
+          <li><span class="n">03</span><div><h3>AI analyzes and recommends</h3><p>AI weighs the environmental data alongside your farm’s details to identify suitable crops and propose alternative rotation strategies. You get your current rotation compared with at least two alternatives, with explanations, supporting data, expected benefits, possible risks and the data gaps to keep in mind.</p><a class="more" href="#sample-report">See a sample report ↓</a></div></li>
           <li><span class="n">04</span><div><h3>Farmer knowledge, built in</h3><p>Experienced farmers contribute practical know-how on crops, soils, planting periods and regional conditions. It is organized into a knowledge base the AI consults, so every recommendation combines scientific evidence with real field experience.</p></div></li>
           <li><span class="n">05</span><div><h3>Ongoing support</h3><p>FarmPartner sends weather alerts, spots chances to make better use of the land between harvests and suggests cover crops or alternative uses such as grazing. Just ask the chatbot, by text or voice note, whenever you need it.</p></div></li>
           <li><span class="n">06</span><div><h3>Global knowledge exchange</h3><p>NASA data covers the whole planet, so FarmPartner can connect farming communities facing similar climates. Through climate-analogue analysis, farmers discover regions already living the conditions their own area may face in the future, and learn from how they adapted.</p></div></li>
@@ -199,15 +200,15 @@
     <section class="sec data" id="nasa-data">
       <p class="label"><b>04</b>NASA DATA</p>
       <div class="body">
-        <h2>Six NASA missions, read for one field.</h2>
+        <h2>Five NASA missions, read for one field.</h2>
         <p>Each dataset answers a different question about your land. Together, and alongside local forecasts, they describe the past and near future of your field’s climate.</p>
         <div class="cards c3">
-          <div class="card"><span class="tag">CLIMATE</span><h3>NASA POWER</h3><p>Temperature, solar radiation and frost-risk indicators.</p></div>
-          <div class="card"><span class="tag">RAINFALL</span><h3>GPM</h3><p>Rainfall patterns and extreme rain events.</p></div>
-          <div class="card"><span class="tag">SOIL</span><h3>SMAP</h3><p>Soil moisture and how it varies through the seasons.</p></div>
-          <div class="card"><span class="tag">VEGETATION</span><h3>MODIS · LANDSAT</h3><p>Vegetation health and crop-stress indicators (NDVI).</p></div>
-          <div class="card"><span class="tag">WATER</span><h3>GRACE · GRACE-FO</h3><p>Long-term trends in water availability.</p></div>
-          <div class="card"><span class="tag">TERRAIN</span><h3>SRTM</h3><p>Elevation, slope and erosion-risk indicators.</p></div>
+          <div class="card"><span class="tag">CLIMATE &amp; RAIN</span><h3>NASA POWER</h3><p>20 years of rain, temperature and root-zone wetness: evaporation demand, frost dates, heat-stress and heavy-rain days.</p></div>
+          <div class="card"><span class="tag">VEGETATION</span><h3>MODIS NDVI</h3><p>How green the field is through the year, and the months the soil lies bare.</p></div>
+          <div class="card"><span class="tag">SOIL</span><h3>SMAP</h3><p>Root-zone and surface soil moisture now versus earlier months.</p></div>
+          <div class="card"><span class="tag">CROP STRESS</span><h3>ECOSTRESS</h3><p>Field-scale (70 m) crop water stress: whether the crop is short of water.</p></div>
+          <div class="card"><span class="tag">WATER</span><h3>GRACE · GRACE-FO</h3><p>Long-term trends in water storage, groundwater included.</p></div>
+          <a class="card" href="/data-and-science"><span class="tag">AND MORE</span><h3>Every source →</h3><p>USDA crop and soil maps, FAO, Open-Meteo, 3,663 field trials, long-term experiments and a library of farm handbooks.</p></a>
         </div>
       </div>
     </section>

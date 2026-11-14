@@ -74,7 +74,7 @@
       <li><a href="#resolution"><span>02</span>RESOLUTION</a></li>
       <li><a href="#economics"><span>03</span>PRICES &amp; YIELDS</a></li>
       <li><a href="#coverage"><span>04</span>COVERAGE</a></li>
-      <li><a href="#missing-data"><span>05</span>MISSING DATA</a></li>
+      <li><a href="#satellite-timing"><span>05</span>SATELLITE TIMING</a></li>
     </ul>
   </section>
 
@@ -84,7 +84,7 @@
         <p class="side"><b>01</b>AGRONOMY</p>
         <div>
           <h2>Crop rules are a first approximation.</h2>
-          <p class="said">Crop traits and scoring weights are hackathon approximations from public extension guidance. They need agronomist review.</p>
+          <p class="said">Crop traits and scoring weights are hackathon approximations from public extension guidance. They need agronomist review. New combinations from the rotation search are less proven: try them on part of a field first.</p>
           <div class="cols">
             <div class="col"><span class="k">WHAT IT MEANS</span><p>How much heat, water or frost each crop tolerates, and how much each factor weighs in the score, comes from general public guidance, not from a study of your region.</p></div>
             <div class="col"><span class="k">FOR YOU</span><p>Use the scores to compare options and start a conversation, not as a final verdict. If something doesn’t match your experience, trust your experience and tell the bot.</p></div>
@@ -97,9 +97,9 @@
         <p class="side"><b>02</b>RESOLUTION</p>
         <div>
           <h2>Satellites see in blocks, not in fields.</h2>
-          <p class="said">POWER is a ~50 km model grid, and a MODIS pixel (250 m) can mix fields. CDL can mislabel some years.</p>
+          <p class="said">POWER is a ~50 km model grid, and a MODIS pixel (250 m) can mix fields. CDL can mislabel some years. GRACE is a ~300 km signal: the regional aquifer trend, not one well.</p>
           <div class="cols">
-            <div class="col"><span class="k">WHAT IT MEANS</span><p>NASA POWER climate describes a square about 50 km wide. One MODIS vegetation pixel covers 250 × 250 m, so a small or narrow field can be blended with its neighbors. The USDA crop map (CDL) is itself made from satellites and sometimes gets a year wrong.</p></div>
+            <div class="col"><span class="k">WHAT IT MEANS</span><p>NASA POWER climate describes a square about 50 km wide. One MODIS vegetation pixel covers 250 × 250 m, so a small or narrow field can be blended with its neighbors. The USDA crop map (CDL) is itself made from satellites and sometimes gets a year wrong. GRACE groundwater trends describe a region about 300 km across.</p></div>
             <div class="col"><span class="k">FOR YOU</span><p>Climate reads describe your area rather than your exact plot. Microclimates such as valleys, slopes or frost pockets may not show. If the crop history looks wrong, correct it in the chat.</p></div>
             <div class="col next"><span class="k">CLOSING THE GAP</span><p>Finer-resolution sources such as Landsat (30 m) for vegetation, plus the farmer’s own corrections, which always take priority over the satellite reading.</p></div>
           </div>
@@ -109,10 +109,10 @@
       <li class="limit" id="economics">
         <p class="side"><b>03</b>PRICES &amp; YIELDS</p>
         <div>
-          <h2>No prices or yields yet.</h2>
-          <p class="said">No prices or yields yet. “Income” is a relative index, and the bot asks farmers for local prices and buyers.</p>
+          <h2>No local prices yet.</h2>
+          <p class="said">No local prices yet. “Income” is a relative index plus the trial-based yield effect, and the bot asks farmers for local prices and buyers.</p>
           <div class="cols">
-            <div class="col"><span class="k">WHAT IT MEANS</span><p>FarmPartner doesn’t know market prices or expected yields. The “income” score only ranks rotations against each other; it is not a forecast in dollars or euros.</p></div>
+            <div class="col"><span class="k">WHAT IT MEANS</span><p>FarmPartner doesn’t know your market prices or your own yields. The “income” score ranks rotations against each other, using a relative market index and the yield gain that 3,663 field trials show after each previous crop (Mudare et al. 2025); it is not a forecast in dollars or euros.</p></div>
             <div class="col"><span class="k">FOR YOU</span><p>Before switching crops, check local prices, buyers and contracts. The bot asks you about them so the comparison reflects your real market.</p></div>
             <div class="col next"><span class="k">CLOSING THE GAP</span><p>Connecting local price and yield data, and learning from the prices and buyers farmers share in the conversation.</p></div>
           </div>
@@ -123,24 +123,24 @@
         <p class="side"><b>04</b>COVERAGE</p>
         <div>
           <h2>Deepest in the U.S., useful worldwide.</h2>
-          <p class="said">U.S.-deepest: CDL and SSURGO are U.S.-only. Climate, NDVI and the forecast work worldwide, and outside the U.S. the farmer types their crops.</p>
+          <p class="said">U.S.-deepest: CDL and SSURGO are U.S.-only. Climate, NDVI and the forecast work worldwide; outside the U.S. the farmer types their crops and FAOSTAT limits the search to crops the country grows.</p>
           <div class="cols">
-            <div class="col"><span class="k">WHAT IT MEANS</span><p>Crop history (USDA CDL) and detailed soil data (USDA SSURGO) only exist for the United States. NASA climate, vegetation health (NDVI) and the weather forecast cover the whole planet.</p></div>
+            <div class="col"><span class="k">WHAT IT MEANS</span><p>Crop history (USDA CDL) and detailed soil data (USDA SSURGO) only exist for the United States. NASA climate, vegetation health (NDVI), soil moisture, crop stress, groundwater trends and the weather forecast cover the whole planet.</p></div>
             <div class="col"><span class="k">FOR YOU</span><p>Outside the U.S., tell the bot which crops you grow and what your soil is like. The climate analysis works just the same; crop history and soil detail come from you.</p></div>
             <div class="col next"><span class="k">CLOSING THE GAP</span><p>Global soil and crop-type datasets, so farmers everywhere get the same depth of analysis without typing it in.</p></div>
           </div>
         </div>
       </li>
 
-      <li class="limit" id="missing-data">
-        <p class="side"><b>05</b>MISSING DATA</p>
+      <li class="limit" id="satellite-timing">
+        <p class="side"><b>05</b>SATELLITE TIMING</p>
         <div>
-          <h2>Two NASA datasets aren’t wired in yet.</h2>
-          <p class="said">SMAP (9 km soil moisture) and ECOSTRESS (ET) need Earthdata login and are not wired in yet. POWER’s GWETROOT stands in for soil moisture.</p>
+          <h2>Some satellites answer minutes later, and not every day.</h2>
+          <p class="said">SMAP is a 9 km grid. ECOSTRESS passes are irregular, and clouds leave gaps. Both arrive 20–30 minutes after onboarding, and until then the report lists them as “processing”.</p>
           <div class="cols">
-            <div class="col"><span class="k">WHAT IT MEANS</span><p>SMAP measures soil moisture from space and ECOSTRESS measures how much water plants release (evapotranspiration). Both need a NASA Earthdata account, so for now soil moisture comes from POWER’s modeled root-zone wetness (<code>GWETROOT</code>).</p></div>
-            <div class="col"><span class="k">FOR YOU</span><p>Soil-moisture reads are a modeled, coarser estimate rather than a direct measurement. If your soil is wetter or drier than the bot thinks, say so.</p></div>
-            <div class="col next"><span class="k">CLOSING THE GAP</span><p>Connecting SMAP and ECOSTRESS through NASA Earthdata for measured soil moisture and plant water use.</p></div>
+            <div class="col"><span class="k">WHAT IT MEANS</span><p>SMAP (soil moisture) and ECOSTRESS (crop water stress) are requested from NASA AppEEARS for each new field. NASA processes them as a queue, so they come in 20–30 minutes after the first answer. SMAP describes a 9 km square; ECOSTRESS sees 70 m but only on the days the space station passes over, and clouds hide some of those passes.</p></div>
+            <div class="col"><span class="k">FOR YOU</span><p>Your first comparison uses climate, vegetation and crop maps; soil moisture and crop stress are added to the report and to the watering advice once they arrive. If your soil is wetter or drier than the bot thinks, say so.</p></div>
+            <div class="col next"><span class="k">CLOSING THE GAP</span><p>Requesting the satellite data ahead of time for common farming regions, and adding finer, more frequent soil-moisture products as they become available.</p></div>
           </div>
         </div>
       </li>
@@ -149,7 +149,7 @@
     <section class="why">
       <p class="side">■ WHY WE SAY THIS</p>
       <div>
-        <p class="big">A recommendation is only useful if you know <em>how far to trust it</em>. That’s why every answer comes with its evidence, a confidence level and the risks to check locally.</p>
+        <p class="big">A recommendation is only useful if you know <em>how far to trust it</em>. That’s why every answer comes with its evidence, the data gaps and the risks to check locally.</p>
         <p class="fine"><span>■ FarmPartner supports, and does not replace, farmer judgment and local agronomic expertise.</span><a href="{{ repo }}#known-limits-said-out-loud-in-the-app-too" target="_blank" rel="noopener">Known limits on GitHub ↗</a></p>
       </div>
     </section>

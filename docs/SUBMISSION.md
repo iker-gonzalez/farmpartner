@@ -27,11 +27,12 @@ NASA's data could help, but it lives in portals, rasters and acronyms that a bus
 ## What it does
 
 1. **No-form onboarding in 3 taps.** A location pin gives us the field. USDA Cropland Data Layer history detects the
-   current rotation ("Looks like wheat → sorghum → fallow, right?"). One goal: save water, soil health, income, less
-   erosion or forage.
-2. **Three strategies compared:** what the farmer does today, the best match for their goal, and the best soil builder.
-   Each gets 7 transparent sub-scores (water, soil, erosion, pest-cycle break, heat/drought resilience, income, forage),
-   weighted by the farmer's goal.
+   current rotation ("Looks like wheat → sorghum → fallow, right?"). One or more goals: save water, soil health,
+   income, less erosion, forage, or the farmer's own words. Works in 46 languages, by text or voice note.
+2. **Three strategies compared:** what the farmer does today and the two best alternatives, found by searching every
+   2- and 3-year sequence that fits the site (with second crops and covers in the gaps). Each gets 7 transparent sub-scores (water, soil, erosion, pest-cycle break, heat/drought resilience, income, forage),
+   weighted by the farmer's goals, plus the yield gain 3,663 field trials predict and the long-term experiments
+   nearby that have run it for decades.
 3. **Every recommendation explains itself:** why, evidence (with its data source), benefits, gaps (e.g. "SMAP is 9 km,
    not your field") and risks ("check local sorghum buyers").
 4. **Bare-soil windows and vulnerable seasons:** MODIS NDVI shows the months the field is bare (the cover-crop window),
@@ -63,7 +64,8 @@ questions and rewrites tool outputs in plain language. It is only allowed to quo
 ## Use of AI (disclosure)
 
 - **In the product:** Claude Opus 5.5 handles conversation (intent, extracting facts from free text, plain-language
-  replies) through six tools. Scores and data are computed by our code, not by the model.
+  replies) through seven tools, including a searchable library of farm handbooks; Claude Haiku 5.5
+  translates and, as a last resort, searches the web with sources. Scores and data are computed by our code, not by the model.
 - **In development:** the team used Claude Code as a coding assistant. *[team: adjust to what you actually used]*
 - *[team: list any AI-generated images or other assets]*
 
@@ -77,9 +79,9 @@ questions and rewrites tool outputs in plain language. It is only allowed to quo
 
 ## Limits and next steps
 
-Crop traits and weights are hackathon approximations that need agronomist review. "Income" is a relative index (no
-live prices yet). SMAP and GRACE are coarse. Next: extension-agent review, local price feeds, Spanish-language
-onboarding, voice notes, and field polygons instead of a pin.
+Crop traits and weights are hackathon approximations that need agronomist review. "Income" is a relative index plus the
+trial-based yield effect (no local prices yet). SMAP and GRACE are coarse. Next: extension-agent review, local price
+feeds, field validation with farmers, and field polygons instead of a pin.
 
 ---
 
@@ -94,7 +96,7 @@ onboarding, voice notes, and field polygons instead of a pin.
 
 ## Demo script (2 minutes)
 
-1. farmpartner.space: show the hero, then enter a phone number (or scan the QR).
+1. farmpartner.space: show the hero, then tap **Open in WhatsApp** (or scan the QR).
 2. WhatsApp: tap **Get started**, send a pin near Garden City, KS (pre-warmed), and show the detected rotation.
 3. Tap **Yes, dryland**, then **Build soil health**, and show the 3 strategies in chat.
 4. Open the report link: map, rain vs. ET₀, NDVI bare months, strategy cards with evidence, gaps and risks.
