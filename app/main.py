@@ -11,7 +11,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from sqlalchemy import select
 
-from app import chat, config, i18n, landing, media, messaging, ratelimit, report_view, service
+from app import chat, config, i18n, landing, media, messaging, ratelimit, report_view, service, team
 from app.prompts import as_text, is_prompt
 from app.db import Farmer, Field, init_db, session
 from app.engine.explain import DISCLAIMER, SCORE_LABELS, evidence, gaps, inch, short_name
@@ -220,11 +220,31 @@ def api_poll(phone: str):
         return _api_messages(msgs, pending=_pending.get(key, 0) > 0)
 
 
+def _site_ctx() -> dict:
+    """Values shared by the public pages (landing and What & How)."""
+    return {"repo": landing.REPO_URL, "whatsapp": landing.whatsapp_url(), "wa": landing.whatsapp_copy(),
+            "sprout_path": landing.SPROUT_PATH, "whatsapp_path": landing.WHATSAPP_PATH,
+            "video_id": landing.VIDEO_ID}
+
+
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
-    return templates.TemplateResponse(request, "landing.html", {
-        "repo": landing.REPO_URL, "whatsapp": landing.whatsapp_url(), "wa": landing.whatsapp_copy(),
-        "sprout_path": landing.SPROUT_PATH, "whatsapp_path": landing.WHATSAPP_PATH})
+    return templates.TemplateResponse(request, "landing.html", _site_ctx())
+
+
+@app.get("/what-and-how", response_class=HTMLResponse)
+def what_and_how(request: Request):
+    return templates.TemplateResponse(request, "what_how.html", {**_site_ctx(), "active": "what-how"})
+
+
+@app.get("/limits", response_class=HTMLResponse)
+def limits_page(request: Request):
+    return templates.TemplateResponse(request, "limits.html", _site_ctx())
+
+
+@app.get("/team", response_class=HTMLResponse)
+def team_page(request: Request):
+    return templates.TemplateResponse(request, "team.html", {**_site_ctx(), "active": "team", "team": team.members()})
 
 
 @app.get("/chat", response_class=HTMLResponse)

@@ -1,0 +1,80 @@
+/* Shared styles for the secondary pages (What & how, Team). */
+:root {
+  --bg: #0a0a0b; --ink: #f4f4f5; --ink-2: #c8c8ce; --ink-3: #adadb7; --line: #34343a; --line-2: #5a5a63;
+  --lime: #a8f326; --mono: "IBM Plex Mono", ui-monospace, monospace; --sans: "Inter", system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+
+/* ---------- Header (markup in templates/_header.html; landing.html keeps its own copy) ---------- */
+header { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center;
+  padding: 22px 64px; background: #0a0a0bd9; border-bottom: 1px solid var(--line); backdrop-filter: blur(6px); }
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo svg { width: 18px; height: 18px; }
+.logo .orbi { width: 58px; height: 29px; margin: -6px 0; }
+.wordmark { font-family: "Space Grotesk", var(--sans); font-size: 20px; font-weight: 600; color: var(--ink); letter-spacing: -.6px; line-height: 1; }
+.wordmark b { font-weight: 600; color: var(--lime); }
+nav { display: flex; align-items: center; gap: 32px; }
+nav a { font-family: var(--mono); font-size: 13px; color: var(--ink-2); }
+nav a:hover, nav a.on { color: var(--ink); }
+nav a.on { box-shadow: 0 2px 0 var(--lime); }
+.btn { display: inline-flex; align-items: center; gap: 10px; background: var(--lime); color: var(--bg);
+  font-family: var(--mono); font-size: 13px; font-weight: 600; white-space: nowrap; }
+.btn:hover { filter: brightness(1.08); }
+nav .btn { padding: 9px 14px; color: var(--bg); }
+
+/* ---------- Intro ---------- */
+.intro { position: relative; isolation: isolate; padding: 112px 64px 88px; text-align: center; overflow: hidden; }
+/* Halftone dots, echoing the pixel-art illustrations, fading out towards the text. */
+.intro::before { content: ""; position: absolute; inset: 0; z-index: -1;
+  background: radial-gradient(#ffffff26 1px, transparent 1.2px) 0 0 / 7px 7px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 90% at 50% 0%, transparent 35%, #000 100%);
+          mask-image: radial-gradient(ellipse 70% 90% at 50% 0%, transparent 35%, #000 100%); }
+.intro::after { content: ""; position: absolute; inset: auto 0 0 0; height: 160px; z-index: -1;
+  background: linear-gradient(180deg, #0a0a0b00, var(--bg)); }
+.kicker { font-family: var(--mono); font-size: 13px; color: var(--lime); }
+.intro h1 { max-width: 900px; margin: 26px auto 0; font-size: 60px; font-weight: 600; line-height: 1.12; letter-spacing: -1.2px; }
+.lead { max-width: 760px; margin: 26px auto 0; font-size: 18px; line-height: 1.6; color: var(--ink-2); }
+
+/* ---------- Content width ---------- */
+.wrap { width: 1100px; max-width: calc(100% - 128px); margin: 0 auto; }
+
+/* ---------- Closing CTA (footer art from the landing) ---------- */
+.cta { position: relative; isolation: isolate; height: 640px; margin-top: 24px; overflow: hidden;
+  background: url("/static/landing/footer.jpg") center / cover no-repeat; }
+.cta::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 420px; z-index: -1;
+  background: linear-gradient(180deg, var(--bg) 0%, #0a0a0bcc 45%, #0a0a0b00 100%); }
+.cta .inner { display: flex; flex-direction: column; align-items: center; gap: 22px; padding-top: 40px; text-align: center; }
+.cta h2 { font-size: 44px; font-weight: 600; letter-spacing: -.9px; line-height: 1.12; }
+.cta .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.cta .btn { padding: 15px 20px; }
+.cta .btn svg { width: 18px; height: 18px; }
+.ghost { display: inline-flex; align-items: center; padding: 15px 20px; border: 1px solid var(--line-2); background: #0a0a0bcc;
+  font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--ink); }
+.ghost:hover { border-color: var(--ink); }
+.bar { position: absolute; inset: auto 0 0 0; height: 103px; display: flex; justify-content: space-between; align-items: flex-end;
+  padding: 0 64px 28px; background: linear-gradient(180deg, #00000000 0%, #000000e6 100%);
+  font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) {
+  nav a:not(.btn) { display: none; }
+}
+@media (max-width: 800px) {
+  header { padding: 14px 20px; }
+  nav .btn { padding: 9px 12px; font-size: 12px; }
+  .long { display: none; }
+  .intro { padding: 64px 20px 56px; }
+  .kicker { font-size: 11px; letter-spacing: .4px; }
+  .intro h1 { font-size: 38px; line-height: 1.1; }
+  .lead { font-size: 15.5px; }
+  .wrap { max-width: calc(100% - 40px); }
+  .cta { height: 600px; background-image: url("/static/landing/footer-800.jpg"); }
+  .cta h2 { font-size: 30px; padding: 0 20px; }
+  .cta .actions { flex-direction: column; width: calc(100% - 40px); }
+  .cta .btn, .ghost { justify-content: center; }
+  .bar { flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 6px; height: 110px;
+    padding: 0 20px 20px; font-size: 10.5px; letter-spacing: .4px; }
+}

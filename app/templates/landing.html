@@ -25,8 +25,11 @@
   a { color: inherit; text-decoration: none; }
 
   /* ---------- Hero ---------- */
-  .hero { position: relative; min-height: 1180px; overflow: hidden; isolation: isolate;
-    background: url("/static/landing/hero.jpg") center / cover no-repeat; }
+  .hero { position: relative; overflow: hidden; isolation: isolate; background: var(--bg); }
+  /* The artwork flows right after the copy (pulled up under it), so its bright horizon always starts
+     below the last line of text, however long the copy gets (translations, extra rows). */
+  .hero-art { position: relative; z-index: -2; height: 1000px; margin-top: -420px;
+    background: url("/static/landing/hero.jpg") center bottom / cover no-repeat; }
   .hero::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 620px; z-index: -1;
     background: linear-gradient(180deg, #0a0a0bf2 0%, #0a0a0bb3 60%, #0a0a0b00 100%); }
   .hero::after { content: ""; position: absolute; inset: auto 0 0 0; height: 100px; z-index: -1;
@@ -41,7 +44,8 @@
   .wordmark b { font-weight: 600; color: var(--lime); }
   nav { display: flex; align-items: center; gap: 32px; }
   nav a { font-family: var(--mono); font-size: 13px; color: var(--ink-2); }
-  nav a:hover { color: var(--ink); }
+  nav a:hover, nav a.on { color: var(--ink); }
+  nav a.on { box-shadow: 0 2px 0 var(--lime); }
   .btn { display: inline-flex; align-items: center; gap: 10px; background: var(--lime); color: var(--bg);
     font-family: var(--mono); font-size: 13px; font-weight: 600; white-space: nowrap; }
   .btn:hover { filter: brightness(1.08); }
@@ -86,13 +90,32 @@
   .status { min-height: 1.2em; font-family: var(--mono); font-size: 13px; color: var(--lime); }
   .status.err { color: #fca5a5; }
   .status a { text-decoration: underline; text-underline-offset: 3px; }
+  .channels { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 0; list-style: none;
+    font-family: var(--mono); font-size: 12px; margin-top: -6px; }
+  .channels li { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px;
+    border: 1px solid var(--line); background: #0a0a0b99; color: var(--ink-3); }
+  .channels .tag { font-size: 10px; letter-spacing: .6px; color: #f4f4f580; }
+  .channels .live { border-color: var(--lime); color: var(--ink); }
+  .channels .live .tag { color: var(--lime); }
   .meta { font-family: var(--mono); font-size: 13px; color: #f4f4f5e6; }
   .meta a { text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ---------- Explainer video ---------- */
+  .video { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 96px 64px 0; text-align: center; }
+  .video h2 { max-width: 760px; font-size: 40px; font-weight: 600; line-height: 1.15; letter-spacing: -.8px; color: var(--ink); }
+  .player { position: relative; width: 960px; max-width: 100%; aspect-ratio: 16 / 9; margin-top: 20px;
+    background: #000; border: 1px solid var(--line-2); box-shadow: 8px 8px 0 #000; }
+  .player iframe, .facade, .facade img { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+  .facade img { object-fit: cover; filter: grayscale(1) contrast(1.15) brightness(.75); transition: filter .25s; }
+  .facade:hover img, .facade:focus-visible img { filter: grayscale(.6) contrast(1.1) brightness(.85); }
+  .facade .btn { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 15px 20px; }
+  .facade:focus-visible { outline: 2px solid var(--lime); outline-offset: 4px; }
 
   /* ---------- Footer ---------- */
   .links { display: flex; flex-direction: column; align-items: center; gap: 48px; padding: 96px 64px 72px; }
   .tagline { font-family: var(--mono); font-size: 14px; color: #f4f4f5cc; }
-  .grid { width: 1100px; max-width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 48px 24px; }
+  /* 3 × 2, columns sized to their content so the block is optically centered under the tagline. */
+  .grid { max-width: 100%; display: grid; grid-template-columns: repeat(3, max-content); justify-content: center; gap: 48px 112px; }
   .grid a { display: flex; flex-direction: column; gap: 4px; }
   .grid .t { font-size: 28px; font-weight: 500; color: var(--ink); }
   .grid .s { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
@@ -121,7 +144,7 @@
     header { padding: 14px 20px; }
     nav .btn { padding: 9px 12px; font-size: 12px; }
     .long { display: none; }
-    .hero { min-height: 1000px; background-image: url("/static/landing/hero-800.jpg"); background-position: center bottom; }
+    .hero-art { height: 760px; margin-top: -330px; background-image: url("/static/landing/hero-800.jpg"); }
     .hero::before { height: 740px; }
     .copy { width: auto; max-width: none; margin: 41px 20px 0; gap: 20px; }
     .kicker { font-size: 11px; letter-spacing: .4px; line-height: 1.6; }
@@ -136,9 +159,15 @@
     form.optin input[type=tel] { flex: 1; min-width: 0; width: auto; border-right: 1px solid var(--line-2); border-bottom: 0; }
     form.optin .btn { width: 100%; justify-content: center; padding: 16px 20px; }
     form.optin label { font-size: 11px; text-align: left; }
+    .channels { font-size: 11px; gap: 6px; margin-top: 0; }
+    .channels li { padding: 5px 8px; gap: 6px; }
     .meta { font-size: 12px; line-height: 1.7; }
     .meta .nl { display: block; }
     .meta .sep { display: none; }
+    .video { padding: 64px 20px 0; gap: 16px; }
+    .video h2 { font-size: 26px; letter-spacing: -.5px; }
+    .player { margin-top: 12px; box-shadow: 5px 5px 0 #000; }
+    .facade .btn { padding: 12px 16px; font-size: 12px; }
     .links { padding: 64px 20px 48px; gap: 32px; }
     .tagline { font-size: 12px; text-align: center; }
     .grid { grid-template-columns: repeat(2, 1fr); gap: 32px 16px; text-align: center; }
@@ -155,20 +184,7 @@
 </head>
 <body>
   <section class="hero">
-    <header>
-      <a class="logo" href="/" aria-label="FarmPartner home">
-        <img class="orbi" src="/static/brand/orbi.svg" alt="" width="58" height="29">
-        <span class="wordmark">farm<b>partner</b></span>
-      </a>
-      <nav>
-        <a href="{{ repo }}#how-it-works">HOW IT WORKS</a>
-        <a href="{{ repo }}#data-sources">NASA DATA</a>
-        <a href="/sample">STRATEGIES</a>
-        <a href="{{ repo }}/graphs/contributors">TEAM</a>
-        <a href="{{ repo }}">GITHUB</a>
-        <a class="btn" href="/chat">TRY <span class="long">THE </span>DEMO →</a>
-      </nav>
-    </header>
+    {% include "_header.html" %}
 
     <div class="copy">
       <p class="kicker">● NASA SPACE APPS 2026<span class="sep"> · </span><span class="nl">FIELD SHIFT CHALLENGE</span></p>
@@ -186,8 +202,27 @@
         <label><input type="checkbox" name="consent" required> I agree to receive WhatsApp messages from FarmPartner. Reply STOP anytime.</label>
         <p class="status" role="status" aria-live="polite"></p>
       </form>
+      <ul class="channels" aria-label="Messaging channels">
+        <li class="live">WhatsApp <span class="tag">● LIVE</span></li>
+        <li>Messenger <span class="tag">SOON</span></li>
+        <li>iMessage <span class="tag">SOON</span></li>
+        <li>Instagram <span class="tag">SOON</span></li>
+        <li>Line <span class="tag">SOON</span></li>
+        <li>SMS <span class="tag">SOON</span></li>
+      </ul>
       <p class="meta">or <a href="{{ whatsapp }}" target="_blank" rel="noopener">open WhatsApp yourself</a><span class="sep"> · </span><span class="nl">or <a href="/chat">try it in your browser →</a></span></p>
-      <p class="meta">Free · No app to install · Open source (MIT) · <a href="/sample">Sample report →</a></p>
+      <p class="meta">Free · Messaging apps &amp; SMS<span class="sep"> · </span><span class="nl">No app to install · Open source (MIT)<span class="sep"> · </span></span><span class="nl"><a href="/sample">See a sample report →</a></span></p>
+    </div>
+    <div class="hero-art" aria-hidden="true"></div>
+  </section>
+
+  <section class="video" id="video">
+    <h2>NASA satellite data, AI and farmers’ know-how — turned into advice for your field.</h2>
+    <div class="player">
+      <a class="facade" href="https://www.youtube.com/watch?v={{ video_id }}" target="_blank" rel="noopener" data-id="{{ video_id }}" aria-label="Play the FarmPartner explainer video">
+        <img src="https://i.ytimg.com/vi/{{ video_id }}/maxresdefault.jpg" alt="" loading="lazy">
+        <span class="btn">▶ PLAY VIDEO</span>
+      </a>
     </div>
   </section>
 
@@ -195,14 +230,12 @@
     <div class="links">
       <p class="tagline">■ ALWAYS WATCHING THE SKY FOR YOUR FIELD</p>
       <div class="grid">
-        <a href="{{ repo }}#how-it-works"><span class="t">How it works</span><span class="s">PIN · CROPS · GOAL</span></a>
+        <a href="/what-and-how"><span class="t">What &amp; how</span><span class="s">DATA · AI · FARMERS</span></a>
         <a href="{{ repo }}#data-sources"><span class="t">NASA data</span><span class="s">POWER · MODIS · GRACE</span></a>
-        <a href="/sample"><span class="t">Strategies</span><span class="s">TODAY VS. 2 OPTIONS</span></a>
-        <a href="/sample"><span class="t">Field report</span><span class="s">MAP · RAIN VS ET · NDVI</span></a>
-        <a href="{{ repo }}"><span class="t">GitHub</span><span class="s">OPEN SOURCE · MIT</span></a>
-        <a href="{{ repo }}/graphs/contributors"><span class="t">Team</span><span class="s">SIX BUILDERS</span></a>
+        <a href="/limits"><span class="t">Our limits</span><span class="s">WHAT DATA CAN’T SEE</span></a>
+        <a href="/team"><span class="t">Team</span><span class="s">SIX BUILDERS</span></a>
         <a href="https://www.spaceappschallenge.org/2026/challenges/adapting-farms-with-nasa-data/"><span class="t">Space Apps</span><span class="s">FIELD SHIFT · 2026</span></a>
-        <a href="{{ repo }}#known-limits-said-out-loud-in-the-app-too"><span class="t">Our limits</span><span class="s">WHAT DATA CAN’T SEE</span></a>
+        <a href="{{ repo }}"><span class="t">GitHub</span><span class="s">OPEN SOURCE · MIT</span></a>
       </div>
     </div>
     <div class="art">
@@ -242,6 +275,16 @@
                setTimeout(() => { location.href = d.wa_url; }, 600); }
       } catch { say("Network error — try again.", true); }
       btn.disabled = false;
+    });
+    // Video: show a grayscale thumbnail first and only load YouTube when the visitor presses play.
+    document.querySelector(".facade").addEventListener("click", e => {
+      e.preventDefault();
+      const f = document.createElement("iframe");
+      f.src = `https://www.youtube-nocookie.com/embed/${e.currentTarget.dataset.id}?autoplay=1&rel=0`;
+      f.title = "FarmPartner explainer video";
+      f.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+      f.allowFullscreen = true;
+      e.currentTarget.replaceWith(f);
     });
   </script>
 </body>

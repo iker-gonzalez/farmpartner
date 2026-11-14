@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Our limits — FarmPartner</title>
+<meta name="description" content="The known limits of FarmPartner: what the satellite data and the current version can't see, what it means for farmers, and what would close each gap.">
+<meta property="og:title" content="Our limits — FarmPartner">
+<meta property="og:image" content="/static/landing/hero.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&family=Silkscreen&family=Space+Grotesk:wght@600&display=swap" rel="stylesheet">
+<link rel="icon" href="/static/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/static/brand/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="/static/brand/apple-touch-icon.png">
+<link rel="stylesheet" href="/static/site.css">
+<style>
+  /* Page-specific styles; shared tokens, header, intro and CTA live in /static/site.css. */
+  .summary { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 40px auto 0; padding: 0; list-style: none;
+    font-family: var(--mono); font-size: 12.5px; }
+  .summary a { display: inline-flex; gap: 8px; padding: 7px 12px; border: 1px solid var(--line); color: var(--ink-2); }
+  .summary a span { color: var(--lime); }
+  .summary a:hover { border-color: var(--ink-3); color: var(--ink); }
+
+  .limits { padding: 0; list-style: none; border-top: 1px solid var(--line); }
+  .limit { display: grid; grid-template-columns: 200px 1fr; gap: 48px; padding: 56px 0; border-bottom: 1px solid var(--line); }
+  .limit .side { font-family: var(--mono); font-size: 13px; color: var(--ink-3); line-height: 1.6; position: sticky; top: 110px; align-self: start; }
+  .limit .side b { display: block; font-size: 28px; font-weight: 400; color: var(--lime); line-height: 1.2; margin-bottom: 6px; }
+  .limit h2 { font-size: 32px; font-weight: 600; line-height: 1.15; letter-spacing: -.6px; }
+  .limit .said { margin-top: 14px; padding-left: 14px; border-left: 2px solid var(--lime); font-family: var(--mono); font-size: 13.5px;
+    line-height: 1.65; color: var(--ink); max-width: 760px; }
+  .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 28px; background: var(--line); border: 1px solid var(--line); }
+  .col { display: flex; flex-direction: column; gap: 10px; padding: 22px 20px; background: var(--bg); }
+  .col .k { font-family: var(--mono); font-size: 11.5px; letter-spacing: .5px; color: var(--ink-3); }
+  .col.next .k { color: var(--lime); }
+  .col p { font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+  .col code { font-family: var(--mono); font-size: 13px; color: var(--ink); }
+
+  .why { display: grid; grid-template-columns: 200px 1fr; gap: 48px; padding: 72px 0 32px; }
+  .why .side { font-family: var(--mono); font-size: 13px; color: var(--lime); }
+  .why p.big { font-size: 28px; font-weight: 500; line-height: 1.3; letter-spacing: -.5px; max-width: 800px; }
+  .why p.big em { font-style: normal; color: var(--lime); }
+  .why .fine { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; margin-top: 32px;
+    font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); }
+  .why .fine a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  .why .fine a:hover { color: var(--lime); }
+
+  @media (max-width: 1100px) {
+    .limit, .why { grid-template-columns: 1fr; gap: 16px; }
+    .limit .side { position: static; display: flex; align-items: baseline; gap: 12px; }
+    .limit .side b { font-size: 22px; margin: 0; }
+  }
+  @media (max-width: 800px) {
+    .summary { font-size: 11.5px; gap: 6px; margin-top: 32px; }
+    .limit { padding: 40px 0; }
+    .limit h2 { font-size: 24px; letter-spacing: -.4px; }
+    .limit .said { font-size: 12.5px; }
+    .cols { grid-template-columns: 1fr; }
+    .col { padding: 18px 16px; }
+    .why { padding: 48px 0 24px; }
+    .why p.big { font-size: 21px; }
+  }
+</style>
+</head>
+<body>
+  {% include "_header.html" %}
+
+  <section class="intro">
+    <p class="kicker">● OUR LIMITS</p>
+    <h1>What the data can’t see.</h1>
+    <p class="lead">Honest advice starts with being honest about its own gaps. These are the known limits of the current version of FarmPartner. The bot says them out loud in its answers too, so every farmer knows how far to trust each recommendation.</p>
+    <ul class="summary">
+      <li><a href="#agronomy"><span>01</span>AGRONOMY</a></li>
+      <li><a href="#resolution"><span>02</span>RESOLUTION</a></li>
+      <li><a href="#economics"><span>03</span>PRICES &amp; YIELDS</a></li>
+      <li><a href="#coverage"><span>04</span>COVERAGE</a></li>
+      <li><a href="#missing-data"><span>05</span>MISSING DATA</a></li>
+    </ul>
+  </section>
+
+  <main class="wrap">
+    <ol class="limits">
+      <li class="limit" id="agronomy">
+        <p class="side"><b>01</b>AGRONOMY</p>
+        <div>
+          <h2>Crop rules are a first approximation.</h2>
+          <p class="said">Crop traits and scoring weights are hackathon approximations from public extension guidance. They need agronomist review.</p>
+          <div class="cols">
+            <div class="col"><span class="k">WHAT IT MEANS</span><p>How much heat, water or frost each crop tolerates, and how much each factor weighs in the score, comes from general public guidance, not from a study of your region.</p></div>
+            <div class="col"><span class="k">FOR YOU</span><p>Use the scores to compare options and start a conversation, not as a final verdict. If something doesn’t match your experience, trust your experience and tell the bot.</p></div>
+            <div class="col next"><span class="k">CLOSING THE GAP</span><p>Review by agronomists, validation with farmers in real fields, and the know-how of experienced farmers feeding the knowledge base the AI consults.</p></div>
+          </div>
+        </div>
+      </li>
+
+      <li class="limit" id="resolution">
+        <p class="side"><b>02</b>RESOLUTION</p>
+        <div>
+          <h2>Satellites see in blocks, not in fields.</h2>
+          <p class="said">POWER is a ~50 km model grid, and a MODIS pixel (250 m) can mix fields. CDL can mislabel some years.</p>
+          <div class="cols">
+            <div class="col"><span class="k">WHAT IT MEANS</span><p>NASA POWER climate describes a square about 50 km wide. One MODIS vegetation pixel covers 250 × 250 m, so a small or narrow field can be blended with its neighbors. The USDA crop map (CDL) is itself made from satellites and sometimes gets a year wrong.</p></div>
+            <div class="col"><span class="k">FOR YOU</span><p>Climate reads describe your area rather than your exact plot. Microclimates such as valleys, slopes or frost pockets may not show. If the crop history looks wrong, correct it in the chat.</p></div>
+            <div class="col next"><span class="k">CLOSING THE GAP</span><p>Finer-resolution sources such as Landsat (30 m) for vegetation, plus the farmer’s own corrections, which always take priority over the satellite reading.</p></div>
+          </div>
+        </div>
+      </li>
+
+      <li class="limit" id="economics">
+        <p class="side"><b>03</b>PRICES &amp; YIELDS</p>
+        <div>
+          <h2>No prices or yields yet.</h2>
+          <p class="said">No prices or yields yet. “Income” is a relative index, and the bot asks farmers for local prices and buyers.</p>
+          <div class="cols">
+            <div class="col"><span class="k">WHAT IT MEANS</span><p>FarmPartner doesn’t know market prices or expected yields. The “income” score only ranks rotations against each other; it is not a forecast in dollars or euros.</p></div>
+            <div class="col"><span class="k">FOR YOU</span><p>Before switching crops, check local prices, buyers and contracts. The bot asks you about them so the comparison reflects your real market.</p></div>
+            <div class="col next"><span class="k">CLOSING THE GAP</span><p>Connecting local price and yield data, and learning from the prices and buyers farmers share in the conversation.</p></div>
+          </div>
+        </div>
+      </li>
+
+      <li class="limit" id="coverage">
+        <p class="side"><b>04</b>COVERAGE</p>
+        <div>
+          <h2>Deepest in the U.S., useful worldwide.</h2>
+          <p class="said">U.S.-deepest: CDL and SSURGO are U.S.-only. Climate, NDVI and the forecast work worldwide, and outside the U.S. the farmer types their crops.</p>
+          <div class="cols">
+            <div class="col"><span class="k">WHAT IT MEANS</span><p>Crop history (USDA CDL) and detailed soil data (USDA SSURGO) only exist for the United States. NASA climate, vegetation health (NDVI) and the weather forecast cover the whole planet.</p></div>
+            <div class="col"><span class="k">FOR YOU</span><p>Outside the U.S., tell the bot which crops you grow and what your soil is like. The climate analysis works just the same; crop history and soil detail come from you.</p></div>
+            <div class="col next"><span class="k">CLOSING THE GAP</span><p>Global soil and crop-type datasets, so farmers everywhere get the same depth of analysis without typing it in.</p></div>
+          </div>
+        </div>
+      </li>
+
+      <li class="limit" id="missing-data">
+        <p class="side"><b>05</b>MISSING DATA</p>
+        <div>
+          <h2>Two NASA datasets aren’t wired in yet.</h2>
+          <p class="said">SMAP (9 km soil moisture) and ECOSTRESS (ET) need Earthdata login and are not wired in yet. POWER’s GWETROOT stands in for soil moisture.</p>
+          <div class="cols">
+            <div class="col"><span class="k">WHAT IT MEANS</span><p>SMAP measures soil moisture from space and ECOSTRESS measures how much water plants release (evapotranspiration). Both need a NASA Earthdata account, so for now soil moisture comes from POWER’s modeled root-zone wetness (<code>GWETROOT</code>).</p></div>
+            <div class="col"><span class="k">FOR YOU</span><p>Soil-moisture reads are a modeled, coarser estimate rather than a direct measurement. If your soil is wetter or drier than the bot thinks, say so.</p></div>
+            <div class="col next"><span class="k">CLOSING THE GAP</span><p>Connecting SMAP and ECOSTRESS through NASA Earthdata for measured soil moisture and plant water use.</p></div>
+          </div>
+        </div>
+      </li>
+    </ol>
+
+    <section class="why">
+      <p class="side">■ WHY WE SAY THIS</p>
+      <div>
+        <p class="big">A recommendation is only useful if you know <em>how far to trust it</em>. That’s why every answer comes with its evidence, a confidence level and the risks to check locally.</p>
+        <p class="fine"><span>■ FarmPartner supports, and does not replace, farmer judgment and local agronomic expertise.</span><a href="{{ repo }}#known-limits-said-out-loud-in-the-app-too" target="_blank" rel="noopener">Known limits on GitHub ↗</a></p>
+      </div>
+    </section>
+  </main>
+
+  {% include "_cta_footer.html" %}
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Team — FarmPartner</title>
+<meta name="description" content="Meet the six people building FarmPartner, the farm advisor that reads your field from space, for the NASA Space Apps Challenge 2026.">
+<meta property="og:title" content="Team — FarmPartner">
+<meta property="og:image" content="/static/landing/hero.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&family=Silkscreen&family=Space+Grotesk:wght@600&display=swap" rel="stylesheet">
+<link rel="icon" href="/static/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/static/brand/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="/static/brand/apple-touch-icon.png">
+<link rel="stylesheet" href="/static/site.css">
+<style>
+  /* Page-specific styles; shared tokens, header, intro and CTA live in /static/site.css. */
+  .team { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; padding: 0; list-style: none;
+    background: var(--line); border: 1px solid var(--line); }
+  .member { display: flex; flex-direction: column; background: var(--bg); }
+
+  /* Photos are printed in grayscale with a halftone screen, like the site's pixel-art; colour comes back on hover. */
+  .photo { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: #111113; border-bottom: 1px solid var(--line); }
+  .photo img { width: 100%; height: 100%; object-fit: cover; display: block;
+    filter: grayscale(1) contrast(1.15) brightness(.92); transition: filter .35s, transform .35s; }
+  .photo::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .45; transition: opacity .35s;
+    background: radial-gradient(#0a0a0b 0.8px, transparent 1.1px) 0 0 / 4px 4px; }
+  .member:hover .photo img { filter: grayscale(0) contrast(1.05); transform: scale(1.02); }
+  .member:hover .photo::after { opacity: .15; }
+  .placeholder { position: absolute; inset: 0; display: grid; place-items: center;
+    background: radial-gradient(#ffffff1f 1px, transparent 1.2px) 0 0 / 7px 7px; }
+  .placeholder span { font-family: "Silkscreen", var(--mono); font-size: 72px; color: var(--line-2); letter-spacing: 2px; }
+  .photo .idx { position: absolute; left: 14px; top: 14px; z-index: 1; padding: 4px 8px; background: #0a0a0bcc;
+    font-family: var(--mono); font-size: 11.5px; color: var(--ink-2); }
+
+  .info { display: flex; flex: 1; flex-direction: column; gap: 10px; padding: 24px 24px 26px; }
+  .role { font-family: var(--mono); font-size: 12px; color: var(--lime); letter-spacing: .4px; text-transform: uppercase; }
+  .name { font-size: 24px; font-weight: 500; letter-spacing: -.4px; }
+  .where { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+  .bio { font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+  .links { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: auto; padding-top: 8px; font-family: var(--mono); font-size: 12.5px; }
+  .links a { text-decoration: underline; text-underline-offset: 3px; color: var(--ink); }
+  .links a:hover { color: var(--lime); }
+
+  .join { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-top: 48px;
+    padding: 24px; border: 1px solid var(--line); font-family: var(--mono); font-size: 13px; color: var(--ink-2); }
+  .join a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  .join a:hover { color: var(--lime); }
+
+  @media (max-width: 1100px) {
+    .team { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 800px) {
+    .team { grid-template-columns: 1fr; }
+    .photo { aspect-ratio: 1 / 1; }
+    .info { padding: 20px 18px 22px; }
+    .name { font-size: 22px; }
+    .join { margin-top: 32px; padding: 18px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+  {% include "_header.html" %}
+
+  <section class="intro">
+    <p class="kicker">● TEAM · {{ team|length }} BUILDERS</p>
+    <h1>The people behind FarmPartner.</h1>
+    <p class="lead">We built FarmPartner for the NASA Space Apps Challenge 2026 to bring satellite data, AI and farmers’ know-how to every field. These are the people who made it.</p>
+  </section>
+
+  <main class="wrap">
+    <ul class="team">
+      {% for m in team %}
+      <li class="member">
+        <div class="photo">
+          <span class="idx">{{ "%02d"|format(loop.index) }} / {{ "%02d"|format(team|length) }}</span>
+          {% if m.photo_url %}
+          <img src="{{ m.photo_url }}" alt="Portrait of {{ m.name }}">
+          {% else %}
+          <div class="placeholder" aria-hidden="true"><span>{{ m.initials }}</span></div>
+          {% endif %}
+        </div>
+        <div class="info">
+          <p class="role">{{ m.role }}</p>
+          <h2 class="name">{{ m.name }}</h2>
+          {% if m.profession %}<p class="where">{{ m.profession }}</p>{% endif %}
+          <p class="bio">{{ m.bio }}</p>
+          {% if m.links %}
+          <p class="links">{% for label, url in m.links.items() %}<a href="{{ url }}" target="_blank" rel="noopener">{{ label }} ↗</a>{% endfor %}</p>
+          {% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <div class="join">
+      <span>■ FarmPartner is open source (MIT). Farmers, researchers and developers are welcome to join.</span>
+      <a href="{{ repo }}" target="_blank" rel="noopener">Contribute on GitHub ↗</a>
+    </div>
+  </main>
+
+  {% include "_cta_footer.html" %}
+</body>
+</html>

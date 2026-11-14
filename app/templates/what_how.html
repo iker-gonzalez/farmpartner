@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What &amp; how — FarmPartner</title>
+<meta name="description" content="FarmPartner combines NASA Earth observation data, AI and the know-how of experienced farmers to recommend crops and rotations that fit each field's climate. Here is what it does and how it works.">
+<meta property="og:title" content="What &amp; how — FarmPartner">
+<meta property="og:image" content="/static/landing/hero.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&family=Silkscreen&family=Space+Grotesk:wght@600&display=swap" rel="stylesheet">
+<link rel="icon" href="/static/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/static/brand/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="/static/brand/apple-touch-icon.png">
+<link rel="stylesheet" href="/static/site.css">
+<style>
+  /* Page-specific styles; shared tokens, header, intro and CTA live in /static/site.css. */
+  .toc { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 28px; margin: 48px auto 0; max-width: 900px;
+    padding: 0; list-style: none; font-family: var(--mono); font-size: 12.5px; }
+  .toc a { color: var(--ink-3); }
+  .toc a span { color: var(--lime); margin-right: 6px; }
+  .toc a:hover { color: var(--ink); }
+
+  /* ---------- Sections ---------- */
+  .sec { display: grid; grid-template-columns: 240px 1fr; gap: 48px; padding: 88px 0; border-top: 1px solid var(--line); }
+  .label { font-family: var(--mono); font-size: 13px; color: var(--ink-3); line-height: 1.6; }
+  .label b { display: block; color: var(--lime); font-weight: 400; }
+  .label { position: sticky; top: 110px; align-self: start; }
+  .sec h2 { font-size: 40px; font-weight: 600; line-height: 1.15; letter-spacing: -.8px; }
+  .sec h2 + p { margin-top: 20px; font-size: 17px; line-height: 1.65; color: var(--ink-2); max-width: 720px; }
+  .mono { font-family: var(--mono); }
+
+  .cards { display: grid; gap: 1px; margin-top: 40px; background: var(--line); border: 1px solid var(--line); }
+  .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+  .cards.c2 { grid-template-columns: repeat(2, 1fr); }
+  .card { display: flex; flex-direction: column; gap: 10px; padding: 28px 24px; background: var(--bg); }
+  .card .tag { font-family: var(--mono); font-size: 12px; color: var(--lime); letter-spacing: .4px; }
+  .card h3 { font-size: 21px; font-weight: 500; letter-spacing: -.3px; }
+  .card p { font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+
+  .steps { margin-top: 40px; padding: 0; list-style: none; }
+  .steps li { display: grid; grid-template-columns: 72px 1fr; gap: 24px; padding: 28px 0; border-top: 1px solid var(--line); }
+  .steps li:last-child { border-bottom: 1px solid var(--line); }
+  .steps .n { font-family: var(--mono); font-size: 28px; color: var(--lime); line-height: 1.1; }
+  .steps h3 { font-size: 22px; font-weight: 500; letter-spacing: -.3px; }
+  .steps p { margin-top: 8px; font-size: 16px; line-height: 1.65; color: var(--ink-2); max-width: 680px; }
+  .steps .more { display: inline-block; margin-top: 10px; font-family: var(--mono); font-size: 13px; color: var(--ink);
+    text-decoration: underline; text-underline-offset: 3px; }
+
+  .data .card h3 { font-family: var(--mono); font-size: 18px; font-weight: 600; letter-spacing: 0; }
+
+  .channels { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; padding: 0; list-style: none; font-family: var(--mono); font-size: 13px; }
+  .channels li { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--line); color: var(--ink-3); }
+  .channels .tag { font-size: 10.5px; letter-spacing: .6px; color: #f4f4f580; }
+  .channels .live { border-color: var(--lime); color: var(--ink); }
+  .channels .live .tag { color: var(--lime); }
+  .facts { display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 24px; font-family: var(--mono); font-size: 13px; color: var(--ink-2); }
+  .facts span::before { content: "■ "; color: var(--lime); }
+
+  .statement { font-size: 30px; font-weight: 500; line-height: 1.3; letter-spacing: -.5px; max-width: 800px; }
+  .statement em { font-style: normal; color: var(--lime); }
+
+  .note { margin-top: 32px; font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); }
+
+  @media (max-width: 1100px) {
+    .sec { grid-template-columns: 1fr; gap: 20px; }
+    .label { position: static; }
+    .cards.c3 { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 800px) {
+    .toc { gap: 8px 18px; font-size: 11.5px; margin-top: 36px; }
+    .sec { padding: 56px 0; }
+    .sec h2 { font-size: 28px; letter-spacing: -.5px; }
+    .sec h2 + p { font-size: 15.5px; }
+    .cards.c3, .cards.c2 { grid-template-columns: 1fr; }
+    .card { padding: 22px 18px; }
+    .steps li { grid-template-columns: 1fr; gap: 6px; }
+    .steps .n { font-size: 20px; }
+    .steps h3 { font-size: 19px; }
+    .steps p { font-size: 15px; }
+    .channels { font-size: 12px; gap: 6px; }
+    .statement { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+  {% include "_header.html" %}
+
+  <section class="intro">
+    <p class="kicker">● WHAT &amp; HOW</p>
+    <h1>Satellite data, AI and farmers’ know-how, working for your field.</h1>
+    <p class="lead">FarmPartner is an AI engine that helps farmers adapt to climate change and make better decisions about their land. It cross-references NASA Earth observation data, information about each farm and the practical knowledge of experienced farmers, and delivers personalized recommendations through a chatbot on the messaging apps farmers already use.</p>
+    <ul class="toc">
+      <li><a href="#what"><span>01</span>WHAT IT DOES</a></li>
+      <li><a href="#how"><span>02</span>HOW IT WORKS</a></li>
+      <li><a href="#nasa-data"><span>03</span>NASA DATA</a></li>
+      <li><a href="#channels"><span>04</span>WHERE TO FIND IT</a></li>
+      <li><a href="#impact"><span>05</span>IMPACT</a></li>
+      <li><a href="#different"><span>06</span>WHAT’S DIFFERENT</a></li>
+      <li><a href="#goals"><span>07</span>GOALS</a></li>
+    </ul>
+  </section>
+
+  <main class="wrap">
+    <section class="sec" id="what">
+      <p class="label"><b>01</b>WHAT IT DOES</p>
+      <div class="body">
+        <h2>Advice that fits your field, not a region’s average.</h2>
+        <p>FarmPartner looks at the environmental conditions of each area (temperature, rainfall, soil moisture, vegetation health and water availability) to identify suitable crops and recommend rotation strategies. Farmers can compare what they do today with alternatives, see the likely benefits and risks, and get alerts when conditions change.</p>
+        <div class="cards c3">
+          <div class="card"><span class="tag">SOURCE 01</span><h3>NASA Earth observation</h3><p>Two decades of satellite records on climate, soil moisture, vegetation and water, for any field on the planet.</p></div>
+          <div class="card"><span class="tag">SOURCE 02</span><h3>Your farm</h3><p>Location, water, current crops and priorities, plus your corrections when the data doesn’t match what you see in the field.</p></div>
+          <div class="card"><span class="tag">SOURCE 03</span><h3>Farmers’ experience</h3><p>Practical knowledge on crops, soils, planting windows and regional conditions, organized into a knowledge base the AI consults.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="how">
+      <p class="label"><b>02</b>HOW IT WORKS</p>
+      <div class="body">
+        <h2>From a location pin to a rotation you can trust.</h2>
+        <p>An integrated process: collect what matters about your farm, analyze the data, and turn it into recommendations you can act on.</p>
+        <ol class="steps">
+          <li><span class="n">01</span><div><h3>Tell us about your farm</h3><p>Share basic information about your land: location, water availability, current crops and farming priorities. You can also correct or adjust the environmental data so it better reflects the real conditions of your field.</p></div></li>
+          <li><span class="n">02</span><div><h3>We read NASA data for your field</h3><p>The platform brings together several NASA datasets, harmonizes them and adds local weather forecasts, combining long-term environmental patterns with short-term information.</p><a class="more" href="#nasa-data">See the datasets ↓</a></div></li>
+          <li><span class="n">03</span><div><h3>AI analyzes and recommends</h3><p>AI weighs the environmental data alongside your farm’s details to identify suitable crops and propose alternative rotation strategies. You get your current rotation compared with at least two alternatives, with explanations, supporting data, expected benefits, possible risks and confidence levels.</p></div></li>
+          <li><span class="n">04</span><div><h3>Farmer knowledge, built in</h3><p>Experienced farmers contribute practical know-how on crops, soils, planting periods and regional conditions. It is organized into a knowledge base the AI consults, so every recommendation combines scientific evidence with real field experience.</p></div></li>
+          <li><span class="n">05</span><div><h3>Ongoing support</h3><p>FarmPartner sends weather alerts, spots chances to make better use of the land between harvests and suggests cover crops or alternative uses such as grazing. Just ask the chatbot, by text or voice note, whenever you need it.</p></div></li>
+          <li><span class="n">06</span><div><h3>Global knowledge exchange</h3><p>NASA data covers the whole planet, so FarmPartner can connect farming communities facing similar climates. Through climate-analogue analysis, farmers discover regions already living the conditions their own area may face in the future, and learn from how they adapted.</p></div></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="sec data" id="nasa-data">
+      <p class="label"><b>03</b>NASA DATA</p>
+      <div class="body">
+        <h2>Six NASA missions, read for one field.</h2>
+        <p>Each dataset answers a different question about your land. Together, and alongside local forecasts, they describe the past and near future of your field’s climate.</p>
+        <div class="cards c3">
+          <div class="card"><span class="tag">CLIMATE</span><h3>NASA POWER</h3><p>Temperature, solar radiation and frost-risk indicators.</p></div>
+          <div class="card"><span class="tag">RAINFALL</span><h3>GPM</h3><p>Rainfall patterns and extreme rain events.</p></div>
+          <div class="card"><span class="tag">SOIL</span><h3>SMAP</h3><p>Soil moisture and how it varies through the seasons.</p></div>
+          <div class="card"><span class="tag">VEGETATION</span><h3>MODIS · LANDSAT</h3><p>Vegetation health and crop-stress indicators (NDVI).</p></div>
+          <div class="card"><span class="tag">WATER</span><h3>GRACE · GRACE-FO</h3><p>Long-term trends in water availability.</p></div>
+          <div class="card"><span class="tag">TERRAIN</span><h3>SRTM</h3><p>Elevation, slope and erosion-risk indicators.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="channels">
+      <p class="label"><b>04</b>WHERE TO FIND IT</p>
+      <div class="body">
+        <h2>In the apps you already use. No app to learn.</h2>
+        <p>There is nothing to install or learn. The AI engine is connected to a chatbot that lives inside everyday messaging apps: farmers simply write or send a voice note, in their own language. That makes advanced agricultural technology accessible even to farmers with limited digital skills.</p>
+        <ul class="channels" aria-label="Channels">
+          <li class="live">WhatsApp <span class="tag">● LIVE</span></li>
+          <li>Messenger <span class="tag">SOON</span></li>
+          <li>iMessage <span class="tag">SOON</span></li>
+          <li>Instagram <span class="tag">SOON</span></li>
+          <li>Line <span class="tag">SOON</span></li>
+          <li>SMS <span class="tag">SOON</span></li>
+        </ul>
+        <p class="facts"><span>Text or voice notes</span><span>Several languages</span><span>Free</span><span>Open source (MIT)</span></p>
+      </div>
+    </section>
+
+    <section class="sec" id="impact">
+      <p class="label"><b>05</b>BENEFITS &amp; IMPACT</p>
+      <div class="body">
+        <h2>Good for the land, the farm and the people who work it.</h2>
+        <div class="cards c2">
+          <div class="card"><span class="tag">ENVIRONMENTAL</span><h3>Healthier soils, smarter water</h3><p>More sustainable rotations, healthier soils, efficient water use, less land degradation and farming that is more resilient to climate change.</p></div>
+          <div class="card"><span class="tag">ECONOMIC</span><h3>Better-informed decisions</h3><p>Better-grounded crop choices, more diversified production, lower climate risk and new ways to improve productivity and profitability.</p></div>
+          <div class="card"><span class="tag">SOCIAL</span><h3>Knowledge that isn’t lost</h3><p>Preserves the knowledge of experienced farmers, helps new generations into farming and builds an international community to share practical know-how, whatever the language or location.</p></div>
+          <div class="card"><span class="tag">ACCESSIBILITY</span><h3>Advanced, yet easy</h3><p>Advanced agricultural information through a chatbot in the messaging apps people use every day. No app to install, no training, practically no learning curve.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="different">
+      <p class="label"><b>06</b>WHAT’S DIFFERENT</p>
+      <div class="body">
+        <p class="statement">Not generic advice. Recommendations built for <em>your</em> conditions, <em>your</em> resources and <em>your</em> priorities.</p>
+        <div class="cards c3">
+          <div class="card"><span class="tag">THREE SOURCES</span><h3>One answer</h3><p>NASA satellite observations, artificial intelligence and accumulated farmer experience, working together instead of in separate tools.</p></div>
+          <div class="card"><span class="tag">CLIMATE ANALOGUES</span><h3>Learn from your future</h3><p>An international knowledge exchange lets farmers learn from regions already experiencing the climate that may reach them.</p></div>
+          <div class="card"><span class="tag">PLAIN LANGUAGE</span><h3>Science, by voice and text</h3><p>Scientific data and farm experience turned into clear recommendations through natural conversations. No technical knowledge or complex data entry needed.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="goals">
+      <p class="label"><b>07</b>WHAT WE HOPE TO ACHIEVE</p>
+      <div class="body">
+        <h2>From a hackathon to a global farming network.</h2>
+        <div class="cards c3">
+          <div class="card"><span class="tag">SHORT TERM</span><h3>Validate in real fields</h3><p>Develop and validate FarmPartner with farmers in different agricultural regions, measuring how accurate and useful its recommendations are in real growing conditions.</p></div>
+          <div class="card"><span class="tag">LONG TERM</span><h3>Build the network</h3><p>An international agricultural knowledge network connecting farmers, researchers, universities, cooperatives and organizations across the sector.</p></div>
+          <div class="card"><span class="tag">VISION</span><h3>Resilient farming, everywhere</h3><p>An accessible decision-support tool that helps farming communities everywhere anticipate climate challenges, protect natural resources and build a more sustainable, resilient agriculture.</p></div>
+        </div>
+        <p class="note">■ FarmPartner supports, and does not replace, farmer judgment and local agronomic expertise.</p>
+      </div>
+    </section>
+  </main>
+
+  {% include "_cta_footer.html" %}
+</body>
+</html>
