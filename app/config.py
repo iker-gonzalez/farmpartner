@@ -23,5 +23,18 @@ TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM", "whatsapp:+14155238886"
 TWILIO_SMS_FROM = os.getenv("TWILIO_SMS_FROM", "")
 
 
+# Workload Identity Federation (Cloud Run): the service's Google identity is exchanged for a short-lived Claude
+# token, so no API key is stored anywhere. These are IDs from the Claude Console, not secrets.
+ANTHROPIC_FEDERATION_RULE_ID = os.getenv("ANTHROPIC_FEDERATION_RULE_ID", "")
+ANTHROPIC_ORGANIZATION_ID = os.getenv("ANTHROPIC_ORGANIZATION_ID", "")
+ANTHROPIC_SERVICE_ACCOUNT_ID = os.getenv("ANTHROPIC_SERVICE_ACCOUNT_ID", "")
+ANTHROPIC_WORKSPACE_ID = os.getenv("ANTHROPIC_WORKSPACE_ID", "")
+
+
+def federation_enabled() -> bool:
+    return bool(ANTHROPIC_FEDERATION_RULE_ID and ANTHROPIC_ORGANIZATION_ID)
+
+
 def llm_enabled() -> bool:
-    return bool(os.getenv("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_AUTH_TOKEN") or os.getenv("ANTHROPIC_PROFILE"))
+    return federation_enabled() or bool(
+        os.getenv("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_AUTH_TOKEN") or os.getenv("ANTHROPIC_PROFILE"))

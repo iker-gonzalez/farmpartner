@@ -27,12 +27,17 @@ locals {
   mounted   = { for k, v in local.secrets : k => v if v.mount }
   versioned = toset([for k, v in local.secrets : k if v.has_value])
 
-  plain_env = {
+  plain_env = merge({
     PUBLIC_BASE_URL      = local.public_url
     ANTHROPIC_EFFORT     = "low"
     TWILIO_WHATSAPP_FROM = var.twilio_whatsapp_from
     TWILIO_SMS_FROM      = var.twilio_sms_from
-  }
+    }, { for k, v in {
+      ANTHROPIC_FEDERATION_RULE_ID = var.anthropic_federation_rule_id
+      ANTHROPIC_ORGANIZATION_ID    = var.anthropic_organization_id
+      ANTHROPIC_SERVICE_ACCOUNT_ID = var.anthropic_service_account_id
+      ANTHROPIC_WORKSPACE_ID       = var.anthropic_workspace_id
+  } : k => v if v != "" })
 }
 
 # --- Runtime identity --------------------------------------------------------------------------------

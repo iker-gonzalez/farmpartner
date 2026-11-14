@@ -16,7 +16,6 @@ class FakeMessages:
 
 
 def test_llm_tool_loop(offline, monkeypatch):
-    import anthropic
     from fastapi.testclient import TestClient
 
     from app import config
@@ -28,7 +27,8 @@ def test_llm_tool_loop(offline, monkeypatch):
 
     fake = FakeMessages()
     monkeypatch.setattr(config, "llm_enabled", lambda: True)
-    monkeypatch.setattr(anthropic, "Anthropic", lambda: NS(beta=NS(messages=fake)))
+    from app import agent
+    monkeypatch.setattr(agent, "_client", NS(beta=NS(messages=fake)))
     out = c.post("/api/chat", json={"phone": "llm", "text": "do I need to water?"}).json()["messages"]
     assert out == ["💧 Water about 1.9 in this week."]
     first = fake.calls[0]

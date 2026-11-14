@@ -112,3 +112,27 @@ variable "supabase_region" {
   type    = string
   default = "eu-west-1"
 }
+
+# --- Claude via Workload Identity Federation (no API key) ----------------------------------------------
+# IDs from Claude Console → Settings → Workload identity, rule for serviceAccount farmpartner-run.
+# They are identifiers, not secrets. Leave empty to fall back to anthropic_api_key (or keyword matching).
+
+variable "anthropic_federation_rule_id" {
+  type    = string
+  default = ""
+}
+
+variable "anthropic_organization_id" {
+  type    = string
+  default = ""
+}
+
+variable "anthropic_service_account_id" {
+  type    = string
+  default = ""
+}
+
+variable "anthropic_workspace_id" {
+  type    = string
+  default = ""
+}

@@ -136,15 +136,61 @@ def answer(farmer: Farmer, text: str) -> str:
     if config.llm_enabled():
         try:
             return _answer_llm(farmer.id)
-        except Exception:
+        except Exception as e:
             log.exception("LLM failed; falling back to rules")
+            if config.federation_enabled() and "Token exchange failed" in str(e):
+                _log_identity_claims()
     return _answer_rules(farmer.id, text)
 
 
-def _answer_llm(farmer_id: int) -> str:
-    import anthropic
+GCP_IDENTITY_URL = ("http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity"
+                    "?audience=https://api.anthropic.com&format=full")
+_client = None
 
-    client = anthropic.Anthropic()
+
+def _google_identity_token() -> str:
+    """Google-signed ID token for this Cloud Run service account (format=full adds the email claim the rule matches)."""
+    import httpx
+
+    r = httpx.get(GCP_IDENTITY_URL, headers={"Metadata-Flavor": "Google"}, timeout=10)
+    r.raise_for_status()
+    return r.text.strip()
+
+
+def _log_identity_claims():
+    """On a federation 401, log which claims our Google token carries (never the token) to compare with the rule."""
+    import base64
+
+    try:
+        payload = _google_identity_token().split(".")[1]
+        claims = json.loads(base64.urlsafe_b64decode(payload + "=" * (-len(payload) % 4)))
+        keep = {k: v for k, v in claims.items() if k in ("iss", "aud", "sub", "azp", "email", "email_verified", "google")}
+        log.error("WIF token claims (compare with the Claude Console federation rule): %s", json.dumps(keep))
+    except Exception:
+        log.exception("could not read identity token claims")
+
+
+def claude_client():
+    """One shared client: with federation the SDK caches the exchanged token and refreshes it before expiry."""
+    global _client
+    if _client is None:
+        import anthropic
+
+        if config.federation_enabled():
+            _client = anthropic.Anthropic(credentials=anthropic.WorkloadIdentityCredentials(
+                identity_token_provider=_google_identity_token,
+                federation_rule_id=config.ANTHROPIC_FEDERATION_RULE_ID,
+                organization_id=config.ANTHROPIC_ORGANIZATION_ID,
+                service_account_id=config.ANTHROPIC_SERVICE_ACCOUNT_ID or None,
+                workspace_id=config.ANTHROPIC_WORKSPACE_ID or None,
+            ))
+        else:
+            _client = anthropic.Anthropic()
+    return _client
+
+
+def _answer_llm(farmer_id: int) -> str:
+    client = claude_client()
     messages = _history(farmer_id)
     if not messages:
         return HELP

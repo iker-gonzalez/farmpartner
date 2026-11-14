@@ -4,6 +4,12 @@
 # Leave empty to keep the value already in Secret Manager (recommended for the database URL:
 # use scripts/set-db-secret.sh so the password never enters Terraform state).
 # database_url       = ""
+# Claude via Workload Identity Federation (preferred, no key). IDs from Claude Console → Workload identity:
+# anthropic_federation_rule_id = "fdrl_..."
+# anthropic_organization_id    = "..."
+# anthropic_service_account_id = "svac_..."
+# anthropic_workspace_id       = "wrkspc_..."
+# Or a plain API key instead:
 # anthropic_api_key  = "sk-ant-..."
 # twilio_account_sid = "AC..."
 # twilio_auth_token  = "..."
