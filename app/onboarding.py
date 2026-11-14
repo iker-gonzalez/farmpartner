@@ -132,17 +132,28 @@ def crops_any_language(text: str) -> tuple[list[str], list[str]]:
         from app.engine.knowledge import crops
         ids = {cid: c["name"] for cid, c in crops().items()}
         raw = quick("A farmer (any language) names the crops on a field. Map them, in order, to these crop ids: "
-                    + json.dumps(ids) + '. Reply with ONLY JSON: {"crops": [ids in order], "unknown": [crop names '
-                    'that fit none], "tree_crop": "English name if they grow a perennial tree/vine crop (orchard, '
-                    'olives, nuts, vineyard, fruit), else null"}. Ignore words that are not crop names.',
-                    text[:300], max_tokens=200)
+                    + json.dumps(ids) + '. Reply with ONLY JSON: {"crops": [ids in order], "unknown": [real crop '
+                    'names that fit none], "closest": {"<unknown crop name>": "<closest crop id by family and season>"}, '
+                    '"tree_crop": "English name if they grow a perennial tree/vine crop (orchard, olives, nuts, '
+                    'vineyard, fruit), else null"}. Only list real crops; ignore any word that is not a crop name '
+                    '(greetings, insults, apologies).', text[:300], max_tokens=250)
+        import logging
+        logging.getLogger(__name__).info("crop mapping %r -> %s", text[:60], raw[:300])
         d = json.loads(re.search(r"\{.*\}", raw, re.S).group(0))
         tree = d.get("tree_crop")
         unknown = [str(u)[:40] for u in d.get("unknown", [])][:3]
+        closest = d.get("closest") or {}
+        crops_out = [c for c in d.get("crops", []) if c in ids]
+        if not crops_out:  # a real crop we don't model: use the closest one we do (tarwi lupin → field peas)
+            for name, cid in closest.items():
+                if cid in ids and cid != "fallow":
+                    unknown = [f"LIKE:{cid}:{str(name)[:40]}"] + [u for u in unknown if u != name]
         if tree and isinstance(tree, str):
             unknown = ["TREE:" + tree[:40]] + unknown
-        return [c for c in d.get("crops", []) if c in ids], unknown
+        return crops_out, unknown
     except Exception:
+        import logging
+        logging.getLogger(__name__).warning("crop mapping failed for %r", text[:60], exc_info=True)
         return [], []
 
 
@@ -320,7 +331,8 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
             named = crops_in_text(t)
             unknown: list[str] = []
             said_no_word = re.search(r"\b(no|nope|wrong|different|incorrect|incorrecto|otro|otros|distinto)\b", low)
-            if not named and not said_no_word and parse_irrigated(t) is None and re.search(r"\w{3}", t) \
+            if not named and not said_no_word and re.search(r"\w{3}", t) and not re.fullmatch(
+                    r"(dry ?land|irrigated|secano|regad[ií]o|de secano|de regad[ií]o|ureztatua|lehorrekoa)\W*", low) \
                     and not re.fullmatch(r"(yes|yep|yeah|right|correct|si|sí|ok|okay|correcto|vale|claro|exacto)\W*", low):
                 named, unknown = crops_any_language(t)
             named = named or []
@@ -330,6 +342,14 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
                 db.commit()
                 return _orchard(farmer, crop, parse_irrigated(t))
             unknown = [u for u in unknown if not u.startswith("TREE:")]
+            note = None
+            like = next((u for u in unknown if u.startswith("LIKE:")), None)
+            if not named and like:
+                _, cid, name = like.split(":", 2)
+                named = [cid]
+                note = (f"🌱 I don't have {name} in my crop list yet, so I'll compare it as the closest crop I know, "
+                        f"*{crop_name(cid)}*. Tell me if that's wrong.")
+            unknown = [u for u in unknown if not u.startswith("LIKE:")]
             said_yes = re.search(r"\b(yes|yep|yeah|right|correct|si|sí|ok|okay|correcto|vale|claro|exacto|bai|oui|sim|ja)\b", low)
             said_no = (re.search(r"\b(no|nope|wrong|different|not right|incorrect|incorrecto|otro|otros|distinto)\b", low)
                        and parse_irrigated(t) is None)  # "dryland, no irrigation" is not a rejection
@@ -351,10 +371,13 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
                                       "grow on this field? Type them in order, e.g. \"corn, soybeans\" or "
                                       "\"wheat, sorghum, fallow\"."])
                 db.commit()
-                if not said_no and re.search(r"\w{3}", t):  # they named something we don't know
-                    what = ", ".join(unknown) if unknown else t[:40]
-                    return Reply(now=[f"🌱 I don't have “{what}” in my crop list yet. I can compare rotations of: "
-                                      f"{KNOWN_CROPS}. Which of these do you grow? (Send RESET to start over.)"])
+                if not said_no and unknown:  # a real crop we don't know (only Claude-confirmed crop names are echoed)
+                    return Reply(now=[f"🌱 I don't have “{', '.join(unknown)}” in my crop list yet. I can compare "
+                                      f"rotations of: {KNOWN_CROPS}. Which of these do you grow? (Send RESET to start "
+                                      "over.)"])
+                if not said_no and re.search(r"\w{3}", t):  # not a crop at all: never repeat it back
+                    return Reply(now=[f"🌱 I didn't recognise a crop there. I can compare rotations of: {KNOWN_CROPS}. "
+                                      "Which of these do you grow? (Send RESET to start over.)"])
                 return Reply(now=["No problem — which crops do you grow on this field? Type them in order, "
                                   "e.g. \"corn, soybeans\" or \"wheat, sorghum, fallow\". Add \"irrigated\" or \"dryland\"."])
             elif not said_yes and parse_irrigated(t) is None:
@@ -366,11 +389,11 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
             if fld.irrigated is None:
                 fm.state = "awaiting_irrigation"
                 db.commit()
-                return Reply(now=[f"👍 Got it: {rot}.", IRRIGATION_PROMPT])
+                return Reply(now=([note] if note else []) + [f"👍 Got it: {rot}.", IRRIGATION_PROMPT])
             fm.state = "awaiting_priority"
             db.commit()
             irr_txt = " (irrigated)" if fld.irrigated else " (dryland)"
-        return Reply(now=[f"👍 Got it: {rot}{irr_txt}.", PRIORITY_PROMPT])
+        return Reply(now=([note] if note else []) + [f"👍 Got it: {rot}{irr_txt}.", PRIORITY_PROMPT])
 
     if state == "awaiting_irrigation":
         irr = parse_irrigated(t)

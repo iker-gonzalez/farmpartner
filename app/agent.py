@@ -428,7 +428,8 @@ def quick(system: str, user, max_tokens: int = 1500) -> str:
     """One short Claude call for translation/classification on the fast model (falls back to the main model).
     user: text, or a list of content blocks (e.g. an image block plus text)."""
     client = claude_client()
-    kw = dict(max_tokens=max_tokens, system=system, messages=[{"role": "user", "content": user}],
+    # floor: short JSON answers were cut off mid-object at 100-250 tokens (and a fallback model's reasoning counts too)
+    kw = dict(max_tokens=max(max_tokens, 1000), system=system, messages=[{"role": "user", "content": user}],
               betas=["server-side-fallback-2026-07-01"], fallbacks="default")
     resp = None
     if _fast["ok"] and config.FAST_MODEL:
@@ -457,7 +458,7 @@ def identify_crop(image: dict) -> str:
     if (not name or "unknown" in name) and _fast["ok"]:  # the small model wasn't sure: ask the main model once
         try:
             resp = claude_client().beta.messages.create(
-                model=config.ANTHROPIC_MODEL, max_tokens=20, output_config={"effort": "low"},
+                model=config.ANTHROPIC_MODEL, max_tokens=1000, output_config={"effort": "low"},
                 betas=["server-side-fallback-2026-07-01"], fallbacks="default",
                 system="You identify crops in farmers' photos. Reply with ONLY the crop's common English name in 1-3 "
                        "words, or 'unknown' if no crop is visible.",

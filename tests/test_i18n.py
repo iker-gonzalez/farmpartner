@@ -194,3 +194,24 @@ def test_button_taps_keep_language_and_questions_see_the_last_photo(offline, mon
                                     "NumMedia": "1"})
     c.post("/twilio/webhook", data={"From": "whatsapp:+15550004444", "Body": "How does my barley look to you?"})
     assert seen and seen[-1] is True
+
+
+def test_unknown_crop_uses_closest_and_nothing_is_echoed(offline, monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from app import onboarding
+    from app.db import Farmer, session
+    from app.main import app
+    c = TestClient(app)
+    say = lambda **kw: c.post("/api/chat", json={"phone": "lup", **kw}).json()["messages"]  # noqa: E731
+    say(text="hi"); say(lat=38.05, lon=-100.75)
+    with session() as db:
+        db.query(Farmer).filter_by(phone="web:lup").one().fields[-1].current_rotation = None
+        db.commit()
+    monkeypatch.setattr(onboarding, "crops_any_language", lambda t: ([], []))   # insults/chatter: no crop at all
+    out = say(text="some rude word")[0]
+    assert "rude" not in out and "didn't recognise a crop" in out
+    monkeypatch.setattr(onboarding, "crops_any_language", lambda t: ([], ["LIKE:field_peas:Lupinus mutabilis"]))
+    out = say(text="Lupinus mutabilis, secano")
+    assert out[0].startswith("🌱 I don't have Lupinus mutabilis") and "Field peas" in out[0]
+    assert "Continuous field peas" in out[1] and "Step 3 of 3" in out[2]
