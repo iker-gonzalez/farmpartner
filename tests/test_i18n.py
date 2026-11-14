@@ -215,3 +215,25 @@ def test_unknown_crop_uses_closest_and_nothing_is_echoed(offline, monkeypatch):
     out = say(text="Lupinus mutabilis, secano")
     assert out[0].startswith("🌱 I don't have Lupinus mutabilis") and "Field peas" in out[0]
     assert "Continuous field peas" in out[1] and "Step 3 of 3" in out[2]
+
+
+def test_any_language_switch_via_claude(offline, monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from app import agent, config, i18n
+    from app.db import Farmer, session
+    from app.main import app
+    answers = {"Bana Türkçe konuş": '{"lang": "tr", "wants": "tr"}',
+               "Benim dilimde konuş": '{"lang": "tr", "wants": "tr"}',
+               "Habari, nataka kupanda mahindi": '{"lang": "sw", "wants": null}'}
+    monkeypatch.setattr(config, "llm_enabled", lambda: True)
+    monkeypatch.setattr(agent, "quick", lambda system, user, max_tokens=0: answers.get(user, '{"lang": null, "wants": null}'))
+    monkeypatch.setattr(i18n, "translate", lambda msgs, lang: msgs)     # translation itself is tested elsewhere
+    i18n._llm_cache.clear()
+    assert i18n.analyze("Bana Türkçe konuş") == ("tr", "tr")
+    assert i18n.analyze("Habari, nataka kupanda mahindi") == ("sw", None)
+    c = TestClient(app)
+    out = c.post("/api/chat", json={"phone": "tr1", "text": "Benim dilimde konuş"}).json()["messages"]
+    assert "Turkish" in out[0]
+    with session() as db:
+        assert db.query(Farmer).filter_by(phone="web:tr1").one().language == "tr"

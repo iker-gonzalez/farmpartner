@@ -81,6 +81,10 @@ def test_landing_and_simulator_pages():
     assert 'href="/team"' in home.text
     limits = c.get("/limits")
     assert limits.status_code == 200 and "What the data can" in limits.text and 'href="/limits"' in home.text
+    data = c.get("/data-and-science")
+    assert data.status_code == 200 and "Every answer has a source" in data.text and 'href="/data-and-science"' in home.text
+    assert data.text.count('<article class="card') == 16 and 'aria-current="page">DATA &amp; SCIENCE' in data.text
+    assert c.get("/data", follow_redirects=False).headers["location"] == "/data-and-science"
     assert c.get("/sample", follow_redirects=False).status_code in (302, 404)
 
 

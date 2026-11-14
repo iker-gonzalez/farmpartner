@@ -48,7 +48,11 @@ def _opus_rate(data: bytes) -> int:
 
 SPEECH_CODES = {"en": "en-US", "es": "es-ES", "eu": "eu-ES", "ca": "ca-ES", "gl": "gl-ES", "pt": "pt-BR", "fr": "fr-FR",
                 "de": "de-DE", "it": "it-IT", "ja": "ja-JP", "zh": "cmn-Hans-CN", "ko": "ko-KR", "ru": "ru-RU",
-                "ar": "ar-SA", "hi": "hi-IN", "th": "th-TH", "el": "el-GR"}
+                "ar": "ar-SA", "hi": "hi-IN", "th": "th-TH", "el": "el-GR", "tr": "tr-TR", "bn": "bn-IN", "ur": "ur-PK",
+                "id": "id-ID", "sw": "sw-KE", "mr": "mr-IN", "te": "te-IN", "ta": "ta-IN", "vi": "vi-VN",
+                "pa": "pa-Guru-IN", "gu": "gu-IN", "kn": "kn-IN", "ml": "ml-IN", "fa": "fa-IR", "pl": "pl-PL",
+                "uk": "uk-UA", "nl": "nl-NL", "ro": "ro-RO", "tl": "fil-PH", "ms": "ms-MY", "he": "iw-IL",
+                "am": "am-ET", "my": "my-MM", "cs": "cs-CZ", "hu": "hu-HU", "sv": "sv-SE", "af": "af-ZA"}
 
 
 def transcribe(data: bytes, content_type: str, langs: list[str] | None = None) -> str | None:

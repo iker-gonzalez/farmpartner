@@ -19,7 +19,11 @@ log = logging.getLogger(__name__)
 TTS_URL = "https://texttospeech.googleapis.com/v1/text:synthesize"
 TTS_CODES = {"en": "en-US", "es": "es-ES", "eu": "eu-ES", "ca": "ca-ES", "gl": "gl-ES", "pt": "pt-BR", "fr": "fr-FR",
              "de": "de-DE", "it": "it-IT", "ja": "ja-JP", "zh": "cmn-CN", "ko": "ko-KR", "ru": "ru-RU", "ar": "ar-XA",
-             "hi": "hi-IN", "th": "th-TH", "el": "el-GR", "tr": "tr-TR"}
+             "hi": "hi-IN", "th": "th-TH", "el": "el-GR", "tr": "tr-TR", "bn": "bn-IN", "ur": "ur-IN", "id": "id-ID",
+             "sw": "sw-KE", "mr": "mr-IN", "te": "te-IN", "ta": "ta-IN", "vi": "vi-VN", "pa": "pa-IN", "gu": "gu-IN",
+             "kn": "kn-IN", "ml": "ml-IN", "pl": "pl-PL", "uk": "uk-UA", "nl": "nl-NL", "ro": "ro-RO", "tl": "fil-PH",
+             "ms": "ms-MY", "he": "he-IL", "am": "am-ET", "cs": "cs-CZ", "hu": "hu-HU", "sv": "sv-SE", "af": "af-ZA"}
+# No Google voice for Persian, Hausa, Yoruba or Burmese: those farmers get text replies only.
 MAX_CHARS = 1400
 ID = re.compile(r"[a-f0-9]{32}")
 ASK_ON = re.compile(r"\b(audio|audios|voice|voz|ahotsez|audioan|entzun|nota de voz|notas de voz|speak|read it to me|"
@@ -59,7 +63,9 @@ def speakable(msgs: list) -> str:
 
 def synthesize(text: str, lang: str) -> bytes:
     from app.media import _google_headers
-    code = TTS_CODES.get(lang or "en", "en-US")
+    code = TTS_CODES.get(lang or "en")
+    if code is None:
+        raise ValueError(f"no text-to-speech voice for {lang}")
     body = {"input": {"text": text}, "voice": {"languageCode": code, "ssmlGender": "NEUTRAL"},
             "audioConfig": {"audioEncoding": "OGG_OPUS", "speakingRate": 1.0}}
     r = httpx.post(TTS_URL, json=body, headers=_google_headers(), timeout=40)

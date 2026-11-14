@@ -55,9 +55,15 @@ def _save(lang: str) -> None:
     except Exception:
         log.warning("could not save translations", exc_info=True)
 
-LANGS = {"es": "Spanish", "pt": "Portuguese", "fr": "French", "de": "German", "it": "Italian", "ja": "Japanese",
-         "zh": "Chinese (Simplified)", "ko": "Korean", "ru": "Russian", "ar": "Arabic", "hi": "Hindi", "th": "Thai",
-         "el": "Greek", "eu": "Basque (Euskara)", "ca": "Catalan", "gl": "Galician", "en": "English"}
+LANGS = {  # the most widely spoken languages (plus the ones our testers use); translation works for any of them
+    "en": "English", "zh": "Chinese (Simplified)", "hi": "Hindi", "es": "Spanish", "fr": "French", "ar": "Arabic",
+    "bn": "Bengali", "pt": "Portuguese", "ru": "Russian", "ur": "Urdu", "id": "Indonesian", "de": "German",
+    "ja": "Japanese", "sw": "Swahili", "mr": "Marathi", "te": "Telugu", "tr": "Turkish", "ta": "Tamil",
+    "vi": "Vietnamese", "ko": "Korean", "it": "Italian", "pa": "Punjabi", "ha": "Hausa", "fa": "Persian",
+    "th": "Thai", "gu": "Gujarati", "pl": "Polish", "uk": "Ukrainian", "kn": "Kannada", "ml": "Malayalam",
+    "my": "Burmese", "am": "Amharic", "yo": "Yoruba", "tl": "Filipino (Tagalog)", "ms": "Malay", "nl": "Dutch",
+    "ro": "Romanian", "el": "Greek", "cs": "Czech", "hu": "Hungarian", "sv": "Swedish", "he": "Hebrew",
+    "af": "Afrikaans", "eu": "Basque (Euskara)", "ca": "Catalan", "gl": "Galician"}
 WORDS = {
     "es": {"hola", "quiero", "gracias", "buenos", "buenas", "tengo", "mi", "mis", "campo", "riego", "secano", "plantar",
            "cultivo", "cultivos", "puedo", "por", "favor", "que", "qué", "como", "cómo", "cuándo", "cuando", "debo",
@@ -83,7 +89,11 @@ WORDS = {
 }
 SCRIPTS = [("ja", r"[\u3040-\u30ff]"), ("ko", r"[\uac00-\ud7af]"), ("zh", r"[\u4e00-\u9fff]"),
            ("ru", r"[\u0400-\u04ff]"), ("ar", r"[\u0600-\u06ff]"), ("hi", r"[\u0900-\u097f]"),
-           ("th", r"[\u0e00-\u0e7f]"), ("el", r"[\u0370-\u03ff]")]
+           ("bn", r"[\u0980-\u09ff]"), ("pa", r"[\u0a00-\u0a7f]"), ("gu", r"[\u0a80-\u0aff]"),
+           ("ta", r"[\u0b80-\u0bff]"), ("te", r"[\u0c00-\u0c7f]"), ("kn", r"[\u0c80-\u0cff]"),
+           ("ml", r"[\u0d00-\u0d7f]"), ("th", r"[\u0e00-\u0e7f]"), ("my", r"[\u1000-\u109f]"),
+           ("am", r"[\u1200-\u137f]"), ("he", r"[\u0590-\u05ff]"), ("el", r"[\u0370-\u03ff]")]
+SHARED_SCRIPT = {"ru", "ar", "hi"}  # Cyrillic (ru/uk), Arabic (ar/fa/ur), Devanagari (hi/mr): let Claude decide
 SWITCH = [("es", r"\b(español|espanol|castellano|spanish)\b"), ("pt", r"\b(português|portugues|portuguese)\b"),
           ("fr", r"\b(français|francais|french)\b"), ("de", r"\b(deutsch|german)\b"),
           ("it", r"\b(italiano|italian)\b"), ("ja", r"(日本語|\bjapanese\b)"),
@@ -216,7 +226,7 @@ def translate(msgs: list, lang: str) -> list:
     return [_rebuild(m, tr) for m in msgs]
 
 
-PREWARM_LANGS = ("es", "eu", "pt", "fr", "ja", "de", "it", "zh", "ca")
+PREWARM_LANGS = ("es", "hi", "zh", "ar", "fr", "pt", "bn", "ru", "ur", "id", "tr", "eu", "sw", "vi", "de", "ja", "it", "ca")
 
 
 def prewarm(messages: list, langs=PREWARM_LANGS) -> None:
@@ -226,3 +236,48 @@ def prewarm(messages: list, langs=PREWARM_LANGS) -> None:
             translate(messages, lang)
         except Exception:
             log.warning("translation prewarm failed for %s", lang, exc_info=True)
+
+
+_llm_cache: dict[str, tuple[str | None, str | None]] = {}
+
+
+def _llm_language(text: str) -> tuple[str | None, str | None]:
+    """(language the message is written in, language the farmer asks to be answered in) via the fast model."""
+    key = text.strip()[:300]
+    if key in _llm_cache:
+        return _llm_cache[key]
+    try:
+        from app.agent import quick
+        raw = quick("Identify the language of a farmer's chat message, and whether the farmer is asking to be "
+                    "answered in a particular language (e.g. 'speak Turkish to me', 'speak my language', 'say it in "
+                    "Arabic', 'can you detect my language'). Reply ONLY JSON: {\"lang\": \"<ISO 639-1 code of the "
+                    "message, or null if too short to tell>\", \"wants\": \"<ISO 639-1 code they ask for; if they ask "
+                    "for 'my language', the language they are writing in; else null>\"}", key, max_tokens=60)
+        d = json.loads(re.search(r"\{.*\}", raw, re.S).group(0))
+        lang = d.get("lang") if d.get("lang") in LANGS else None
+        wants = d.get("wants") if d.get("wants") in LANGS else None
+    except Exception:
+        log.info("language detection skipped", exc_info=True)
+        lang, wants = None, None
+    _llm_cache[key] = (lang, wants)
+    return lang, wants
+
+
+def analyze(text: str) -> tuple[str | None, str | None]:
+    """(language of the message, language explicitly requested) — word lists and scripts first, then Claude for
+    the rest (any of LANGS; 'speak my language'; scripts shared by several languages)."""
+    t = (text or "").strip()
+    if not t:
+        return None, None
+    wants = explicit_language(t)
+    lang = detect(t)
+    words = len(t.split())
+    ambiguous = lang in SHARED_SCRIPT or (lang is None and words >= 2)
+    asks = bool(re.search(r"(speak|talk|answer|reply|write|language|idioma|lengua|habla|h[aá]blame|dilim|t[uü]rk[cç]e|"
+                          r"langue|sprache|lingua|língua|hizkuntz|язык|لغت|لغة|भाषा|ভাষা|زبان|bahasa|lugha|ngôn ngữ)",
+                          t, re.I))
+    if config.llm_enabled() and (ambiguous or (asks and not wants)):
+        l2, w2 = _llm_language(t)
+        lang = l2 or lang
+        wants = w2 or wants
+    return lang, wants

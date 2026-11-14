@@ -21,13 +21,19 @@ def inbound(phone: str, channel: str, text: str, lat: float | None = None, lon: 
     with session() as db:
         farmer = service.get_or_create_farmer(db, phone, channel)
     onboarding.record(farmer.id, "in", text or "", lat, lon, media_url)
-    lang = None if (text or "").strip().lower() in onboarding.button_ids() else i18n.detect(text or "")
-    if lang and lang != farmer.language:
+    lang, wants = (None, None) if (text or "").strip().lower() in onboarding.button_ids() else i18n.analyze(text or "")
+    new_lang = wants or lang
+    if new_lang and new_lang != farmer.language:
         with session() as db:
             from app.db import Farmer
-            db.get(Farmer, farmer.id).language = lang
+            db.get(Farmer, farmer.id).language = new_lang
             db.commit()
-        farmer.language = lang
+        farmer.language = new_lang
+    if wants and lat is None and len((text or "").split()) <= 12:
+        hello = ("👍 Sure, let's continue in English." if farmer.language == "en"
+                 else f"👍 Sure — I'll write to you in {i18n.LANGS.get(farmer.language, farmer.language)}.")
+        return _out(farmer.id, Turn(now=[hello] + onboarding.current_step(farmer), later=None), farmer.language,
+                    units.preferred(farmer))
     want_voice = voice.asked(text or "") if lat is None and not i18n.explicit_language(text or "") else None
     if want_voice is not None and not onboarding.is_question(text or ""):
         _set_voice(farmer, want_voice)
@@ -35,11 +41,6 @@ def inbound(phone: str, channel: str, text: str, lat: float | None = None, lon: 
                else "👍 OK — text only from now on.")
         step = onboarding.current_step(farmer) if farmer.state not in ("ready",) else []
         return _out(farmer.id, Turn(now=[msg] + step, later=None), farmer.language, units.preferred(farmer))
-    if i18n.is_switch(text or "") or i18n.explicit_language(text or ""):
-        hello = ("👍 Sure, let's continue in English." if farmer.language == "en"
-                 else f"👍 Sure — I'll write to you in {i18n.LANGS.get(farmer.language, farmer.language)}.")
-        return _out(farmer.id, Turn(now=[hello] + onboarding.current_step(farmer), later=None), farmer.language,
-                    units.preferred(farmer))
     want_units = units.asked(text or "") if lat is None else None
     if want_units:
         with session() as db:
@@ -157,7 +158,9 @@ def speech_languages(phone: str) -> list[str]:
         fm = db.query(Farmer).filter(Farmer.phone == phone).first()
         lang = fm.language if fm else "en"
     by_country = {"es": ["es", "eu", "ca"], "mx": ["es"], "ar": ["es"], "co": ["es"], "cl": ["es"], "fr": ["fr"],
-                  "pt": ["pt"], "br": ["pt"], "de": ["de"], "it": ["it"], "jp": ["ja"]}.get(phone_country(phone), [])
+                  "pt": ["pt"], "br": ["pt"], "de": ["de"], "it": ["it"], "jp": ["ja"], "in": ["hi", "en"],
+                  "ph": ["tl", "en"], "tr": ["tr"], "pl": ["pl"], "nl": ["nl"], "th": ["th"], "za": ["af", "en"],
+                  "ro": ["ro"], "hu": ["hu"], "cz": ["cs"], "se": ["sv"]}.get(phone_country(phone), [])
     return list(dict.fromkeys([lang] + by_country + ["en", "es"]))
 
 

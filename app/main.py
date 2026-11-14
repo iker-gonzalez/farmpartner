@@ -11,7 +11,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from sqlalchemy import select
 
-from app import chat, config, i18n, landing, media, messaging, ratelimit, report_view, service, team, voice
+from app import chat, config, i18n, landing, media, messaging, ratelimit, report_view, service, sources, team, voice
 from app.prompts import as_text, is_prompt
 from app.db import Farmer, Field, init_db, session
 from app.engine.explain import DISCLAIMER, SCORE_LABELS, evidence, gaps, inch, short_name
@@ -143,7 +143,8 @@ def _media_turn(sender: str, channel: str, url: str, kind: str, caption: str, me
             messaging.send(sender, "🎙️ Sorry, I couldn't make out that voice note. Could you type it, or send a "
                                    "shorter note (under a minute)?")
             return
-        messaging.send(sender, "🎙️ " + i18n.translate(["I heard:"], i18n.detect(heard) or "en")[0] + f" “{heard}”")
+        heard_lang = i18n.analyze(heard)[0] or chat.wants_voice(sender)[1]  # the note's language, else the farmer's
+        messaging.send(sender, "🎙️ " + i18n.translate(["I heard:"], heard_lang)[0] + f" “{heard}”")
         turn = chat.inbound(sender, channel, heard, None, None, url)
     else:
         turn = chat.photo(sender, channel, media.image_block(data, content_type), caption, url)
@@ -267,6 +268,18 @@ def what_and_how(request: Request):
 @app.get("/limits", response_class=HTMLResponse)
 def limits_page(request: Request):
     return templates.TemplateResponse(request, "limits.html", _site_ctx())
+
+
+@app.get("/data-and-science", response_class=HTMLResponse)
+def data_page(request: Request):
+    return templates.TemplateResponse(request, "data.html", {**_site_ctx(), "active": "data", "stats": sources.STATS,
+                                                             "sections": sources.SECTIONS, "steps": sources.STEPS,
+                                                             "limits": sources.LIMITS})
+
+
+@app.get("/data")
+def data_short():
+    return RedirectResponse("/data-and-science", status_code=301)
 
 
 @app.get("/team", response_class=HTMLResponse)
