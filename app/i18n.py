@@ -115,6 +115,17 @@ def detect(text: str) -> str | None:
     return code if best >= 2 and best > second else None
 
 
+def explicit_language(text: str) -> str | None:
+    """The language a short message explicitly asks for ("en español porfa", "contéstame en euskera")."""
+    t = text or ""
+    if len(t.split()) > 8:
+        return None
+    for code, pat in SWITCH:
+        if re.search(pat, t, re.I):
+            return code
+    return None
+
+
 def is_switch(text: str) -> bool:
     """A message that only asks to change language ("en castellano", "in English please", "日本語で")."""
     t = (text or "").lower()

@@ -27,7 +27,7 @@ def inbound(phone: str, channel: str, text: str, lat: float | None = None, lon: 
             db.get(Farmer, farmer.id).language = lang
             db.commit()
         farmer.language = lang
-    if i18n.is_switch(text or ""):
+    if i18n.is_switch(text or "") or i18n.explicit_language(text or ""):
         hello = ("👍 Sure, let's continue in English." if farmer.language == "en"
                  else f"👍 Sure — I'll write to you in {i18n.LANGS.get(farmer.language, farmer.language)}.")
         return _out(farmer.id, Turn(now=[hello] + onboarding.current_step(farmer), later=None), farmer.language,
@@ -77,11 +77,31 @@ def inbound(phone: str, channel: str, text: str, lat: float | None = None, lon: 
                                                                        else step, lang)
         return _out(farmer.id, Turn(now=[], later=answer_then_step))
     reply = onboarding.handle(farmer, text or "", lat, lon)
+    if reply is not None and reply.to_agent:
+        unit, lang = units.preferred(farmer), farmer.language
+
+        def agent_then_step():
+            step = onboarding.current_step(farmer)
+            return [agent.answer(farmer, text or "")] + i18n.translate(units.convert(step) if unit == "metric"
+                                                                       else step, lang)
+        return _out(farmer.id, Turn(now=[], later=agent_then_step))
     if reply is None:  # onboarded: free conversation, answered in the background (LLM can take a few seconds)
         def later():
             return [agent.answer(farmer, text or "")]
         return _out(farmer.id, Turn(now=[], later=later))  # Claude already answers in the farmer's language and units
     return _out(farmer.id, Turn(now=reply.now, later=reply.later), farmer.language, units.preferred(farmer))
+
+
+def speech_languages(phone: str) -> list[str]:
+    """Languages to listen for in a voice note: the farmer's, their phone country's, then English."""
+    from app.data.geocode import phone_country
+    from app.db import Farmer
+    with session() as db:
+        fm = db.query(Farmer).filter(Farmer.phone == phone).first()
+        lang = fm.language if fm else "en"
+    by_country = {"es": ["es", "eu", "ca"], "mx": ["es"], "ar": ["es"], "co": ["es"], "cl": ["es"], "fr": ["fr"],
+                  "pt": ["pt"], "br": ["pt"], "de": ["de"], "it": ["it"], "jp": ["ja"]}.get(phone_country(phone), [])
+    return list(dict.fromkeys([lang] + by_country + ["en", "es"]))
 
 
 def photo(phone: str, channel: str, image: dict | None, caption: str, media_url: str | None = None) -> Turn:

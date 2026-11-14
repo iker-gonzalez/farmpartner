@@ -46,8 +46,15 @@ def _opus_rate(data: bytes) -> int:
     return rate if rate in OPUS_RATES else 16000
 
 
-def transcribe(data: bytes, content_type: str) -> str | None:
-    """Transcript of a short voice note (≤ 1 minute), English or Spanish. None if nothing was understood."""
+SPEECH_CODES = {"en": "en-US", "es": "es-ES", "eu": "eu-ES", "ca": "ca-ES", "gl": "gl-ES", "pt": "pt-BR", "fr": "fr-FR",
+                "de": "de-DE", "it": "it-IT", "ja": "ja-JP", "zh": "cmn-Hans-CN", "ko": "ko-KR", "ru": "ru-RU",
+                "ar": "ar-SA", "hi": "hi-IN", "th": "th-TH", "el": "el-GR"}
+
+
+def transcribe(data: bytes, content_type: str, langs: list[str] | None = None) -> str | None:
+    """Transcript of a short voice note (≤ 1 minute) in the first of langs (up to 3 alternatives also heard).
+    None if nothing was understood."""
+    codes = list(dict.fromkeys(SPEECH_CODES[x] for x in (langs or ["en", "es"]) if x in SPEECH_CODES)) or ["en-US"]
     if "ogg" in content_type or "opus" in content_type:
         audio_cfg = {"encoding": "OGG_OPUS", "sampleRateHertz": _opus_rate(data)}
     elif "amr" in content_type:
@@ -56,7 +63,7 @@ def transcribe(data: bytes, content_type: str) -> str | None:
         audio_cfg = {}  # let the API detect WAV/FLAC/MP3 headers
         if "mpeg" in content_type or "mp3" in content_type:
             audio_cfg = {"encoding": "MP3", "sampleRateHertz": 16000}
-    body = {"config": {**audio_cfg, "languageCode": "en-US", "alternativeLanguageCodes": ["es-US"],
+    body = {"config": {**audio_cfg, "languageCode": codes[0], "alternativeLanguageCodes": codes[1:4],
                        "enableAutomaticPunctuation": True},
             "audio": {"content": base64.b64encode(data).decode()}}
     r = httpx.post(SPEECH_URL, json=body, headers=_google_headers(), timeout=40)

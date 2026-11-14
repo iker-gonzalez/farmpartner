@@ -10,7 +10,7 @@ from typing import Callable
 
 from app import service
 from app.data import landcheck
-from app.data.geocode import county_name, zip_to_point
+from app.data.geocode import county_name, phone_country, place_to_point, zip_to_point
 from app.db import Farmer, Field, Message, now, session
 from app.engine import explain as ex
 from app.engine.features import crop_name, rotation_label
@@ -85,6 +85,7 @@ HELP = ("You can ask me things like:\n• \"Should I water this week?\"\n• \"I
 class Reply:
     now: list[str] = field(default_factory=list)
     later: Callable[[], list[str]] | None = None
+    to_agent: bool = False  # not an answer to this step: let Claude reply, then repeat the step
 
 
 def parse_priorities(text: str) -> list[str]:
@@ -249,7 +250,7 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
         with session() as db:
             db.get(Farmer, farmer.id).state = "awaiting_location"
             db.commit()
-        if lat is not None or zip_to_point(t):
+        if lat is not None or zip_to_point(t, phone_country(farmer.phone)):
             farmer.state = "awaiting_location"
             return handle(farmer, text, lat, lon)
         return Reply(now=[WELCOME])
@@ -257,11 +258,18 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
     if state == "awaiting_location":
         if lat is not None and lon is not None:
             return _set_location(farmer, lat, lon, None)
-        z = zip_to_point(t)
+        z = zip_to_point(t, phone_country(farmer.phone))
         if z:
             return _set_location(farmer, z[0], z[1], z[2])
         if low.strip("!.¡ ") in GREETINGS:
             return Reply(now=[WELCOME])
+        if re.search(r"[^\W\d_]{3}", t):
+            pl = place_to_point(t, farmer.language)
+            if pl:
+                r = _set_location(farmer, pl[0], pl[1], pl[2])
+                r.now.insert(0, f"📍 I'll use {pl[2]} as an approximate location. For data about your exact field, "
+                                "send a pin on it anytime.")
+                return r
         if re.fullmatch(r"\d{3,6}", t.replace(" ", "")):
             return Reply(now=[f"I couldn't find ZIP code {t} — ZIP codes only work in the U.S. Anywhere else, send a "
                               "pin (📎 → Location), paste a Google Maps link, or type coordinates like 41.39, 2.17."])
@@ -288,6 +296,13 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
                        and parse_irrigated(t) is None)  # "dryland, no irrigation" is not a rejection
             if named:
                 fld.current_rotation = named if len(named) > 1 else named * 2
+            elif len(t.split()) >= 4 and not said_yes and not said_no and not unknown:
+                # a request or remark, not a crop list ("give me the best dryland rotation"): Claude answers it
+                irr_req = parse_irrigated(t)
+                if irr_req is not None:
+                    fld.irrigated = irr_req
+                db.commit()
+                return Reply(to_agent=True)
             elif said_no or not fld.current_rotation:
                 irr_only = parse_irrigated(t)
                 if irr_only is not None:  # "dryland" on its own: keep it, ask only for the crops

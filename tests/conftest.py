@@ -44,5 +44,7 @@ def offline(monkeypatch):
     fc = [{"date": f"2026-07-{10 + i}", "tmax": 36.0, "tmin": 18.0, "precip": 0.0, "et0": 7.0} for i in range(7)]
     monkeypatch.setattr(forecast, "forecast", lambda lat, lon, days=7: fc)
     monkeypatch.setattr(service.fc, "forecast", lambda lat, lon, days=7: fc)
-    monkeypatch.setattr(onboarding, "zip_to_point", lambda t: (38.05, -100.75, "Garden City, KS") if "67846" in t else None)
+    monkeypatch.setattr(onboarding, "zip_to_point", lambda t, *a: (38.05, -100.75, "Garden City, KS") if "67846" in t else None)
+    monkeypatch.setattr(onboarding, "place_to_point", lambda t, *a: (43.26, -2.93, "Bilbao, Basque Country, ES")
+                        if "bilbao" in t.lower() else None)
     monkeypatch.setattr(onboarding, "_spawn", lambda fn, *args: fn(*args))

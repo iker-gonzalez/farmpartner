@@ -108,7 +108,7 @@ def _media_turn(sender: str, channel: str, url: str, kind: str, caption: str, me
         return
     if kind == "audio":
         try:
-            heard = media.transcribe(data, content_type)
+            heard = media.transcribe(data, content_type, chat.speech_languages(sender))
         except Exception:
             log.exception("transcription failed")
             heard = None

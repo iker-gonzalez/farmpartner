@@ -43,7 +43,7 @@ def test_voice_note_is_transcribed_and_answered(offline, monkeypatch):
     sent = []
     monkeypatch.setattr(messaging, "send", lambda to, m: sent.append(m))
     monkeypatch.setattr(media, "download", lambda url: (b"OggS...OpusHead", "audio/ogg"))
-    monkeypatch.setattr(media, "transcribe", lambda data, ct: "hi")
+    monkeypatch.setattr(media, "transcribe", lambda data, ct, langs=None: "hi")
     c = _client()
     assert _webhook(c, MediaUrl0="https://api.twilio.com/m/1", MediaContentType0="audio/ogg", NumMedia="1").status_code == 200
     assert sent[0] == "🎙️ I heard: “hi”" and "Step 1 of 3" in sent[1]
@@ -54,7 +54,7 @@ def test_unclear_voice_note(offline, monkeypatch):
     sent = []
     monkeypatch.setattr(messaging, "send", lambda to, m: sent.append(m))
     monkeypatch.setattr(media, "download", lambda url: (b"x", "audio/ogg"))
-    monkeypatch.setattr(media, "transcribe", lambda data, ct: None)
+    monkeypatch.setattr(media, "transcribe", lambda data, ct, langs=None: None)
     _webhook(_client(), MediaUrl0="u", MediaContentType0="audio/ogg", NumMedia="1")
     assert "couldn't make out" in sent[0]
 

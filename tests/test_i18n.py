@@ -103,3 +103,32 @@ def test_crops_in_any_language_and_questions_mid_setup(offline, monkeypatch):
     assert onboarding.is_question("¿Qué cultivos consideras apropiados para esta zona?")
     assert not onboarding.is_question("corn, soybeans") and not onboarding.is_question("¿sí?")
     assert onboarding.parse_irrigated("garia eta artoa, lehorrekoa") is False and onboarding.parse_irrigated("ureztatua") is True
+
+
+def test_places_postcodes_switches_and_requests(offline, monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from app import agent, chat
+    from app.data.geocode import phone_country
+    from app.db import Farmer, session
+    from app.main import app
+    assert phone_country("whatsapp:+34666000000") == "es" and phone_country("whatsapp:+15550001") == "us"
+    assert phone_country("web:abc") == "us"
+    assert "eu" in chat.speech_languages("whatsapp:+34666000001")
+    c = TestClient(app)
+    say = lambda **kw: c.post("/api/chat", json={"phone": "pl1", **kw}).json()["messages"]  # noqa: E731
+    say(text="hi")
+    out = say(text="soy residente en Bilbao")
+    assert out[0].startswith("📍 I'll use Bilbao") and "Step 2 of 3" in out[-1]
+    out = say(text="En español porfa")
+    assert "Spanish" in out[0]                                     # a loose language request still switches
+    with session() as db:
+        db.query(Farmer).filter_by(phone="web:pl1").one().fields[-1].current_rotation = None
+        db.commit()
+    monkeypatch.setattr(agent, "answer", lambda f, t, image=None: "For dryland here: wheat → peas → barley.")
+    from app import onboarding
+    monkeypatch.setattr(onboarding, "crops_any_language", lambda t: ([], []))
+    out = say(text="Dame la rotación óptima para secano")
+    assert out[0].startswith("For dryland here") and len(out) == 2   # answered, then the step again
+    with session() as db:
+        assert db.query(Farmer).filter_by(phone="web:pl1").one().fields[-1].irrigated is False
