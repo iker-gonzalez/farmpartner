@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FarmPartner · Field report</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root { --ink:#1d2a1f; --muted:#5d6b5f; --line:#dfe5dc; --bg:#f6f4ee; --card:#fff; --green:#2f6b3a; --amber:#b7791f; --soil:#7a5230; }
+  * { box-sizing:border-box } body { margin:0; font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg) }
+  header { padding:20px 20px 8px; max-width:1100px; margin:auto } h1 { margin:0; font-size:1.6rem } .sub { color:var(--muted) }
+  main { max-width:1100px; margin:auto; padding:0 20px 40px; display:grid; gap:16px }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px } @media (max-width:800px){ .grid2,.strats,.top,.ev{ grid-template-columns:1fr } }
+  .top { grid-template-columns:1fr 1.4fr } .top .card { display:flex; flex-direction:column }
+  #map { flex:1; min-height:300px; border-radius:8px }
+  .ev { display:grid; grid-template-columns:1fr 1fr; gap:10px 16px } .ev div { display:flex; flex-direction:column; border-left:3px solid #cfe0cf; padding-left:8px }
+  .ev .m { font-size:.82rem; color:var(--muted) } .ev .src { font-size:.72rem; color:#8a968b }
+  h2 { font-size:1.1rem; margin:0 0 10px } h3 { margin:4px 0 8px; font-size:1.05rem }
+  table { width:100%; border-collapse:collapse; font-size:.92rem } td { padding:5px 4px; border-bottom:1px solid var(--line); vertical-align:top }
+  td.src { color:var(--muted); font-size:.8rem; white-space:nowrap }
+  .strats { display:grid; grid-template-columns:repeat(3,1fr); gap:16px }
+  .strat.current { border-color:#c9c2b0; background:#fbfaf6 } .role { font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted) }
+  .total { font-size:2rem; font-weight:700; color:var(--green) } .total small { font-size:.9rem; color:var(--muted); font-weight:400 }
+  .bar { display:grid; grid-template-columns:150px 1fr 32px; gap:6px; align-items:center; font-size:.82rem; margin:3px 0 }
+  .bar div.t { height:8px; background:#edf0ea; border-radius:4px; overflow:hidden } .bar div.t i { display:block; height:100%; background:var(--green) }
+  ul { margin:4px 0 10px; padding-left:18px } li { margin:2px 0 } .k { font-weight:600; font-size:.85rem; margin-top:10px }
+  .risk li { color:#7a4b0c } .gap li { color:var(--muted) }
+  .chips span { display:inline-block; padding:2px 8px; margin:2px; border-radius:99px; background:#edf0ea; font-size:.82rem }
+  .chips span.fallow { background:#f1e6d8 } .note { background:#fff8e6; border:1px solid #f1dfae; border-radius:10px; padding:10px 14px; font-size:.92rem }
+  footer { color:var(--muted); font-size:.82rem; max-width:1100px; margin:auto; padding:0 20px 30px }
+</style>
+</head>
+<body>
+<header>
+  <h1>🌾 {{ field.place or "Your field" }}</h1>
+  <div class="sub">FarmPartner field report · {{ "irrigated" if field.irrigated else ("dryland" if field.irrigated == False else "irrigation unknown") }} ·
+    current rotation: <b>{{ rotation_label(field.current_rotation) }}</b></div>
+</header>
+<main>
+  <div class="note">🤝 {{ disclaimer }}</div>
+
+  <div class="grid2 top">
+    <div class="card"><h2>📍 Field</h2><div id="map"></div></div>
+    <div class="card"><h2>🛰️ What NASA sees</h2>
+      <div class="ev">{% for e in evidence %}
+        <div><span class="m">{{ e.metric }}</span><b>{{ e.value }}</b><span class="src">{{ e.source }}</span></div>{% endfor %}
+      </div>
+    </div>
+  </div>
+
+  {% if rec %}
+  <div class="card">
+    <h2>🔄 Rotation strategies compared
+      <span class="sub" style="font-weight:400">— your goals: {{ goals }}</span></h2>
+    <div class="strats">
+    {% for s in rec.strategies %}
+      <div class="card strat {{ 'current' if s.is_current }}">
+        <div class="role">{{ s.role }}</div>
+        <h3>{{ short_name(s) }}</h3>
+        <div class="chips">{% for y in s.years %}<span class="{{ 'fallow' if y == 'fallow' }}">Yr {{ loop.index }} · {{ crop_name(y) }}{% if s.covers.get(loop.index0|string) %} + cover{% endif %}</span>{% endfor %}</div>
+        <div class="total">{{ "%.0f"|format(s.total) }}<small> / 100 for your goals</small></div>
+        {% for k, v in s.scores.items() %}
+          <div class="bar"><span>{{ labels[k] }}</span><div class="t"><i style="width:{{ v }}%"></i></div><span>{{ v }}</span></div>
+        {% endfor %}
+        <div class="k">Why it's here</div><ul>{% for w in s.why %}<li>{{ w }}</li>{% endfor %}</ul>
+        <div class="k">Possible benefits</div><ul>{% for b in s.benefits %}<li>{{ b }}</li>{% endfor %}</ul>
+        {% if s.risks %}<div class="k">Check locally</div><ul class="risk">{% for r in s.risks %}<li>{{ r }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+    {% endfor %}
+    </div>
+    <div class="k">What this analysis can't see (information gaps)</div>
+    <ul class="gap">{% for g in gaps %}<li>{{ g }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+
+  <div class="grid2">
+    <div class="card"><h2>💧 Rain vs. crop water demand (inches / month)</h2><canvas id="water"></canvas>
+      <div class="sub" style="font-size:.85rem">Bars: average rain. Line: reference crop water use (ET₀). The gap is what crops must pull from stored soil water or irrigation. NASA POWER, {{ c.years }}.</div></div>
+    <div class="card"><h2>🌿 Vegetation from space (MODIS NDVI)</h2>
+      {% if f.ndvi %}<canvas id="ndvi"></canvas>
+        <div class="sub" style="font-size:.85rem">NDVI under 0.25 ≈ bare soil. Bare months on this field: <b>{{ f.ndvi.bare_months | join(", ") or "none" }}</b>. Bare months are when cover crops can protect soil.</div>
+      {% else %}<p class="sub">Satellite vegetation is still loading for this field — refresh in a minute.</p>{% endif %}
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><h2>🗓️ Crop history (USDA Cropland Data Layer)</h2>
+      <div class="chips">{% for h in field.history %}<span class="{{ 'fallow' if h.crop == 'fallow' }}">{{ h.year }} · {{ h.category }}</span>{% endfor %}</div>
+      {% if f.soil %}<p style="margin-top:12px">🟫 <b>Soil:</b> {{ f.soil.map_unit }} — organic matter {{ f.soil.om_pct }}%, clay {{ f.soil.clay_pct }}%, {{ f.soil.drainage }}, erodibility K={{ f.soil.k_factor }} <span class="sub">(USDA NRCS SSURGO)</span></p>{% endif %}
+    </div>
+    <div class="card"><h2>📝 Your reports</h2>
+      {% if observations %}<table>{% for o in observations %}<tr><td>{{ o.created_at.strftime("%b %d") }}</td><td>{{ o.kind }}</td><td>{{ (o.value ~ " " ~ (o.unit or "")) if o.value is not none else "" }} {{ o.text or "" }}</td></tr>{% endfor %}</table>
+      {% else %}<p class="sub">Text the bot what you see — rain gauge readings, pests, planting dates, yields. Your ground truth sits next to the satellite data.</p>{% endif %}
+    </div>
+  </div>
+</main>
+<footer>Data: {{ (f.sources or []) | join(" · ") }}. Open source (MIT). Built for NASA Space Apps 2026 “Field Shift”. This tool supports, not replaces, farmer judgment and local agronomic expertise.</footer>
+<script>
+  const lat = {{ field.lat }}, lon = {{ field.lon }};
+  const map = L.map('map').setView([lat, lon], 14);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {attribution: 'Esri, Maxar, Earthstar'}).addTo(map);
+  L.circleMarker([lat, lon], {radius: 9, color: '#ffd84d', weight: 3}).addTo(map);
+  const clim = {{ (c.monthly or []) | tojson }};
+  if (clim.length) new Chart(document.getElementById('water'), { data: { labels: clim.map(m => m.month), datasets: [
+    { type: 'bar', label: 'Rain', data: clim.map(m => +(m.precip_mm / 25.4).toFixed(2)), backgroundColor: '#6fa8dc' },
+    { type: 'line', label: 'Crop water demand (ET₀)', data: clim.map(m => +(m.et0_mm / 25.4).toFixed(2)), borderColor: '#b7791f', tension: .3 } ] } });
+  const nd = {{ ((f.ndvi or {}).get("series") or []) | tojson }};
+  if (nd.length) new Chart(document.getElementById('ndvi'), { type: 'line', data: { labels: nd.map(p => p.date), datasets: [
+    { label: 'NDVI', data: nd.map(p => p.ndvi), borderColor: '#2f6b3a', pointRadius: 0, tension: .25 },
+    { label: 'Bare-soil threshold', data: nd.map(() => 0.25), borderColor: '#c9a27a', borderDash: [5,5], pointRadius: 0 } ] },
+    options: { scales: { y: { min: 0, max: 1 } } } });
+</script>
+</body>
+</html>

@@ -1,0 +1,416 @@
+{
+ "lat": 38.05,
+ "lon": -100.75,
+ "built_at": "2026-11-14T11:50:13",
+ "sources": [
+  "NASA POWER daily (MERRA-2 temperature, bias-corrected precipitation, GWETROOT soil wetness)",
+  "USDA NASS Cropland Data Layer 30 m (CropScape)",
+  "USDA NRCS SSURGO soil survey (Soil Data Access)",
+  "NASA MODIS MOD13Q1 NDVI 250 m (ORNL DAAC)"
+ ],
+ "errors": [],
+ "ndvi": {
+  "monthly_ndvi": {
+   "1": 0.316,
+   "2": 0.328,
+   "3": 0.377,
+   "4": 0.463,
+   "5": 0.341,
+   "6": 0.31,
+   "7": 0.537,
+   "8": 0.476,
+   "9": 0.535,
+   "10": 0.426,
+   "11": 0.299,
+   "12": 0.345
+  },
+  "bare_months": [],
+  "peak_ndvi": 0.537,
+  "series": [
+   {
+    "date": "2024-11-16",
+    "ndvi": 0.347
+   },
+   {
+    "date": "2024-12-02",
+    "ndvi": 0.541
+   },
+   {
+    "date": "2024-12-18",
+    "ndvi": 0.317
+   },
+   {
+    "date": "2025-01-01",
+    "ndvi": 0.381
+   },
+   {
+    "date": "2025-01-17",
+    "ndvi": 0.396
+   },
+   {
+    "date": "2025-02-02",
+    "ndvi": 0.445
+   },
+   {
+    "date": "2025-02-18",
+    "ndvi": 0.411
+   },
+   {
+    "date": "2025-03-06",
+    "ndvi": 0.452
+   },
+   {
+    "date": "2025-03-22",
+    "ndvi": 0.604
+   },
+   {
+    "date": "2025-04-07",
+    "ndvi": 0.709
+   },
+   {
+    "date": "2025-04-23",
+    "ndvi": 0.668
+   },
+   {
+    "date": "2025-05-09",
+    "ndvi": 0.53
+   },
+   {
+    "date": "2025-05-25",
+    "ndvi": 0.385
+   },
+   {
+    "date": "2025-06-10",
+    "ndvi": 0.325
+   },
+   {
+    "date": "2025-06-26",
+    "ndvi": 0.273
+   },
+   {
+    "date": "2025-07-12",
+    "ndvi": 0.55
+   },
+   {
+    "date": "2025-07-28",
+    "ndvi": 0.647
+   },
+   {
+    "date": "2025-08-13",
+    "ndvi": 0.312
+   },
+   {
+    "date": "2025-08-29",
+    "ndvi": 0.363
+   },
+   {
+    "date": "2025-09-14",
+    "ndvi": 0.551
+   },
+   {
+    "date": "2025-09-30",
+    "ndvi": 0.605
+   },
+   {
+    "date": "2025-10-16",
+    "ndvi": 0.419
+   },
+   {
+    "date": "2025-11-01",
+    "ndvi": 0.296
+   },
+   {
+    "date": "2025-11-17",
+    "ndvi": 0.253
+   },
+   {
+    "date": "2025-12-03",
+    "ndvi": 0.266
+   },
+   {
+    "date": "2025-12-19",
+    "ndvi": 0.257
+   },
+   {
+    "date": "2026-01-01",
+    "ndvi": 0.234
+   },
+   {
+    "date": "2026-01-17",
+    "ndvi": 0.253
+   },
+   {
+    "date": "2026-02-02",
+    "ndvi": 0.236
+   },
+   {
+    "date": "2026-02-18",
+    "ndvi": 0.221
+   },
+   {
+    "date": "2026-03-06",
+    "ndvi": 0.216
+   },
+   {
+    "date": "2026-03-22",
+    "ndvi": 0.237
+   },
+   {
+    "date": "2026-04-07",
+    "ndvi": 0.244
+   },
+   {
+    "date": "2026-04-23",
+    "ndvi": 0.231
+   },
+   {
+    "date": "2026-05-09",
+    "ndvi": 0.212
+   },
+   {
+    "date": "2026-05-25",
+    "ndvi": 0.236
+   },
+   {
+    "date": "2026-06-10",
+    "ndvi": 0.243
+   },
+   {
+    "date": "2026-06-26",
+    "ndvi": 0.401
+   },
+   {
+    "date": "2026-07-12",
+    "ndvi": 0.596
+   },
+   {
+    "date": "2026-07-28",
+    "ndvi": 0.356
+   },
+   {
+    "date": "2026-08-13",
+    "ndvi": 0.667
+   },
+   {
+    "date": "2026-08-29",
+    "ndvi": 0.561
+   },
+   {
+    "date": "2026-09-14",
+    "ndvi": 0.641
+   },
+   {
+    "date": "2026-09-30",
+    "ndvi": 0.344
+   },
+   {
+    "date": "2026-10-16",
+    "ndvi": 0.433
+   }
+  ]
+ },
+ "climate": {
+  "years": "2006\u20132025",
+  "annual_precip_mm": 547.0,
+  "annual_et0_mm": 1295.0,
+  "water_balance_mm": -748.0,
+  "last_12mo_precip_mm": 547.0,
+  "last_12mo_precip_pct_normal": 100,
+  "median_last_spring_frost": "Apr 14",
+  "median_first_fall_frost": "Oct 27",
+  "frost_free_days": 199.0,
+  "season_gdd_c": 2265,
+  "heat_days_per_yr": 43.6,
+  "heat_days_early": 45.2,
+  "heat_days_recent5": 48.4,
+  "heavy_rain_days_per_yr": 2.1,
+  "soil_wetness_now": 0.347,
+  "soil_wetness_normal": 0.29,
+  "monthly": [
+   {
+    "month": "Jan",
+    "precip_mm": 11.0,
+    "et0_mm": 31.7,
+    "soil_wetness": 0.305
+   },
+   {
+    "month": "Feb",
+    "precip_mm": 10.7,
+    "et0_mm": 43.5,
+    "soil_wetness": 0.303
+   },
+   {
+    "month": "Mar",
+    "precip_mm": 27.4,
+    "et0_mm": 86.1,
+    "soil_wetness": 0.298
+   },
+   {
+    "month": "Apr",
+    "precip_mm": 49.0,
+    "et0_mm": 121.5,
+    "soil_wetness": 0.302
+   },
+   {
+    "month": "May",
+    "precip_mm": 77.1,
+    "et0_mm": 162.6,
+    "soil_wetness": 0.306
+   },
+   {
+    "month": "Jun",
+    "precip_mm": 79.2,
+    "et0_mm": 190.7,
+    "soil_wetness": 0.297
+   },
+   {
+    "month": "Jul",
+    "precip_mm": 92.2,
+    "et0_mm": 196.7,
+    "soil_wetness": 0.288
+   },
+   {
+    "month": "Aug",
+    "precip_mm": 75.3,
+    "et0_mm": 172.6,
+    "soil_wetness": 0.289
+   },
+   {
+    "month": "Sep",
+    "precip_mm": 44.4,
+    "et0_mm": 129.8,
+    "soil_wetness": 0.284
+   },
+   {
+    "month": "Oct",
+    "precip_mm": 41.5,
+    "et0_mm": 83.5,
+    "soil_wetness": 0.293
+   },
+   {
+    "month": "Nov",
+    "precip_mm": 17.0,
+    "et0_mm": 46.7,
+    "soil_wetness": 0.296
+   },
+   {
+    "month": "Dec",
+    "precip_mm": 21.8,
+    "et0_mm": 29.7,
+    "soil_wetness": 0.3
+   }
+  ],
+  "yearly": [
+   {
+    "year": 2023,
+    "precip_mm": 611.6,
+    "et0_mm": 1295.6,
+    "heat_days": 37,
+    "heavy_rain_days": 3,
+    "last_spring_frost_doy": 96,
+    "first_fall_frost_doy": 301,
+    "frost_free_days": 205,
+    "season_gdd_c": 2321.2
+   },
+   {
+    "year": 2024,
+    "precip_mm": 519.9,
+    "et0_mm": 1376.6,
+    "heat_days": 57,
+    "heavy_rain_days": 2,
+    "last_spring_frost_doy": 87,
+    "first_fall_frost_doy": 325,
+    "frost_free_days": 238,
+    "season_gdd_c": 2613.5
+   },
+   {
+    "year": 2025,
+    "precip_mm": 594.0,
+    "et0_mm": 1284.0,
+    "heat_days": 33,
+    "heavy_rain_days": 1,
+    "last_spring_frost_doy": 96,
+    "first_fall_frost_doy": 305,
+    "frost_free_days": 209,
+    "season_gdd_c": 2361.9
+   }
+  ]
+ },
+ "rotation": {
+  "is_cropland": true,
+  "sequence": [
+   {
+    "year": 2017,
+    "crop": "sorghum",
+    "category": "Sorghum"
+   },
+   {
+    "year": 2018,
+    "crop": "fallow",
+    "category": "Fallow/Idle Cropland"
+   },
+   {
+    "year": 2019,
+    "crop": "winter_wheat",
+    "category": "Winter Wheat"
+   },
+   {
+    "year": 2020,
+    "crop": "sorghum",
+    "category": "Sorghum"
+   },
+   {
+    "year": 2021,
+    "crop": "fallow",
+    "category": "Fallow/Idle Cropland"
+   },
+   {
+    "year": 2022,
+    "crop": "winter_wheat",
+    "category": "Winter Wheat"
+   },
+   {
+    "year": 2023,
+    "crop": "sorghum",
+    "category": "Sorghum"
+   },
+   {
+    "year": 2024,
+    "crop": "fallow",
+    "category": "Fallow/Idle Cropland"
+   },
+   {
+    "year": 2025,
+    "crop": "winter_wheat",
+    "category": "Winter Wheat"
+   }
+  ],
+  "recent": [
+   "sorghum",
+   "fallow",
+   "winter_wheat",
+   "sorghum",
+   "fallow",
+   "winter_wheat"
+  ],
+  "pattern": [
+   "sorghum",
+   "fallow",
+   "winter_wheat"
+  ]
+ },
+ "soil": {
+  "map_unit": "Satanta loam, 0 to 1 percent slopes",
+  "series": "Satanta",
+  "slope_pct": 1.0,
+  "drainage": "Well drained",
+  "hydrologic_group": "C",
+  "om_pct": 2.0,
+  "clay_pct": 18.0,
+  "sand_pct": 43.0,
+  "k_factor": 0.32,
+  "awc": 0.2
+ },
+ "grace": null,
+ "elevation_m": 882.0
+}

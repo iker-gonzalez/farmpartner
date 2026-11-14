@@ -1,0 +1,57 @@
+from fastapi.testclient import TestClient
+
+
+def _client():
+    from app.main import app
+    return TestClient(app)
+
+
+def say(c, phone, **kw):
+    return c.post("/api/chat", json={"phone": phone, **kw}).json()["messages"]
+
+
+def test_full_onboarding_with_pin_then_questions(offline):
+    from app.db import Farmer, Observation, session
+
+    c = _client()
+    assert "location" in say(c, "a", text="hi")[0].lower()
+    msgs = say(c, "a", lat=38.05, lon=-100.75)
+    assert "NASA" in msgs[-1] and "Winter wheat → Grain sorghum → Fallow" in msgs[-1]
+    assert "Finney County" in msgs[-1]
+    assert "Save water" in say(c, "a", text="yes it's dryland")[0]
+    msgs = say(c, "a", text="2")
+    summary = next(m for m in msgs if "Option 1" in m)
+    assert "/r/" in summary
+    url = summary.split("http://localhost:8000")[1].split()[0]
+    page = c.get(url)
+    assert page.status_code == 200 and "Rotation strategies compared" in page.text
+
+    assert "Dryland" in say(c, "a", text="should I water this week?")[0]
+    assert "Saved 1.2 in" in say(c, "a", text="we got 1.2 inches of rain")[0]
+    assert "Heat" in say(c, "a", text="any heat coming?")[0]
+    with session() as db:
+        fld = db.query(Farmer).filter_by(phone="web:a").one().fields[-1]
+        assert fld.irrigated is False
+        assert db.query(Observation).filter_by(field_id=fld.id, kind="rain").one().value == 1.2
+
+
+def test_sms_zip_onboarding_and_farmer_corrects_crops(offline):
+    c = _client()
+    say(c, "b", text="hello")
+    msgs = say(c, "b", text="my zip is 67846")
+    assert "Garden City" in msgs[-1]
+    out = say(c, "b", text="no, we grow corn and soybeans, irrigated with a pivot")[0]
+    assert "Corn → Soybeans (irrigated)" in out
+
+
+def test_reset(offline):
+    c = _client()
+    say(c, "d", text="hi")
+    say(c, "d", lat=40.65, lon=-98.3)
+    assert "Starting over" in say(c, "d", text="reset")[0]
+
+
+def test_twilio_webhook_returns_twiml(offline):
+    c = _client()
+    r = c.post("/twilio/webhook", data={"From": "whatsapp:+15550001", "Body": "hi"})
+    assert r.status_code == 200 and "<Message>" in r.text

@@ -1,0 +1,21 @@
+{
+  "_note": "Rotation templates. 'years' lists the main crop per rotation year; 'covers' maps a year index (0-based) to a cover crop planted after that year's harvest. 'min_rain_mm' is the minimum annual rainfall for a dryland version (ignored when the field is irrigated).",
+  "rotations": [
+    {"id": "corn_soy", "name": "Corn → Soybeans", "years": ["corn", "soybeans"], "covers": {}, "min_rain_mm": 650},
+    {"id": "corn_soy_rye", "name": "Corn → Soybeans + cereal rye cover", "years": ["corn", "soybeans"], "covers": {"0": "cereal_rye", "1": "cereal_rye"}, "min_rain_mm": 650},
+    {"id": "corn_soy_wheat_cover", "name": "Corn → Soybeans → Wheat + summer cover", "years": ["corn", "soybeans", "winter_wheat"], "covers": {"2": "summer_mix"}, "min_rain_mm": 600},
+    {"id": "corn_soy_oats_clover", "name": "Corn → Soybeans → Oats + clover", "years": ["corn", "soybeans", "oats"], "covers": {"2": "clover"}, "min_rain_mm": 650},
+    {"id": "continuous_corn", "name": "Continuous corn", "years": ["corn", "corn"], "covers": {}, "min_rain_mm": 700},
+    {"id": "wheat_sorghum_fallow", "name": "Wheat → Sorghum → Fallow", "years": ["winter_wheat", "sorghum", "fallow"], "covers": {}, "min_rain_mm": 350},
+    {"id": "wheat_sorghum_peas", "name": "Wheat → Sorghum → Field peas (flex fallow)", "years": ["winter_wheat", "sorghum", "field_peas"], "covers": {}, "min_rain_mm": 400},
+    {"id": "wheat_sorghum_cover", "name": "Wheat + summer cover → Sorghum", "years": ["winter_wheat", "sorghum"], "covers": {"0": "summer_mix"}, "min_rain_mm": 450},
+    {"id": "wheat_corn_sunflower", "name": "Wheat → Corn → Sunflower", "years": ["winter_wheat", "corn", "sunflower"], "covers": {}, "min_rain_mm": 450},
+    {"id": "wheat_millet_fallow", "name": "Wheat → Proso millet → Fallow", "years": ["winter_wheat", "proso_millet", "fallow"], "covers": {}, "min_rain_mm": 300},
+    {"id": "wheat_fallow", "name": "Wheat → Fallow", "years": ["winter_wheat", "fallow"], "covers": {}, "min_rain_mm": 250},
+    {"id": "wheat_canola_sorghum", "name": "Wheat → Canola → Sorghum", "years": ["winter_wheat", "canola", "sorghum"], "covers": {}, "min_rain_mm": 450},
+    {"id": "sorghum_soy_wheat_cover", "name": "Sorghum → Soybeans → Wheat + summer cover", "years": ["sorghum", "soybeans", "winter_wheat"], "covers": {"2": "summer_mix"}, "min_rain_mm": 550},
+    {"id": "alfalfa_corn_wheat", "name": "Alfalfa (3 yrs) → Corn → Wheat", "years": ["alfalfa", "alfalfa", "alfalfa", "corn", "winter_wheat"], "covers": {}, "min_rain_mm": 600},
+    {"id": "corn_sorghum_triticale", "name": "Corn → Sorghum + triticale forage", "years": ["corn", "sorghum"], "covers": {}, "extra_forage": "triticale", "min_rain_mm": 500},
+    {"id": "cotton_sorghum", "name": "Cotton → Sorghum", "years": ["cotton", "sorghum"], "covers": {}, "min_rain_mm": 450}
+  ]
+}

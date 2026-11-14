@@ -1,0 +1,419 @@
+{
+ "lat": 40.65,
+ "lon": -98.3,
+ "built_at": "2026-11-14T11:50:58",
+ "sources": [
+  "NASA POWER daily (MERRA-2 temperature, bias-corrected precipitation, GWETROOT soil wetness)",
+  "USDA NASS Cropland Data Layer 30 m (CropScape)",
+  "USDA NRCS SSURGO soil survey (Soil Data Access)",
+  "NASA MODIS MOD13Q1 NDVI 250 m (ORNL DAAC)"
+ ],
+ "errors": [],
+ "ndvi": {
+  "monthly_ndvi": {
+   "1": 0.24,
+   "2": 0.237,
+   "3": 0.246,
+   "4": 0.3,
+   "5": 0.421,
+   "6": 0.655,
+   "7": 0.839,
+   "8": 0.798,
+   "9": 0.55,
+   "10": 0.362,
+   "11": 0.291,
+   "12": 0.265
+  },
+  "bare_months": [
+   "Jan",
+   "Feb",
+   "Mar"
+  ],
+  "peak_ndvi": 0.839,
+  "series": [
+   {
+    "date": "2024-11-16",
+    "ndvi": 0.229
+   },
+   {
+    "date": "2024-12-02",
+    "ndvi": 0.247
+   },
+   {
+    "date": "2024-12-18",
+    "ndvi": 0.241
+   },
+   {
+    "date": "2025-01-01",
+    "ndvi": 0.184
+   },
+   {
+    "date": "2025-01-17",
+    "ndvi": 0.234
+   },
+   {
+    "date": "2025-02-02",
+    "ndvi": 0.222
+   },
+   {
+    "date": "2025-02-18",
+    "ndvi": 0.232
+   },
+   {
+    "date": "2025-03-06",
+    "ndvi": 0.233
+   },
+   {
+    "date": "2025-03-22",
+    "ndvi": 0.287
+   },
+   {
+    "date": "2025-04-07",
+    "ndvi": 0.362
+   },
+   {
+    "date": "2025-04-23",
+    "ndvi": 0.283
+   },
+   {
+    "date": "2025-05-09",
+    "ndvi": 0.322
+   },
+   {
+    "date": "2025-05-25",
+    "ndvi": 0.465
+   },
+   {
+    "date": "2025-06-10",
+    "ndvi": 0.537
+   },
+   {
+    "date": "2025-06-26",
+    "ndvi": 0.592
+   },
+   {
+    "date": "2025-07-12",
+    "ndvi": 0.872
+   },
+   {
+    "date": "2025-07-28",
+    "ndvi": 0.903
+   },
+   {
+    "date": "2025-08-13",
+    "ndvi": 0.901
+   },
+   {
+    "date": "2025-08-29",
+    "ndvi": 0.857
+   },
+   {
+    "date": "2025-09-14",
+    "ndvi": 0.787
+   },
+   {
+    "date": "2025-09-30",
+    "ndvi": 0.456
+   },
+   {
+    "date": "2025-10-16",
+    "ndvi": 0.423
+   },
+   {
+    "date": "2025-11-01",
+    "ndvi": 0.292
+   },
+   {
+    "date": "2025-11-17",
+    "ndvi": 0.352
+   },
+   {
+    "date": "2025-12-03",
+    "ndvi": 0.343
+   },
+   {
+    "date": "2025-12-19",
+    "ndvi": 0.228
+   },
+   {
+    "date": "2026-01-01",
+    "ndvi": 0.286
+   },
+   {
+    "date": "2026-01-17",
+    "ndvi": 0.257
+   },
+   {
+    "date": "2026-02-02",
+    "ndvi": 0.236
+   },
+   {
+    "date": "2026-02-18",
+    "ndvi": 0.257
+   },
+   {
+    "date": "2026-03-06",
+    "ndvi": 0.235
+   },
+   {
+    "date": "2026-03-22",
+    "ndvi": 0.23
+   },
+   {
+    "date": "2026-04-07",
+    "ndvi": 0.241
+   },
+   {
+    "date": "2026-04-23",
+    "ndvi": 0.314
+   },
+   {
+    "date": "2026-05-09",
+    "ndvi": 0.385
+   },
+   {
+    "date": "2026-05-25",
+    "ndvi": 0.514
+   },
+   {
+    "date": "2026-06-10",
+    "ndvi": 0.802
+   },
+   {
+    "date": "2026-06-26",
+    "ndvi": 0.689
+   },
+   {
+    "date": "2026-07-12",
+    "ndvi": 0.792
+   },
+   {
+    "date": "2026-07-28",
+    "ndvi": 0.79
+   },
+   {
+    "date": "2026-08-13",
+    "ndvi": 0.775
+   },
+   {
+    "date": "2026-08-29",
+    "ndvi": 0.661
+   },
+   {
+    "date": "2026-09-14",
+    "ndvi": 0.398
+   },
+   {
+    "date": "2026-09-30",
+    "ndvi": 0.559
+   },
+   {
+    "date": "2026-10-16",
+    "ndvi": 0.302
+   }
+  ]
+ },
+ "climate": {
+  "years": "2006\u20132025",
+  "annual_precip_mm": 719.0,
+  "annual_et0_mm": 1110.0,
+  "water_balance_mm": -390.0,
+  "last_12mo_precip_mm": 846.0,
+  "last_12mo_precip_pct_normal": 118,
+  "median_last_spring_frost": "Apr 19",
+  "median_first_fall_frost": "Oct 23",
+  "frost_free_days": 183.0,
+  "season_gdd_c": 1957,
+  "heat_days_per_yr": 14.7,
+  "heat_days_early": 13.4,
+  "heat_days_recent5": 22.8,
+  "heavy_rain_days_per_yr": 4.1,
+  "soil_wetness_now": 0.499,
+  "soil_wetness_normal": 0.416,
+  "monthly": [
+   {
+    "month": "Jan",
+    "precip_mm": 15.8,
+    "et0_mm": 20.8,
+    "soil_wetness": 0.44
+   },
+   {
+    "month": "Feb",
+    "precip_mm": 17.0,
+    "et0_mm": 30.7,
+    "soil_wetness": 0.441
+   },
+   {
+    "month": "Mar",
+    "precip_mm": 39.6,
+    "et0_mm": 68.7,
+    "soil_wetness": 0.439
+   },
+   {
+    "month": "Apr",
+    "precip_mm": 61.7,
+    "et0_mm": 105.5,
+    "soil_wetness": 0.441
+   },
+   {
+    "month": "May",
+    "precip_mm": 120.3,
+    "et0_mm": 144.7,
+    "soil_wetness": 0.456
+   },
+   {
+    "month": "Jun",
+    "precip_mm": 107.5,
+    "et0_mm": 170.2,
+    "soil_wetness": 0.442
+   },
+   {
+    "month": "Jul",
+    "precip_mm": 96.6,
+    "et0_mm": 177.4,
+    "soil_wetness": 0.411
+   },
+   {
+    "month": "Aug",
+    "precip_mm": 96.0,
+    "et0_mm": 153.8,
+    "soil_wetness": 0.408
+   },
+   {
+    "month": "Sep",
+    "precip_mm": 58.1,
+    "et0_mm": 113.7,
+    "soil_wetness": 0.409
+   },
+   {
+    "month": "Oct",
+    "precip_mm": 55.9,
+    "et0_mm": 68.9,
+    "soil_wetness": 0.42
+   },
+   {
+    "month": "Nov",
+    "precip_mm": 23.0,
+    "et0_mm": 35.5,
+    "soil_wetness": 0.425
+   },
+   {
+    "month": "Dec",
+    "precip_mm": 27.7,
+    "et0_mm": 19.8,
+    "soil_wetness": 0.433
+   }
+  ],
+  "yearly": [
+   {
+    "year": 2023,
+    "precip_mm": 532.9,
+    "et0_mm": 1188.9,
+    "heat_days": 24,
+    "heavy_rain_days": 1,
+    "last_spring_frost_doy": 113,
+    "first_fall_frost_doy": 300,
+    "frost_free_days": 187,
+    "season_gdd_c": 2162.7
+   },
+   {
+    "year": 2024,
+    "precip_mm": 625.2,
+    "et0_mm": 1191.4,
+    "heat_days": 22,
+    "heavy_rain_days": 2,
+    "last_spring_frost_doy": 112,
+    "first_fall_frost_doy": 324,
+    "frost_free_days": 212,
+    "season_gdd_c": 2210.7
+   },
+   {
+    "year": 2025,
+    "precip_mm": 661.1,
+    "et0_mm": 1126.3,
+    "heat_days": 12,
+    "heavy_rain_days": 2,
+    "last_spring_frost_doy": 98,
+    "first_fall_frost_doy": 303,
+    "frost_free_days": 205,
+    "season_gdd_c": 2164.4
+   }
+  ]
+ },
+ "rotation": {
+  "is_cropland": true,
+  "sequence": [
+   {
+    "year": 2017,
+    "crop": "corn",
+    "category": "Corn"
+   },
+   {
+    "year": 2018,
+    "crop": "soybeans",
+    "category": "Soybeans"
+   },
+   {
+    "year": 2019,
+    "crop": "corn",
+    "category": "Corn"
+   },
+   {
+    "year": 2020,
+    "crop": "corn",
+    "category": "Corn"
+   },
+   {
+    "year": 2021,
+    "crop": "corn",
+    "category": "Corn"
+   },
+   {
+    "year": 2022,
+    "crop": "corn",
+    "category": "Corn"
+   },
+   {
+    "year": 2023,
+    "crop": "corn",
+    "category": "Corn"
+   },
+   {
+    "year": 2024,
+    "crop": "corn",
+    "category": "Corn"
+   },
+   {
+    "year": 2025,
+    "crop": "soybeans",
+    "category": "Soybeans"
+   }
+  ],
+  "recent": [
+   "corn",
+   "corn",
+   "corn",
+   "corn",
+   "corn",
+   "soybeans"
+  ],
+  "pattern": [
+   "corn",
+   "corn"
+  ]
+ },
+ "soil": {
+  "map_unit": "Holder silty clay loam, 7 to 11 percent slopes, severely eroded",
+  "series": "Holder",
+  "slope_pct": 9.0,
+  "drainage": "Well drained",
+  "hydrologic_group": "C",
+  "om_pct": 1.25,
+  "clay_pct": 31.0,
+  "sand_pct": 7.0,
+  "k_factor": 0.37,
+  "awc": 0.22
+ },
+ "grace": null,
+ "elevation_m": 571.0
+}

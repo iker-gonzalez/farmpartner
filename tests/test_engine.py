@@ -1,0 +1,58 @@
+from app.engine.explain import chat_summary, explain
+from app.engine.features import detect_rotation
+from app.engine.scoring import canonical_cycle, compare, covered_months
+
+
+def test_detects_three_year_cycle():
+    hist = [{"year": 2017 + i, "category": c} for i, c in enumerate(
+        ["Winter Wheat", "Sorghum", "Fallow/Idle Cropland"] * 3)]
+    r = detect_rotation(hist)
+    assert r["is_cropland"]
+    assert canonical_cycle(r["pattern"]) == ["winter_wheat", "sorghum", "fallow"]
+
+
+def test_detects_continuous_corn_despite_one_soy_year():
+    cats = ["Corn", "Corn", "Corn", "Soybeans", "Corn", "Corn", "Corn", "Corn"]
+    r = detect_rotation([{"year": 2018 + i, "category": c} for i, c in enumerate(cats)])
+    assert r["pattern"] == ["corn", "corn"]
+
+
+def test_non_cropland():
+    r = detect_rotation([{"year": 2020 + i, "category": "Grassland/Pasture"} for i in range(5)])
+    assert not r["is_cropland"]
+
+
+def test_cover_crop_fills_bare_months():
+    bare = sum(12 - len(m) for m in covered_months(["corn", "soybeans"], {}))
+    with_rye = sum(12 - len(m) for m in covered_months(["corn", "soybeans"], {"0": "cereal_rye", "1": "cereal_rye"}))
+    assert with_rye < bare
+
+
+def test_three_strategies_with_full_explanations(garden_city):
+    res = explain(compare(garden_city, ["soil_health"], irrigated=False), garden_city)
+    s = res["strategies"]
+    assert len(s) == 3 and s[0]["is_current"]
+    for strat in s:
+        for key in ("why", "evidence", "benefits", "gaps", "risks"):
+            assert key in strat
+        assert strat["why"] and strat["evidence"] and strat["gaps"] and strat["benefits"]
+    # the soil-health goal should beat the wheat-sorghum-fallow baseline on soil
+    assert s[1]["scores"]["soil"] > s[0]["scores"]["soil"]
+    assert any(e["source"].startswith("NASA") for e in s[0]["evidence"])
+
+
+def test_dryland_filter_excludes_corn_soy_in_semi_arid(garden_city):
+    res = compare(garden_city, ["income"], irrigated=False)
+    assert all(st["id"] != "corn_soy" for st in res["strategies"])
+
+
+def test_priorities_change_the_answer(hastings):
+    a = compare(hastings, ["soil_health"], irrigated=True)["strategies"][1]["id"]
+    b = compare(hastings, ["save_water"], irrigated=True)["strategies"][1]["id"]
+    assert a != b
+
+
+def test_chat_summary_is_short(hastings):
+    res = explain(compare(hastings, ["soil_health"], irrigated=True), hastings)
+    txt = chat_summary(res, "http://x/r/abc")
+    assert len(txt) < 1500 and "extension" in txt
