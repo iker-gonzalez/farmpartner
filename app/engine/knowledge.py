@@ -55,6 +55,11 @@ CROP_WORDS = {
     "papas": "potatoes", "patata": "potatoes", "patatas": "potatoes", "tomate": "tomatoes", "tomates": "tomatoes",
     "remolacha": "sugarbeets", "arroz": "rice", "caña": "sugarcane", "hortalizas": "vegetables",
     "verduras": "vegetables", "cebollas": "vegetables", "pimientos": "vegetables", "lechuga": "vegetables",
+    # Basque
+    "artoa": "corn", "arto": "corn", "garia": "winter_wheat", "gari": "winter_wheat", "garagarra": "barley",
+    "garagar": "barley", "oloa": "oats", "olo": "oats", "soja": "soybeans", "ekilorea": "sunflower",
+    "patata": "potatoes", "patatak": "potatoes", "tomatea": "tomatoes", "tomateak": "tomatoes", "babarrunak": "dry_beans",
+    "ilarrak": "field_peas", "alpapa": "alfalfa", "errapea": "canola", "zekalea": "triticale", "lugorria": "fallow",
 }
 
 

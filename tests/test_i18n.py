@@ -77,3 +77,29 @@ def test_basque_catalan_galician():
     assert i18n.is_switch("Me hablas en castellano?") and i18n.detect("en català, si us plau") == "ca"
     assert i18n.is_switch("Euskeraz hitz egin dezakezu, mesedez 🙏") and i18n.is_switch("Can you speak English please?")
     assert i18n.detect("hola") == "es" and i18n.detect("Kaixo!") == "eu" and i18n.detect("hi") is None
+
+
+def test_crops_in_any_language_and_questions_mid_setup(offline, monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from app import agent, onboarding
+    from app.db import Farmer, session
+    from app.main import app
+    c = TestClient(app)
+    say = lambda **kw: c.post("/api/chat", json={"phone": "eu1", **kw}).json()["messages"]  # noqa: E731
+    say(text="hi")
+    say(lat=38.05, lon=-100.75)
+    with session() as db:
+        db.query(Farmer).filter_by(phone="web:eu1").one().fields[-1].current_rotation = None
+        db.commit()
+    # a question in the middle of setup: answered, then the step is repeated
+    monkeypatch.setattr(agent, "answer", lambda f, t, image=None: "Sorghum and wheat suit this area.")
+    out = say(text="Which crops suit this area?")
+    assert out[0] == "Sorghum and wheat suit this area." and "crops" in out[1].lower()
+    # crop names the word list doesn't know go to Claude
+    monkeypatch.setattr(onboarding, "crops_any_language", lambda t: (["winter_wheat", "corn"], []))
+    out = say(text="txirikorda eta zerbait")
+    assert "Winter wheat → Corn" in out[0]
+    assert onboarding.is_question("¿Qué cultivos consideras apropiados para esta zona?")
+    assert not onboarding.is_question("corn, soybeans") and not onboarding.is_question("¿sí?")
+    assert onboarding.parse_irrigated("garia eta artoa, lehorrekoa") is False and onboarding.parse_irrigated("ureztatua") is True

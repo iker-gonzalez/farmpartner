@@ -160,13 +160,9 @@ SYSTEM = ("You translate WhatsApp messages from FarmPartner, a farm advisor, int
 
 
 def _translate_batch(texts: list[str], lang: str) -> list[str]:
-    from app.agent import claude_client
+    from app.agent import quick
 
-    resp = claude_client().beta.messages.create(
-        model=config.ANTHROPIC_MODEL, max_tokens=8000, system=SYSTEM.format(lang=LANGS.get(lang, lang)),
-        messages=[{"role": "user", "content": json.dumps(texts, ensure_ascii=False)}],
-        output_config={"effort": "low"}, betas=["server-side-fallback-2026-07-01"], fallbacks="default")
-    raw = "".join(b.text for b in resp.content if b.type == "text").strip()
+    raw = quick(SYSTEM.format(lang=LANGS.get(lang, lang)), json.dumps(texts, ensure_ascii=False), max_tokens=8000)
     raw = re.sub(r"^```(?:json)?|```$", "", raw).strip()
     out = json.loads(raw)
     if not (isinstance(out, list) and len(out) == len(texts) and all(isinstance(x, str) for x in out)):

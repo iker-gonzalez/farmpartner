@@ -387,3 +387,23 @@ def prewarm() -> None:
     u = getattr(resp, "usage", None)
     log.info("Claude prewarm: cache write %s / read %s tokens", getattr(u, "cache_creation_input_tokens", "?"),
              getattr(u, "cache_read_input_tokens", "?"))
+
+
+_fast = {"ok": True}
+
+
+def quick(system: str, user: str, max_tokens: int = 1500) -> str:
+    """One short Claude call for translation/classification on the fast model (falls back to the main model)."""
+    client = claude_client()
+    kw = dict(max_tokens=max_tokens, system=system, messages=[{"role": "user", "content": user}],
+              betas=["server-side-fallback-2026-07-01"], fallbacks="default")
+    resp = None
+    if _fast["ok"] and config.FAST_MODEL:
+        try:
+            resp = client.beta.messages.create(model=config.FAST_MODEL, **kw)
+        except Exception as e:
+            log.warning("fast model unavailable (%s); using %s", e, config.ANTHROPIC_MODEL)
+            _fast["ok"] = False
+    if resp is None:
+        resp = client.beta.messages.create(model=config.ANTHROPIC_MODEL, output_config={"effort": "low"}, **kw)
+    return "".join(b.text for b in resp.content if b.type == "text").strip()

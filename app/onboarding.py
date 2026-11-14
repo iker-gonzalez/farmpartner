@@ -59,6 +59,18 @@ KNOWN_CROPS = ("corn, soybeans, wheat, barley, oats, grain sorghum (milo), rice,
                "proso millet, triticale, and fallow")
 GREETINGS = {"hi", "hello", "hey", "hola", "buenas", "buenos días", "ola", "olá", "bonjour", "salut", "hallo", "ciao",
              "start", "empezar", "comenzar", "こんにちは", "你好", "안녕하세요"}
+QUESTION = re.compile(r"[?¿？]|^\s*(what|which|how|when|why|where|should|can|could|is|are|do|does|qué|que|cuál|"
+                      r"cuáles|cómo|como|cuándo|dónde|por qué|debo|puedo|zer|zein|nola|noiz|non|zergatik|quel|quelle|"
+                      r"comment|pourquoi|o que|qual|quais|quando|onde|was|wie|wann|welche|warum|cosa|quale|perché)\b",
+                      re.I)
+MID_ONBOARDING = ("awaiting_crops", "awaiting_irrigation", "awaiting_priority", "awaiting_more_goals",
+                  "awaiting_goal_text")
+
+
+def is_question(text: str) -> bool:
+    return bool(QUESTION.search(text or "")) and len((text or "").split()) >= 3
+
+
 PRIORITY_KEYS = {"1": "save_water", "2": "soil_health", "3": "income", "4": "less_erosion", "5": "forage"}
 PRIORITY_WORDS = {"water": "save_water", "soil": "soil_health", "income": "income", "money": "income", "profit": "income",
                   "erosion": "less_erosion", "forage": "forage", "cattle": "forage", "livestock": "forage",
@@ -83,6 +95,26 @@ def parse_priorities(text: str) -> list[str]:
     return list(dict.fromkeys(out))[:MAX_GOALS]
 
 
+def crops_any_language(text: str) -> tuple[list[str], list[str]]:
+    """Crop ids named in any language ("garia, artoa", "小麦と大豆"), via Claude; plus names it couldn't place."""
+    from app import config
+    if not config.llm_enabled() or not re.search(r"\w{3}", text):
+        return [], []
+    try:
+        import json
+
+        from app.agent import quick
+        from app.engine.knowledge import crops
+        ids = {cid: c["name"] for cid, c in crops().items()}
+        raw = quick("A farmer (any language) names the crops on a field. Map them, in order, to these crop ids: "
+                    + json.dumps(ids) + '. Reply with ONLY JSON: {"crops": [ids in order], "unknown": [crop names '
+                    'that fit none]}. Ignore words that are not crop names.', text[:300], max_tokens=200)
+        d = json.loads(re.search(r"\{.*\}", raw, re.S).group(0))
+        return [c for c in d.get("crops", []) if c in ids], [str(u)[:40] for u in d.get("unknown", [])][:3]
+    except Exception:
+        return [], []
+
+
 def classify_goal(text: str) -> list[str]:
     """Map a goal in the farmer's own words onto the scoring goals (keywords first, then Claude)."""
     pr = parse_priorities(text)
@@ -93,14 +125,10 @@ def classify_goal(text: str) -> list[str]:
         try:
             import json
 
-            from app.agent import claude_client
-            resp = claude_client().beta.messages.create(
-                model=config.ANTHROPIC_MODEL, max_tokens=200, output_config={"effort": "low"},
-                betas=["server-side-fallback-2026-07-01"], fallbacks="default",
-                system="Map a farmer's goal (any language) to 1-2 of these crop-rotation scoring goals: save_water, "
-                       "soil_health, income, less_erosion, forage. Reply with ONLY a JSON array of keys.",
-                messages=[{"role": "user", "content": text[:300]}])
-            raw = "".join(b.text for b in resp.content if b.type == "text")
+            from app.agent import quick
+            raw = quick("Map a farmer's goal (any language) to 1-2 of these crop-rotation scoring goals: save_water, "
+                        "soil_health, income, less_erosion, forage. Reply with ONLY a JSON array of keys.",
+                        text[:300], max_tokens=100)
             keys = [k for k in json.loads(re.search(r"\[.*\]", raw, re.S).group(0)) if k in PRIORITY_KEYS.values()]
             if keys:
                 return keys[:2]
@@ -111,9 +139,9 @@ def classify_goal(text: str) -> list[str]:
 
 def parse_irrigated(text: str) -> bool | None:
     t = text.lower()
-    if re.search(r"\b(dry ?land|rain[- ]?fed|not irrigated|no irrigation|no water|secano|sin riego|de temporal|no riego)\b", t):
+    if re.search(r"\b(dry ?land|rain[- ]?fed|not irrigated|no irrigation|no water|secano|sin riego|de temporal|no riego|lehor\w*|ureztatu gabe\w*)\b", t):
         return False
-    if re.search(r"irrigat|pivot|\bwell\b|sprinkler|drip|flood|riego|regad|irrigad|goteo|aspersi|pivote|pozo", t):
+    if re.search(r"irrigat|pivot|\bwell\b|sprinkler|drip|flood|riego|regad|irrigad|goteo|aspersi|pivote|pozo|ureztat", t):
         return True
     return None
 
@@ -249,7 +277,13 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
                 db.commit()
                 return Reply(now=["Please send your field location first (📎 → Location or a ZIP code)."])
             named = crops_in_text(t)
-            said_yes = re.search(r"\b(yes|yep|yeah|right|correct|si|sí|ok|okay|correcto|vale|claro|exacto)\b", low)
+            unknown: list[str] = []
+            said_no_word = re.search(r"\b(no|nope|wrong|different|incorrect|incorrecto|otro|otros|distinto)\b", low)
+            if not named and not said_no_word and parse_irrigated(t) is None and re.search(r"\w{3}", t) \
+                    and not re.fullmatch(r"(yes|yep|yeah|right|correct|si|sí|ok|okay|correcto|vale|claro|exacto)\W*", low):
+                named, unknown = crops_any_language(t)
+            named = named or []
+            said_yes = re.search(r"\b(yes|yep|yeah|right|correct|si|sí|ok|okay|correcto|vale|claro|exacto|bai|oui|sim|ja)\b", low)
             said_no = (re.search(r"\b(no|nope|wrong|different|not right|incorrect|incorrecto|otro|otros|distinto)\b", low)
                        and parse_irrigated(t) is None)  # "dryland, no irrigation" is not a rejection
             if named:
@@ -263,8 +297,9 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
                                       "grow on this field? Type them in order, e.g. \"corn, soybeans\" or "
                                       "\"wheat, sorghum, fallow\"."])
                 db.commit()
-                if not said_no and re.search(r"[a-zA-Z]{3}", t):  # they named something we don't know
-                    return Reply(now=[f"🌱 I don't have “{t[:40]}” in my crop list yet. I can compare rotations of: "
+                if not said_no and re.search(r"\w{3}", t):  # they named something we don't know
+                    what = ", ".join(unknown) if unknown else t[:40]
+                    return Reply(now=[f"🌱 I don't have “{what}” in my crop list yet. I can compare rotations of: "
                                       f"{KNOWN_CROPS}. Which of these do you grow? (Send RESET to start over.)"])
                 return Reply(now=["No problem — which crops do you grow on this field? Type them in order, "
                                   "e.g. \"corn, soybeans\" or \"wheat, sorghum, fallow\". Add \"irrigated\" or \"dryland\"."])

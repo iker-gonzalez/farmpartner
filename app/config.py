@@ -17,6 +17,8 @@ PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "http://localhost:8000").rstrip("
 
 ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-opus-5-5")
 ANTHROPIC_EFFORT = os.getenv("ANTHROPIC_EFFORT", "low")
+# Small, fast model for translation and quick classification (crop names, goals); falls back to ANTHROPIC_MODEL.
+FAST_MODEL = os.getenv("FAST_MODEL", "claude-haiku-5-5")
 
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")

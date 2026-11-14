@@ -66,6 +66,16 @@ def inbound(phone: str, channel: str, text: str, lat: float | None = None, lon: 
         if dup:  # WhatsApp sometimes delivers the same pin twice; the first one is already being analyzed
             return Turn(now=[], later=None)
         farmer.state = "awaiting_location"  # a new pin at any step = add/replace the field
+    if lat is None and farmer.state in onboarding.MID_ONBOARDING and onboarding.is_question(text or ""):
+        # A question in the middle of setup ("which crops suit this area?"): Claude answers it, then we repeat
+        # the step we're waiting for, so the farmer isn't stuck.
+        unit, lang = units.preferred(farmer), farmer.language
+
+        def answer_then_step():
+            step = onboarding.current_step(farmer)
+            return [agent.answer(farmer, text or "")] + i18n.translate(units.convert(step) if unit == "metric"
+                                                                       else step, lang)
+        return _out(farmer.id, Turn(now=[], later=answer_then_step))
     reply = onboarding.handle(farmer, text or "", lat, lon)
     if reply is None:  # onboarded: free conversation, answered in the background (LLM can take a few seconds)
         def later():
