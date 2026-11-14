@@ -1,0 +1,71 @@
+/* WhatsApp opt-in: country picker, status line and the compact header form.
+   Shared by every public page; the larger hero form keeps its own sizing in landing.html (form.optin). */
+
+/* ---------- Country picker (markup built by /static/landing/country-picker.js) ---------- */
+.cc { display: flex; }
+.cc-btn { display: flex; align-items: center; gap: 7px; padding: 0 12px; cursor: pointer; white-space: nowrap; }
+.cc-btn .f, .cc-list .f { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-size: 16px; line-height: 1; }
+.cc-btn .car { color: var(--ink-3); font-size: 10px; }
+.cc-btn[aria-expanded=true] { border-color: var(--lime); }
+.cc-pop { position: absolute; z-index: 20; top: calc(100% + 6px); left: 0; width: 320px; max-width: calc(100vw - 40px);
+  background: #0f0f11f2; backdrop-filter: blur(12px); border: 1px solid var(--line-2); box-shadow: 0 18px 50px #000a; text-align: left; }
+.cc-search { width: 100%; padding: 13px 14px; background: transparent; border: 0; border-bottom: 1px solid var(--line-2);
+  color: var(--ink); font-family: var(--mono); font-size: 13px; outline: none; }
+.cc-search::placeholder { color: var(--ink-3); }
+.cc-list { list-style: none; margin: 0; padding: 6px 0; max-height: 300px; overflow-y: auto; scrollbar-width: thin; }
+.cc-list li { display: flex; align-items: center; gap: 10px; padding: 8px 14px; cursor: pointer; font-size: 14px; color: var(--ink-2); }
+.cc-list li .n { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cc-list li .d { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+.cc-list li.on { background: #a8f32614; color: var(--ink); box-shadow: inset 2px 0 0 var(--lime); }
+.cc-list li.on .d { color: var(--lime); }
+.cc-list li[aria-selected=true] .n::after { content: "  ✓"; color: var(--lime); }
+.cc-list li.none { cursor: default; font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+
+/* ---------- Status line under a form ---------- */
+.status { min-height: 1.2em; font-family: var(--mono); font-size: 13px; color: var(--lime); }
+.status.err { color: #fca5a5; }
+.status a { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- Header opt-in form ---------- */
+.nav-cta { display: flex; align-items: center; }
+.nav-cta .nav-toggle { display: none; border: 0; cursor: pointer; }
+form.nav-optin { position: relative; }
+form.nav-optin .row { position: relative; display: flex; align-items: stretch; }
+form.nav-optin .cc-btn, form.nav-optin input[type=tel] { background: #0a0a0bcc; border: 1px solid var(--line-2); border-right: 0;
+  color: var(--ink); font-family: var(--mono); font-size: 12.5px; outline: none; border-radius: 0; }
+form.nav-optin .cc-btn { padding: 0 10px; gap: 6px; }
+form.nav-optin .cc-btn .f { font-size: 14px; }
+form.nav-optin input[type=tel] { width: 190px; padding: 0 12px; }
+form.nav-optin input::placeholder { color: var(--ink-3); }
+form.nav-optin .cc-btn:focus-visible, form.nav-optin input:focus { border-color: var(--lime); }
+form.nav-optin .btn { padding: 9px 14px; border: 0; cursor: pointer; }
+form.nav-optin .btn svg { width: 16px; height: 16px; }
+form.nav-optin .btn[disabled] { opacity: .6; cursor: wait; }
+form.nav-optin .cc-pop { right: auto; }
+/* Consent + status drop down under the form while it's in use (or showing a result). */
+form.nav-optin .drop { position: absolute; z-index: 15; top: calc(100% + 8px); left: 0; right: 0; display: none; flex-direction: column; gap: 8px;
+  padding: 12px 14px; background: #0f0f11f2; backdrop-filter: blur(12px); border: 1px solid var(--line-2); box-shadow: 0 18px 50px #000a; text-align: left; }
+form.nav-optin:focus-within .drop, form.nav-optin.has-status .drop { display: flex; }
+form.nav-optin label { display: flex; align-items: flex-start; gap: 8px; font-family: var(--mono); font-size: 11.5px; line-height: 1.5; color: var(--ink-2); cursor: pointer; }
+form.nav-optin label input { accent-color: var(--lime); width: 14px; height: 14px; margin-top: 2px; flex: none; }
+form.nav-optin .status { min-height: 0; font-size: 12px; }
+form.nav-optin .status:empty { display: none; }
+
+@media (max-width: 1280px) {
+  form.nav-optin .lbl-long { display: none; }
+  form.nav-optin input[type=tel] { width: 185px; }
+}
+@media (max-width: 800px) {
+  /* Mobile: a compact WhatsApp button opens the full form as a panel under the header. */
+  .nav-cta .nav-toggle { display: inline-flex; }
+  .nav-toggle svg { width: 16px; height: 16px; }
+  form.nav-optin { display: none; position: absolute; left: 0; right: 0; top: 100%; padding: 16px 20px 18px;
+    background: var(--bg); border-bottom: 1px solid var(--line); box-shadow: 0 18px 40px #000c; }
+  form.nav-optin.open { display: block; }
+  form.nav-optin .row { flex-wrap: wrap; }
+  form.nav-optin .cc-btn { height: 100%; border-bottom: 0; padding: 12px 10px; }
+  form.nav-optin input[type=tel] { flex: 1; min-width: 0; width: auto; padding: 12px; border-right: 1px solid var(--line-2); border-bottom: 0; font-size: 14px; }
+  form.nav-optin .btn { width: 100%; justify-content: center; padding: 14px 16px; }
+  form.nav-optin .lbl-long { display: inline; }
+  form.nav-optin .drop { position: static; display: flex; margin-top: 12px; padding: 0; background: none; border: 0; box-shadow: none; backdrop-filter: none; }
+}

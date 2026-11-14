@@ -1,4 +1,6 @@
-{# Site header shared by landing.html and what_how.html. Styles live in each page (header, .logo, nav, .btn). #}
+{# Site header shared by every public page. Header styles: landing.html (own copy) and /static/site.css;
+   the WhatsApp opt-in form: /static/optin.css + /static/landing/country-picker.js + /static/landing/optin.js.
+   It works exactly like the landing hero form (POST /api/optin). #}
 <header>
   <a class="logo" href="/" aria-label="FarmPartner home">
     <img class="orbi" src="/static/brand/orbi.svg" alt="" width="58" height="29">
@@ -9,6 +11,25 @@
     <a href="{{ repo }}#data-sources">NASA DATA</a>
     <a href="/team"{% if active == "team" %} class="on" aria-current="page"{% endif %}>TEAM</a>
     <a href="{{ repo }}">GITHUB</a>
-    <a class="btn" href="/chat">TRY <span class="long">THE </span>DEMO →</a>
+    <div class="nav-cta">
+      <button type="button" class="btn nav-toggle" aria-expanded="false" aria-controls="nav-optin">
+        <svg viewBox="0 0 14.6453 14.6344" aria-hidden="true"><path transform="matrix(1 -0.000029 0.000029 1 -1.6875 -1.687)" fill="#0a0a0b" d="{{ whatsapp_path }}"/></svg>
+        WHATSAPP →
+      </button>
+      <form class="nav-optin" id="nav-optin" data-optin novalidate>
+        <div class="row">
+          <div class="cc" data-picker><input type="hidden" name="cc" value="1"></div>
+          <input type="tel" name="phone" inputmode="tel" autocomplete="tel-national" placeholder="Your WhatsApp number" aria-label="Your WhatsApp number" required>
+          <button class="btn" type="submit">
+            <svg viewBox="0 0 14.6453 14.6344" aria-hidden="true"><path transform="matrix(1 -0.000029 0.000029 1 -1.6875 -1.687)" fill="#0a0a0b" d="{{ whatsapp_path }}"/></svg>
+            SEND<span class="lbl-long"> ME A WHATSAPP</span> →
+          </button>
+        </div>
+        <div class="drop">
+          <label><input type="checkbox" name="consent" required> I agree to receive WhatsApp messages from FarmPartner. Reply STOP anytime.</label>
+          <p class="status" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+    </div>
   </nav>
 </header>

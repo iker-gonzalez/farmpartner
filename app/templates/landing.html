@@ -14,6 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="/static/landing/hero.jpg" media="(min-width: 801px)">
+<link rel="stylesheet" href="/static/optin.css">
 <style>
   :root {
     --bg: #0a0a0b; --ink: #f4f4f5; --ink-2: #c8c8ce; --ink-3: #adadb7; --line: #34343a; --line-2: #5a5a63;
@@ -61,24 +62,6 @@
   form.optin .cc-btn, form.optin input[type=tel] { background: #0a0a0bcc; border: 1px solid var(--line-2); border-right: 0;
     color: var(--ink); font-family: var(--mono); font-size: 14px; outline: none; border-radius: 0; }
   form.optin .row { position: relative; }
-  .cc { display: flex; }
-  .cc-btn { display: flex; align-items: center; gap: 7px; padding: 0 12px; cursor: pointer; white-space: nowrap; }
-  .cc-btn .f, .cc-list .f { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-size: 16px; line-height: 1; }
-  .cc-btn .car { color: var(--ink-3); font-size: 10px; }
-  .cc-btn[aria-expanded=true] { border-color: var(--lime); }
-  .cc-pop { position: absolute; z-index: 20; top: calc(100% + 6px); left: 0; width: 320px; max-width: calc(100vw - 40px);
-    background: #0f0f11f2; backdrop-filter: blur(12px); border: 1px solid var(--line-2); box-shadow: 0 18px 50px #000a; text-align: left; }
-  .cc-search { width: 100%; padding: 13px 14px; background: transparent; border: 0; border-bottom: 1px solid var(--line-2);
-    color: var(--ink); font-family: var(--mono); font-size: 13px; outline: none; }
-  .cc-search::placeholder { color: var(--ink-3); }
-  .cc-list { list-style: none; margin: 0; padding: 6px 0; max-height: 300px; overflow-y: auto; scrollbar-width: thin; }
-  .cc-list li { display: flex; align-items: center; gap: 10px; padding: 8px 14px; cursor: pointer; font-size: 14px; color: var(--ink-2); }
-  .cc-list li .n { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .cc-list li .d { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
-  .cc-list li.on { background: #a8f32614; color: var(--ink); box-shadow: inset 2px 0 0 var(--lime); }
-  .cc-list li.on .d { color: var(--lime); }
-  .cc-list li[aria-selected=true] .n::after { content: "  ✓"; color: var(--lime); }
-  .cc-list li.none { cursor: default; font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
   form.optin input[type=tel] { width: 230px; padding: 15px 16px; }
   form.optin input::placeholder { color: var(--ink-3); }
   form.optin .cc-btn:focus-visible, form.optin input:focus { border-color: var(--lime); }
@@ -87,9 +70,6 @@
   form.optin .btn[disabled] { opacity: .6; cursor: wait; }
   form.optin label { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 12px; color: var(--ink-2); cursor: pointer; }
   form.optin label input { accent-color: var(--lime); width: 15px; height: 15px; }
-  .status { min-height: 1.2em; font-family: var(--mono); font-size: 13px; color: var(--lime); }
-  .status.err { color: #fca5a5; }
-  .status a { text-decoration: underline; text-underline-offset: 3px; }
   .channels { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 0; list-style: none;
     font-family: var(--mono); font-size: 12px; margin-top: -6px; }
   .channels li { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px;
@@ -190,7 +170,7 @@
       <p class="kicker">● NASA SPACE APPS 2026<span class="sep"> · </span><span class="nl">FIELD SHIFT CHALLENGE</span></p>
       <h1>The farm advisor that <br>reads your field from space.</h1>
       <p class="sub">Send a location pin on WhatsApp. FarmPartner reads 20 years of NASA climate, soil-moisture and vegetation data for that field, then compares your crop rotation with two that fit your climate — with the evidence and the risks to check locally.</p>
-      <form class="optin" novalidate>
+      <form class="optin" data-optin novalidate>
         <div class="row">
           <div class="cc" data-picker><input type="hidden" name="cc" value="1"></div>
           <input type="tel" name="phone" inputmode="tel" autocomplete="tel-national" placeholder="Your WhatsApp number" aria-label="Your WhatsApp number" required>
@@ -251,31 +231,8 @@
     </div>
   </footer>
   <script src="/static/landing/country-picker.js" defer></script>
+  <script src="/static/landing/optin.js" defer></script>
   <script>
-    // Phone opt-in: FarmPartner sends the first WhatsApp message (approved template). If it can't yet,
-    // open WhatsApp with "hi" prefilled so the farmer starts the chat instead.
-    const form = document.querySelector("form.optin"), status = form.querySelector(".status");
-    const say = (html, err) => { status.innerHTML = html; status.classList.toggle("err", !!err); };
-    form.addEventListener("submit", async e => {
-      e.preventDefault();
-      const raw = form.phone.value.trim();
-      const digits = raw.replace(/\D/g, "");
-      if (digits.length < 6) return say("Enter your WhatsApp number.", true);
-      if (!form.consent.checked) return say("Tick the box so we can message you on WhatsApp.", true);
-      const phone = raw.startsWith("+") || !form.cc.value ? "+" + digits : "+" + form.cc.value + digits.replace(/^0+/, "");
-      const btn = form.querySelector("button"); btn.disabled = true; say("Sending…");
-      try {
-        const r = await fetch("/api/optin", {method: "POST", headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({phone, consent: true})});
-        const d = await r.json().catch(() => ({}));
-        if (!r.ok) say(d.detail || "Something went wrong — try again.", true);
-        else if (d.sent) say(d.again ? "Already sent — check WhatsApp for FarmPartner’s message. 📲"
-                                     : "✓ Check WhatsApp — FarmPartner just messaged you. Tap <b>Get started</b>. 📲");
-        else { say(`Opening WhatsApp — just send the “hi” message. <a href="${d.wa_url}" target="_blank" rel="noopener">Didn’t open?</a>`);
-               setTimeout(() => { location.href = d.wa_url; }, 600); }
-      } catch { say("Network error — try again.", true); }
-      btn.disabled = false;
-    });
     // Video: show a grayscale thumbnail first and only load YouTube when the visitor presses play.
     document.querySelector(".facade").addEventListener("click", e => {
       e.preventDefault();

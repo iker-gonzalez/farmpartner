@@ -14,11 +14,12 @@ TEAM = [
             "infrastructure and the AI model at its core, from the cloud setup to the assistant that turns NASA "
             "data into plain-language advice, with an eye on doing it responsibly.",
      "links": {"GitHub": "https://github.com/iker-gonzalez"}},
-    {"name": "Israel Conde", "role": "Storyboard & Design", "profession": "Industrial Mechatronics student",
+    {"name": "Israel Conde C.", "role": "Storyboard & Design", "profession": "Industrial Mechatronics student",
      "photo": "member-02.jpg",
      "bio": "Industrial mechatronics student who gave FarmPartner its visual story. He designed the storyboard "
             "and the look of the project, translating satellites, data and fields into images anyone can "
-            "understand at a glance.",
+            "understand at a glance. He also helped shape the product itself, bringing ideas that grew into "
+            "features of the app.",
      "links": {}},
     {"name": "Janire Martinez", "role": "Agri Data & Research", "profession": "Mechanical Engineering student",
      "photo": "member-03.jpg",

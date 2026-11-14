@@ -14,6 +14,7 @@
 <link rel="icon" href="/static/brand/favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="/static/brand/apple-touch-icon.png">
 <link rel="stylesheet" href="/static/site.css">
+<link rel="stylesheet" href="/static/optin.css">
 <style>
   /* Page-specific styles; shared tokens, header, intro and CTA live in /static/site.css. */
   .toc { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 28px; margin: 48px auto 0; max-width: 900px;
@@ -61,12 +62,39 @@
   .statement { font-size: 30px; font-weight: 500; line-height: 1.3; letter-spacing: -.5px; max-width: 800px; }
   .statement em { font-style: normal; color: var(--lime); }
 
+  /* ---------- Sample report ---------- */
+  .sample-cta { margin: 32px auto 0; font-family: var(--mono); font-size: 13px; }
+  .sample-cta a { color: var(--lime); text-decoration: underline; text-underline-offset: 4px; }
+  .sample-cta a:hover { color: var(--ink); }
+  .showcase { display: grid; grid-template-columns: 300px 1fr; gap: 48px; align-items: start; margin-top: 40px; }
+  .phone { position: relative; display: block; height: 620px; overflow: hidden; border: 1px solid var(--line-2);
+    box-shadow: 8px 8px 0 #000; transition: border-color .2s; }
+  .phone img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+  .phone::after { content: ""; position: absolute; inset: auto 0 0 0; height: 120px; background: linear-gradient(180deg, #0a0a0b00, #0a0a0bf2); }
+  .phone:hover { border-color: var(--lime); }
+  .chat { display: flex; flex-direction: column; gap: 10px; padding: 18px; border: 1px solid var(--line); }
+  .chat-h, .inside-h { font-family: var(--mono); font-size: 12px; letter-spacing: .4px; color: var(--ink-3); }
+  .msg { max-width: 86%; padding: 10px 12px; font-size: 14.5px; line-height: 1.5; }
+  .msg.me { align-self: flex-end; background: #a8f32614; border: 1px solid #a8f32659; color: var(--ink); }
+  .msg.bot { align-self: flex-start; background: #16161a; border: 1px solid var(--line-2); color: var(--ink); }
+  .msg .mono { font-size: 12.5px; color: var(--lime); }
+  .inside-h { margin-top: 32px; }
+  .inside { margin: 12px 0 0; padding: 0; list-style: none; counter-reset: i; }
+  .inside li { display: grid; grid-template-columns: 36px 1fr; column-gap: 8px; padding: 14px 0; border-top: 1px solid var(--line); counter-increment: i; }
+  .inside li::before { content: counter(i, decimal-leading-zero); grid-row: span 2; font-family: var(--mono); font-size: 13px; color: var(--lime); }
+  .inside b { font-weight: 500; font-size: 17px; }
+  .inside span { margin-top: 4px; font-size: 15px; line-height: 1.55; color: var(--ink-2); }
+  .sample-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-top: 28px; }
+  .sample-actions .btn { padding: 15px 20px; }
+  .sample-actions .mono { font-size: 12.5px; color: var(--ink-3); }
+
   .note { margin-top: 32px; font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); }
 
   @media (max-width: 1100px) {
     .sec { grid-template-columns: 1fr; gap: 20px; }
     .label { position: static; }
     .cards.c3 { grid-template-columns: repeat(2, 1fr); }
+    .showcase { grid-template-columns: 260px 1fr; gap: 32px; }
   }
   @media (max-width: 800px) {
     .toc { gap: 8px 18px; font-size: 11.5px; margin-top: 36px; }
@@ -81,6 +109,10 @@
     .steps p { font-size: 15px; }
     .channels { font-size: 12px; gap: 6px; }
     .statement { font-size: 22px; }
+    .sample-cta { font-size: 11.5px; line-height: 1.6; }
+    .showcase { grid-template-columns: 1fr; gap: 32px; }
+    .phone { width: min(300px, 100%); height: 520px; margin: 0 auto; box-shadow: 5px 5px 0 #000; }
+    .sample-actions .btn { width: 100%; justify-content: center; }
   }
 </style>
 </head>
@@ -91,14 +123,16 @@
     <p class="kicker">● WHAT &amp; HOW</p>
     <h1>Satellite data, AI and farmers’ know-how, working for your field.</h1>
     <p class="lead">FarmPartner is an AI engine that helps farmers adapt to climate change and make better decisions about their land. It cross-references NASA Earth observation data, information about each farm and the practical knowledge of experienced farmers, and delivers personalized recommendations through a chatbot on the messaging apps farmers already use.</p>
+    <p class="sample-cta"><a href="#sample-report">■ SEE WHAT A FARMER GETS: A REAL FIELD REPORT ↓</a></p>
     <ul class="toc">
       <li><a href="#what"><span>01</span>WHAT IT DOES</a></li>
       <li><a href="#how"><span>02</span>HOW IT WORKS</a></li>
-      <li><a href="#nasa-data"><span>03</span>NASA DATA</a></li>
-      <li><a href="#channels"><span>04</span>WHERE TO FIND IT</a></li>
-      <li><a href="#impact"><span>05</span>IMPACT</a></li>
-      <li><a href="#different"><span>06</span>WHAT’S DIFFERENT</a></li>
-      <li><a href="#goals"><span>07</span>GOALS</a></li>
+      <li><a href="#sample-report"><span>03</span>SAMPLE REPORT</a></li>
+      <li><a href="#nasa-data"><span>04</span>NASA DATA</a></li>
+      <li><a href="#channels"><span>05</span>WHERE TO FIND IT</a></li>
+      <li><a href="#impact"><span>06</span>IMPACT</a></li>
+      <li><a href="#different"><span>07</span>WHAT’S DIFFERENT</a></li>
+      <li><a href="#goals"><span>08</span>GOALS</a></li>
     </ul>
   </section>
 
@@ -124,7 +158,7 @@
         <ol class="steps">
           <li><span class="n">01</span><div><h3>Tell us about your farm</h3><p>Share basic information about your land: location, water availability, current crops and farming priorities. You can also correct or adjust the environmental data so it better reflects the real conditions of your field.</p></div></li>
           <li><span class="n">02</span><div><h3>We read NASA data for your field</h3><p>The platform brings together several NASA datasets, harmonizes them and adds local weather forecasts, combining long-term environmental patterns with short-term information.</p><a class="more" href="#nasa-data">See the datasets ↓</a></div></li>
-          <li><span class="n">03</span><div><h3>AI analyzes and recommends</h3><p>AI weighs the environmental data alongside your farm’s details to identify suitable crops and propose alternative rotation strategies. You get your current rotation compared with at least two alternatives, with explanations, supporting data, expected benefits, possible risks and confidence levels.</p></div></li>
+          <li><span class="n">03</span><div><h3>AI analyzes and recommends</h3><p>AI weighs the environmental data alongside your farm’s details to identify suitable crops and propose alternative rotation strategies. You get your current rotation compared with at least two alternatives, with explanations, supporting data, expected benefits, possible risks and confidence levels.</p><a class="more" href="#sample-report">See a sample report ↓</a></div></li>
           <li><span class="n">04</span><div><h3>Farmer knowledge, built in</h3><p>Experienced farmers contribute practical know-how on crops, soils, planting periods and regional conditions. It is organized into a knowledge base the AI consults, so every recommendation combines scientific evidence with real field experience.</p></div></li>
           <li><span class="n">05</span><div><h3>Ongoing support</h3><p>FarmPartner sends weather alerts, spots chances to make better use of the land between harvests and suggests cover crops or alternative uses such as grazing. Just ask the chatbot, by text or voice note, whenever you need it.</p></div></li>
           <li><span class="n">06</span><div><h3>Global knowledge exchange</h3><p>NASA data covers the whole planet, so FarmPartner can connect farming communities facing similar climates. Through climate-analogue analysis, farmers discover regions already living the conditions their own area may face in the future, and learn from how they adapted.</p></div></li>
@@ -132,8 +166,39 @@
       </div>
     </section>
 
+    <section class="sec" id="sample-report">
+      <p class="label"><b>03</b>SAMPLE REPORT</p>
+      <div class="body">
+        <h2>Every conversation ends in a field report.</h2>
+        <p>When a farmer talks to the FarmPartner engine through a messaging app (for now, WhatsApp), the chatbot answers right in the chat and sends back a link to a full field report like this one. It is a real example, generated by the engine for a dryland farm in Finney County, Kansas.</p>
+        <div class="showcase">
+          <a class="phone" href="https://farmpartner.space/sample" target="_blank" rel="noopener" aria-label="Open the sample field report">
+            <img src="/static/landing/sample-report.jpg" alt="Sample FarmPartner field report for Finney County, Kansas: the bottom line, scores and the field seen from orbit" width="375" height="1000" loading="lazy">
+          </a>
+          <div class="side">
+            <div class="chat" aria-label="How the report arrives in the chat">
+              <p class="chat-h">● IN THE CHAT</p>
+              <p class="msg me">📍 Location pin · wheat → sorghum · goal: soil health</p>
+              <p class="msg bot">Your field report is ready 🌱<br><span class="mono">farmpartner.space/r/…</span></p>
+            </div>
+            <p class="inside-h">WHAT’S INSIDE</p>
+            <ol class="inside">
+              <li><b>The bottom line</b><span>The rotation that best fits your goals, scored against what you grow today.</span></li>
+              <li><b>What NASA sees</b><span>Your field from orbit, rainfall and water balance, frost and heat, soil moisture and groundwater trends.</span></li>
+              <li><b>Today vs. two alternatives</b><span>Rotations compared on water use, soil health, erosion, pest breaks, income potential and drought resilience.</span></li>
+              <li><b>Why it fits</b><span>The evidence behind each option and the risks to check locally.</span></li>
+            </ol>
+            <div class="sample-actions">
+              <a class="btn" href="https://farmpartner.space/sample" target="_blank" rel="noopener">OPEN THE SAMPLE REPORT ↗</a>
+              <span class="mono">farmpartner.space/sample</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="sec data" id="nasa-data">
-      <p class="label"><b>03</b>NASA DATA</p>
+      <p class="label"><b>04</b>NASA DATA</p>
       <div class="body">
         <h2>Six NASA missions, read for one field.</h2>
         <p>Each dataset answers a different question about your land. Together, and alongside local forecasts, they describe the past and near future of your field’s climate.</p>
@@ -149,7 +214,7 @@
     </section>
 
     <section class="sec" id="channels">
-      <p class="label"><b>04</b>WHERE TO FIND IT</p>
+      <p class="label"><b>05</b>WHERE TO FIND IT</p>
       <div class="body">
         <h2>In the apps you already use. No app to learn.</h2>
         <p>There is nothing to install or learn. The AI engine is connected to a chatbot that lives inside everyday messaging apps: farmers simply write or send a voice note, in their own language. That makes advanced agricultural technology accessible even to farmers with limited digital skills.</p>
@@ -166,7 +231,7 @@
     </section>
 
     <section class="sec" id="impact">
-      <p class="label"><b>05</b>BENEFITS &amp; IMPACT</p>
+      <p class="label"><b>06</b>BENEFITS &amp; IMPACT</p>
       <div class="body">
         <h2>Good for the land, the farm and the people who work it.</h2>
         <div class="cards c2">
@@ -179,7 +244,7 @@
     </section>
 
     <section class="sec" id="different">
-      <p class="label"><b>06</b>WHAT’S DIFFERENT</p>
+      <p class="label"><b>07</b>WHAT’S DIFFERENT</p>
       <div class="body">
         <p class="statement">Not generic advice. Recommendations built for <em>your</em> conditions, <em>your</em> resources and <em>your</em> priorities.</p>
         <div class="cards c3">
@@ -191,7 +256,7 @@
     </section>
 
     <section class="sec" id="goals">
-      <p class="label"><b>07</b>WHAT WE HOPE TO ACHIEVE</p>
+      <p class="label"><b>08</b>WHAT WE HOPE TO ACHIEVE</p>
       <div class="body">
         <h2>From a hackathon to a global farming network.</h2>
         <div class="cards c3">
@@ -205,5 +270,7 @@
   </main>
 
   {% include "_cta_footer.html" %}
+  <script src="/static/landing/country-picker.js" defer></script>
+  <script src="/static/landing/optin.js" defer></script>
 </body>
 </html>

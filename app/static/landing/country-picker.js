@@ -33,14 +33,14 @@ NA Namibia 264|BW Botswana 267|ZA South Africa 27|LS Lesotho 266|SZ Eswatini 268
   const flag = iso => String.fromCodePoint(...[...iso].map(c => 127397 + c.charCodeAt(0)));
   const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
-  document.querySelectorAll("[data-picker]").forEach(root => {
+  document.querySelectorAll("[data-picker]").forEach((root, k) => {
     const hidden = root.querySelector("input[type=hidden]");
     root.insertAdjacentHTML("beforeend", `
       <button type="button" class="cc-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Country code"></button>
       <div class="cc-pop" hidden>
         <input class="cc-search" type="text" placeholder="Search country or code" aria-label="Search country"
-               autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="cc-list">
-        <ul class="cc-list" id="cc-list" role="listbox"></ul>
+               autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="cc-list-${k}">
+        <ul class="cc-list" id="cc-list-${k}" role="listbox"></ul>
       </div>`);
     const btn = root.querySelector(".cc-btn"), pop = root.querySelector(".cc-pop");
     const search = root.querySelector(".cc-search"), list = root.querySelector(".cc-list");
@@ -58,7 +58,7 @@ NA Namibia 264|BW Botswana 267|ZA South Africa 27|LS Lesotho 266|SZ Eswatini 268
       active = Math.max(0, shown.indexOf(current));
       if (q) active = 0;
       list.innerHTML = shown.length ? shown.map((c, i) =>
-        `<li role="option" id="cc-${c.iso}" data-i="${i}" aria-selected="${c === current}" class="${i === active ? "on" : ""}">
+        `<li role="option" id="cc-${k}-${c.iso}" data-i="${i}" aria-selected="${c === current}" class="${i === active ? "on" : ""}">
            <span class="f">${flag(c.iso)}</span><span class="n">${c.name}</span><span class="d">+${c.dial}</span></li>`).join("")
         : `<li class="none">No match — type your number with + and its code</li>`;
       highlight();
