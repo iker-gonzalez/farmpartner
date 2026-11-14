@@ -166,3 +166,31 @@ def test_tree_crops_become_an_orchard_and_photos_name_the_crop(offline, monkeypa
     c.post("/twilio/webhook", data={"From": "whatsapp:+15550003333", "MediaUrl0": "u", "MediaContentType0": "image/jpeg",
                                     "NumMedia": "1"})
     assert sent[0] == "📷 That looks like *corn*." and "Continuous corn" in sent[1]
+
+
+def test_button_taps_keep_language_and_questions_see_the_last_photo(offline, monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from app import agent, chat, i18n, media, messaging
+    from app.db import Farmer, session
+    from app.main import app
+    c = TestClient(app)
+    c.post("/api/chat", json={"phone": "btn2", "text": "Kaixo, zer moduz zaude?"})
+    with session() as db:
+        fm = db.query(Farmer).filter_by(phone="web:btn2").one()
+        assert fm.language == "eu"
+    c.post("/api/chat", json={"phone": "btn2", "text": "should I water this week?"})   # a tapped button id
+    with session() as db:
+        assert db.query(Farmer).filter_by(phone="web:btn2").one().language == "eu"
+    assert i18n.detect("should I water this week?") == "en"    # typed by a person it still means English
+    # a photo, then a question about it: the agent gets the image
+    seen = []
+    monkeypatch.setattr(messaging, "send", lambda to, m: None)
+    monkeypatch.setattr(media, "download", lambda url: (b"\xff\xd8jpeg", "image/jpeg"))
+    monkeypatch.setattr(agent, "identify_crop", lambda image: "")
+    monkeypatch.setattr(agent, "answer", lambda f, t, image=None: seen.append(image is not None) or "ok")
+    c.post("/twilio/webhook", data={"From": "whatsapp:+15550004444", "Body": "hi"})
+    c.post("/twilio/webhook", data={"From": "whatsapp:+15550004444", "MediaUrl0": "u", "MediaContentType0": "image/jpeg",
+                                    "NumMedia": "1"})
+    c.post("/twilio/webhook", data={"From": "whatsapp:+15550004444", "Body": "How does my barley look to you?"})
+    assert seen and seen[-1] is True

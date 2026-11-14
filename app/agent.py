@@ -446,4 +446,15 @@ def identify_crop(image: dict) -> str:
         log.warning("crop identification failed", exc_info=True)
         return ""
     name = name.strip().strip(".").lower()
+    if (not name or "unknown" in name) and _fast["ok"]:  # the small model wasn't sure: ask the main model once
+        try:
+            resp = claude_client().beta.messages.create(
+                model=config.ANTHROPIC_MODEL, max_tokens=20, output_config={"effort": "low"},
+                betas=["server-side-fallback-2026-07-01"], fallbacks="default",
+                system="You identify crops in farmers' photos. Reply with ONLY the crop's common English name in 1-3 "
+                       "words, or 'unknown' if no crop is visible.",
+                messages=[{"role": "user", "content": [image, {"type": "text", "text": "Which crop is this?"}]}])
+            name = "".join(b.text for b in resp.content if b.type == "text").strip().strip(".").lower()
+        except Exception:
+            log.warning("crop identification (main model) failed", exc_info=True)
     return "" if not name or "unknown" in name or len(name) > 40 else name

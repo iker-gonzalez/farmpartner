@@ -1,5 +1,6 @@
 """One entry point for every channel (WhatsApp, SMS, web simulator, CLI)."""
 import re
+import time
 from dataclasses import dataclass
 from typing import Callable
 
@@ -20,7 +21,7 @@ def inbound(phone: str, channel: str, text: str, lat: float | None = None, lon: 
     with session() as db:
         farmer = service.get_or_create_farmer(db, phone, channel)
     onboarding.record(farmer.id, "in", text or "", lat, lon, media_url)
-    lang = i18n.detect(text or "")
+    lang = None if (text or "").strip().lower() in onboarding.button_ids() else i18n.detect(text or "")
     if lang and lang != farmer.language:
         with session() as db:
             from app.db import Farmer
@@ -72,24 +73,54 @@ def inbound(phone: str, channel: str, text: str, lat: float | None = None, lon: 
         unit, lang = units.preferred(farmer), farmer.language
 
         def answer_then_step():
-            step = onboarding.current_step(farmer)
-            return [agent.answer(farmer, text or "")] + i18n.translate(units.convert(step) if unit == "metric"
-                                                                       else step, lang)
+            step = onboarding.current_step(farmer) if _remind(farmer.id) else []
+            return [agent.answer(farmer, text or "", image=recent_photo(farmer.id))] + i18n.translate(
+                units.convert(step) if unit == "metric" else step, lang)
         return _out(farmer.id, Turn(now=[], later=answer_then_step))
     reply = onboarding.handle(farmer, text or "", lat, lon)
     if reply is not None and reply.to_agent:
         unit, lang = units.preferred(farmer), farmer.language
 
         def agent_then_step():
-            step = onboarding.current_step(farmer)
-            return [agent.answer(farmer, text or "")] + i18n.translate(units.convert(step) if unit == "metric"
-                                                                       else step, lang)
+            step = onboarding.current_step(farmer) if _remind(farmer.id) else []
+            return [agent.answer(farmer, text or "", image=recent_photo(farmer.id))] + i18n.translate(
+                units.convert(step) if unit == "metric" else step, lang)
         return _out(farmer.id, Turn(now=[], later=agent_then_step))
     if reply is None:  # onboarded: free conversation, answered in the background (LLM can take a few seconds)
         def later():
-            return [agent.answer(farmer, text or "")]
+            return [agent.answer(farmer, text or "", image=recent_photo(farmer.id))]
         return _out(farmer.id, Turn(now=[], later=later))  # Claude already answers in the farmer's language and units
     return _out(farmer.id, Turn(now=reply.now, later=reply.later), farmer.language, units.preferred(farmer))
+
+
+_photos: dict[int, tuple[float, dict]] = {}
+_reminded: dict[int, float] = {}
+PHOTO_MEMORY_S = 600
+REMIND_EVERY_S = 180
+
+
+def remember_photo(farmer_id: int, image: dict | None) -> None:
+    if image is not None:
+        _photos[farmer_id] = (time.time(), image)
+
+
+def recent_photo(farmer_id: int) -> dict | None:
+    """The farmer's photo from the last 10 minutes, so "how does my barley look?" right after it can see it.
+    Used once."""
+    t, img = _photos.get(farmer_id, (0.0, None))
+    if img is not None and time.time() - t <= PHOTO_MEMORY_S:
+        _photos.pop(farmer_id, None)
+        return img
+    return None
+
+
+def _remind(farmer_id: int) -> bool:
+    """Repeat the setup step after an answer at most every few minutes, not after every single question."""
+    now_t = time.time()
+    if now_t - _reminded.get(farmer_id, 0) < REMIND_EVERY_S:
+        return False
+    _reminded[farmer_id] = now_t
+    return True
 
 
 def speech_languages(phone: str) -> list[str]:
@@ -109,6 +140,15 @@ def photo(phone: str, channel: str, image: dict | None, caption: str, media_url:
     with session() as db:
         farmer = service.get_or_create_farmer(db, phone, channel)
     onboarding.record(farmer.id, "in", ("[sent a photo] " + caption).strip(), media_url=media_url)
+    cap_lang = i18n.detect(caption or "")
+    if cap_lang and cap_lang != farmer.language:
+        with session() as db:
+            from app.db import Farmer
+            db.get(Farmer, farmer.id).language = cap_lang
+            db.commit()
+        farmer.language = cap_lang
+    if farmer.state != "ready" or not (caption or "").strip():
+        remember_photo(farmer.id, image)  # a question right after the photo will get to see it
     if farmer.state == "awaiting_crops" and image is not None:
         # A photo at the crop step answers "what do you grow?": identify the crop and carry on with setup.
         unit, lang = units.preferred(farmer), farmer.language

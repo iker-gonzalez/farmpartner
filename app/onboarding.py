@@ -87,7 +87,7 @@ QUESTION = re.compile(r"[?¿？]|^\s*(what|which|how|when|why|where|should|can|c
                       r"cuáles|cómo|como|cuándo|dónde|por qué|debo|puedo|zer|zein|nola|noiz|non|zergatik|quel|quelle|"
                       r"comment|pourquoi|o que|qual|quais|quando|onde|was|wie|wann|welche|warum|cosa|quale|perché)\b",
                       re.I)
-MID_ONBOARDING = ("awaiting_crops", "awaiting_irrigation", "awaiting_priority", "awaiting_more_goals",
+MID_ONBOARDING = ("awaiting_location", "awaiting_crops", "awaiting_irrigation", "awaiting_priority", "awaiting_more_goals",
                   "awaiting_goal_text")
 
 
@@ -511,3 +511,11 @@ def static_messages() -> list:
             "📷 Got it — taking a look…", "I heard:",
             "👍 Got it — I'll use metric units: mm of rain and water, °C, hectares.",
             "Pick another goal."]
+
+
+def button_ids() -> set[str]:
+    """Ids of every tap-able choice: a tap sends the id (an English phrase), which must not count as language."""
+    ids = {"compare now", "add goal", "get started", "not now", "report", "6"}
+    for m in (PRIORITY_PROMPT, CROPS_PROMPT, IRRIGATION_PROMPT, NEXT_PROMPT):
+        ids |= {b["id"] for b in m.get("buttons", [])} | {i["id"] for i in (m.get("list") or {}).get("items", [])}
+    return {i.lower() for i in ids}
