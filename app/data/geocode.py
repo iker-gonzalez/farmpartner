@@ -44,6 +44,15 @@ def _plain(x: str) -> str:
     return "".join(c for c in unicodedata.normalize("NFKD", (x or "").lower()) if not unicodedata.combining(c))
 
 
+def _close(query: str, name: str) -> bool:
+    """Every searched word matches a word of the place name, allowing one letter's difference
+    ("Galapago" ≈ "Galápagos")."""
+    def near(a: str, b: str) -> bool:
+        return a == b or (abs(len(a) - len(b)) <= 1 and (a.startswith(b) or b.startswith(a)))
+    name_words = re.findall(r"\w+", _plain(name))
+    return all(any(near(q, n) for n in name_words) for q in re.findall(r"\w+", _plain(query)) if len(q) > 2)
+
+
 def place_to_point(text: str, lang: str = "en") -> tuple[float, float, str] | None:
     """A town, region or island name ("Bilbao", "soy residente en Bilbao", "Islas Galápagos", "Garden City Kansas")
     via Open-Meteo's free geocoder. Tries the whole phrase, then shorter runs of words; a partial match must contain
@@ -65,8 +74,8 @@ def place_to_point(text: str, lang: str = "en") -> tuple[float, float, str] | No
                                {"name": run, "count": 10, "language": lg}, ttl_s=0).get("results") or []
             except Exception:
                 continue
+            res = [r for r in res if _close(run, r.get("name", ""))]  # "hello" must not land on "Hellouw"
             if strict:
-                res = [r for r in res if re.search(rf"\b{re.escape(_plain(run))}\b", _plain(r.get("name")))]
                 if others:  # "Garden City Kansas": keep the Garden City whose state/country matches "Kansas"
                     res = [r for r in res if any(o in _plain(" ".join(str(r.get(k, "")) for k in
                                                 ("admin1", "admin2", "country", "country_code"))) for o in others)] or (
