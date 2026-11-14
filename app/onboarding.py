@@ -294,7 +294,10 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
         if low.strip("!.¡ ") in GREETINGS:
             return Reply(now=[WELCOME])
         if re.search(r"[^\W\d_]{3}", t):
-            pl = place_to_point(t, farmer.language)
+            try:
+                pl = place_to_point(t, farmer.language)
+            except Exception:
+                pl = None  # a geocoder hiccup must not break the chat: fall through to the location prompt
             if pl:
                 r = _set_location(farmer, pl[0], pl[1], pl[2])
                 r.now.insert(0, f"📍 I'll use {pl[2]} as an approximate location. For data about your exact field, "

@@ -141,3 +141,10 @@ def test_pasted_coordinates_and_duplicate_pins(offline):
 def test_favicon(offline):
     r = _client().get("/favicon.ico")
     assert r.status_code == 200 and r.headers["content-type"] == "image/png"
+
+
+def test_place_on_the_equator(monkeypatch):
+    from app.data import geocode
+    monkeypatch.setattr(geocode, "get_json", lambda *a, **k: {"results": [
+        {"name": "Islas galápagos", "longitude": -90.5, "country_code": "EC", "admin1": "Galápagos"}]})
+    assert geocode.place_to_point("Islas Galapago", "es") == (0.0, -90.5, "Islas galápagos, Galápagos, EC")

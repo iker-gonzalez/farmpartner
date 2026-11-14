@@ -49,7 +49,8 @@ def place_to_point(text: str, lang: str = "en") -> tuple[float, float, str] | No
         if res:
             r = res[0]
             label = ", ".join(x for x in (r.get("name"), r.get("admin1"), r.get("country_code")) if x)
-            return float(r["latitude"]), float(r["longitude"]), label
+            # the API omits zero values: the Galápagos (on the equator) come back without "latitude"
+            return float(r.get("latitude", 0.0)), float(r.get("longitude", 0.0)), label
     return None
 
 STATES = {"01": "AL", "02": "AK", "04": "AZ", "05": "AR", "06": "CA", "08": "CO", "09": "CT", "10": "DE", "12": "FL",
