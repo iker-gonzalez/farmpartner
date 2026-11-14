@@ -14,6 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="/static/landing/hero.jpg" media="(min-width: 801px)">
+<link rel="stylesheet" href="/static/optin.css">  <!-- also styles the "● LIVE" WhatsApp channel chip -->
 <style>
   :root {
     --bg: #0a0a0b; --ink: #f4f4f5; --ink-2: #c8c8ce; --ink-3: #adadb7; --line: #34343a; --line-2: #5a5a63;
@@ -65,9 +66,9 @@
   .ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding-top: 8px; }
   .ctas .btn, .ctas .ghost { padding: 15px 20px; }
   .ctas .btn svg { width: 18px; height: 18px; }
-  .ghost { display: inline-flex; align-items: center; border: 1px solid var(--line-2); background: #0a0a0bcc;
+  .ghost { display: inline-flex; align-items: center; border: 1px solid var(--ink); background: var(--bg); box-shadow: 4px 4px 0 #000;
     font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
-  .ghost:hover { border-color: var(--ink); }
+  .ghost:hover { border-color: var(--lime); color: var(--lime); }
   .channels { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 0; list-style: none;
     font-family: var(--mono); font-size: 12px; margin-top: -6px; }
   .channels li { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px;
