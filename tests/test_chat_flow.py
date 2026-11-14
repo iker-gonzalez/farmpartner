@@ -127,7 +127,7 @@ def test_landing_copy_follows_whatsapp_prefill(monkeypatch):
     assert "Scan to join on WhatsApp" in page and "text=join%20shelter-gently" in page
     monkeypatch.setattr(config, "WHATSAPP_PREFILL", "hi")
     page = c.get("/").text
-    assert "Text “hi” on WhatsApp" in page and "SEND ME A WHATSAPP" in page and 'name="consent"' in page
+    assert "Text “hi” on WhatsApp" in page and "READ MY FIELD FROM SPACE" in page and "CHAT NOW" in page and 'name="consent"' in page
 
 
 
