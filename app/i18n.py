@@ -19,7 +19,7 @@ _lock = threading.Lock()
 _loaded: set[str] = set()
 
 
-CACHE_VERSION = 3  # bump when the glossary or prompt changes, so cached translations are redone
+CACHE_VERSION = 4  # bump when the glossary or prompt changes, so cached translations are redone
 
 
 def _store_name(lang: str) -> str:
@@ -175,7 +175,8 @@ GLOSSARY = {
     "es": " Always address the farmer as \"usted\" (never \"tú\"), consistently in every string. Use these farming terms (Spain's usage, understood everywhere): dryland = secano (\"de secano\"), "
           "irrigated = regadío (\"de regadío\"), rain-fed = secano (never \"temporal\"), soybeans = soja, "
           "corn = maíz, elevators/buyers = cooperativas o compradores, ZIP code = código postal, extension agent = "
-          "técnico agrícola o agrónomo, cover crop = cubierta vegetal o cultivo de cobertura, fallow = barbecho.",
+          "técnico agrícola o agrónomo, cover crop = cubierta vegetal o cultivo de cobertura, fallow = barbecho, orchard = plantación leñosa (never "
+          "\"huerto\", which means a vegetable garden), tree crop = cultivo leñoso.",
 }
 
 
