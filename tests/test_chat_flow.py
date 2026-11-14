@@ -71,3 +71,43 @@ def test_landing_and_simulator_pages():
 def test_admin_sample_requires_token():
     c = _client()
     assert c.post("/admin/sample", data={"token": "wrong"}).status_code == 403
+
+
+def test_api_rate_limit(offline):
+    from app import ratelimit
+
+    ratelimit.reset()
+    c = _client()
+    codes = [c.post("/api/chat", json={"phone": "flood", "text": "hello"}).status_code for _ in range(14)]
+    assert codes[:12] == [200] * 12 and codes[-1] == 429
+    ratelimit.reset()
+
+
+def test_daily_job_auth_and_refresh(offline, monkeypatch):
+    import datetime as dt
+
+    from app.db import Farmer, session
+
+    monkeypatch.setenv("ADMIN_TOKEN", "t0ken")
+    c = _client()
+    for kw in ({"text": "hi"}, {"lat": 38.05, "lon": -100.75}, {"text": "yes dryland"}, {"text": "2"}):
+        say(c, "daily", **kw)
+    with session() as db:
+        fld = db.query(Farmer).filter_by(phone="web:daily").one().fields[-1]
+        fld.features_at = dt.datetime(2020, 1, 1)
+        db.commit()
+    assert c.post("/internal/daily").status_code == 403
+    assert c.post("/internal/daily", headers={"Authorization": "Bearer forged"}).status_code == 403
+    r = c.post("/internal/daily", data={"token": "t0ken"})
+    assert r.status_code == 200 and r.json()["refreshed"] >= 1
+
+
+def test_landing_copy_follows_whatsapp_prefill(monkeypatch):
+    from app import config
+
+    c = _client()
+    monkeypatch.setattr(config, "WHATSAPP_PREFILL", "join shelter-gently")
+    page = c.get("/").text
+    assert "JOIN ON WHATSAPP" in page and "text=join%20shelter-gently" in page
+    monkeypatch.setattr(config, "WHATSAPP_PREFILL", "hi")
+    assert "TEXT “HI” ON WHATSAPP" in c.get("/").text

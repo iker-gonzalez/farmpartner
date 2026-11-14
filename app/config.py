@@ -22,6 +22,9 @@ TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
 TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM", "whatsapp:+14155238886")  # Twilio sandbox number
 TWILIO_SMS_FROM = os.getenv("TWILIO_SMS_FROM", "")
+# Cloud Scheduler calls /internal/daily with a Google-signed OIDC token for this service account + audience.
+SCHEDULER_SA_EMAIL = os.getenv("SCHEDULER_SA_EMAIL", "")
+SCHEDULER_AUDIENCE = os.getenv("SCHEDULER_AUDIENCE", "")
 # First WhatsApp message prefilled by the landing page (sandbox: "join <code>").
 WHATSAPP_PREFILL = os.getenv("WHATSAPP_PREFILL", "hi")
 

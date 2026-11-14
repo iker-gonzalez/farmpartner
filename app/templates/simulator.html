@@ -42,6 +42,7 @@
     phone = localStorage.fpPhone || phone;
     add(label, 'out');
     const r = await fetch('/api/chat', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({phone, wait: false, ...body}) });
+    if (r.status === 429) { add('⏳ Too many messages — please wait a minute.', 'sys'); return; }
     const j = await r.json(); (j.messages || []).forEach(m => add(m, 'in'));
     if (j.pending) poll(add('⏳ working…', 'sys'));
   }

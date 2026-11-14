@@ -70,3 +70,13 @@ def test_chat_summary_is_short(hastings):
     res = explain(compare(hastings, ["soil_health"], irrigated=True), hastings)
     txt = chat_summary(res, "http://x/r/abc")
     assert len(txt) < 1500 and "extension" in txt
+
+
+def test_grace_decline_shows_in_evidence_benefits_and_risks(hastings):
+    f = dict(hastings)
+    f["grace"] = {"trend_cm_per_yr": -2.0, "period": "2002–2026"}
+    res = explain(compare(f, ["save_water"], irrigated=True), f)
+    s = res["strategies"]
+    assert any(e["source"] == "NASA GRACE/GRACE-FO" and "in/yr" in e["value"] for e in s[0]["evidence"])
+    assert any("GRACE" in r for r in s[0]["risks"])  # thirsty irrigated corn today
+    assert any("regional signal" in g for g in s[0]["gaps"])

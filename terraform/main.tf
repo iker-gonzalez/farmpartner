@@ -36,6 +36,8 @@ locals {
     TWILIO_SMS_FROM      = var.twilio_sms_from
     WHATSAPP_PREFILL     = var.whatsapp_prefill
     CACHE_BUCKET         = google_storage_bucket.cache.name
+    SCHEDULER_SA_EMAIL   = "farmpartner-scheduler@${var.project_id}.iam.gserviceaccount.com"
+    SCHEDULER_AUDIENCE   = "${local.run_url}/internal/daily"
     }, { for k, v in {
       ANTHROPIC_FEDERATION_RULE_ID = var.anthropic_federation_rule_id
       ANTHROPIC_ORGANIZATION_ID    = var.anthropic_organization_id

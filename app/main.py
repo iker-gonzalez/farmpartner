@@ -9,7 +9,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from sqlalchemy import select
 
-from app import chat, config, landing, messaging, service
+from app import chat, config, landing, messaging, ratelimit, service
 from app.db import Farmer, Field, init_db, session
 from app.engine.explain import DISCLAIMER, SCORE_LABELS, evidence, gaps, inch, short_name
 from app.engine.scoring import PRIORITY_LABELS
@@ -51,6 +51,8 @@ async def twilio_webhook(request: Request, background: BackgroundTasks):
         if not RequestValidator(config.TWILIO_AUTH_TOKEN).validate(url, form, request.headers.get("X-Twilio-Signature", "")):
             raise HTTPException(403, "invalid Twilio signature")
     sender = form.get("From", "")
+    if not ratelimit.allow("wh:" + sender, ratelimit.WEBHOOK_PER_SENDER):
+        return _twiml([])  # silently drop floods; no outbound message, no cost
     channel = "whatsapp" if sender.startswith("whatsapp:") else "sms"
     lat = float(form["Latitude"]) if form.get("Latitude") else None
     lon = float(form["Longitude"]) if form.get("Longitude") else None
@@ -85,8 +87,13 @@ def _deliver_later(key: str, later):
 
 
 @app.post("/api/chat")
-def api_chat(msg: ChatIn):
+def api_chat(msg: ChatIn, request: Request):
     """Chat for the web simulator, tests and demos without WhatsApp."""
+    if len(msg.phone) > 64 or len(msg.text) > 1000:
+        raise HTTPException(400, "message too long")
+    if not (ratelimit.allow("ip:" + ratelimit.client_ip(request), ratelimit.API_PER_IP)
+            and ratelimit.allow("ph:" + msg.phone, ratelimit.API_PER_PHONE)):
+        raise HTTPException(429, "Too many messages — please wait a minute.")
     key = "web:" + msg.phone
     turn = chat.inbound(key, "web", msg.text, msg.lat, msg.lon)
     out = list(turn.now)
@@ -110,7 +117,7 @@ def api_poll(phone: str):
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
     return templates.TemplateResponse(request, "landing.html", {
-        "repo": landing.REPO_URL, "whatsapp": landing.whatsapp_url(),
+        "repo": landing.REPO_URL, "whatsapp": landing.whatsapp_url(), "wa": landing.whatsapp_copy(),
         "sprout_path": landing.SPROUT_PATH, "whatsapp_path": landing.WHATSAPP_PATH})
 
 
@@ -184,21 +191,75 @@ def report(request: Request, public_id: str):
     })
 
 
+def _send_alerts(db) -> int:
+    sent = 0
+    for fm in db.scalars(select(Farmer).where(Farmer.state == "ready")):
+        fld = service.main_field(fm)
+        if not fld or fm.phone.startswith("sample:"):
+            continue
+        for body in service.check_alerts(db, fld):
+            if not fm.phone.startswith(("web:", "cli:")):
+                try:
+                    messaging.send(fm.phone, body)
+                except Exception:  # e.g. WhatsApp's 24 h session window closed; keep going
+                    log.exception("alert to %s failed", fm.phone)
+            sent += 1
+    return sent
+
+
+def _refresh_stale_fields(db, max_fields: int = 10, older_than_days: int = 7) -> int:
+    """Re-run the NASA/USDA analysis for fields whose snapshot is older than a week (oldest first)."""
+    import datetime as _dt
+
+    cutoff = _dt.datetime.utcnow() - _dt.timedelta(days=older_than_days)
+    stale = db.scalars(select(Field).where((Field.features_at == None) | (Field.features_at < cutoff))  # noqa: E711
+                       .order_by(Field.features_at.asc().nullsfirst()).limit(max_fields)).all()
+    done = 0
+    for fld in stale:
+        try:
+            service.analyze_field(db, fld, with_ndvi=True)
+            done += 1
+        except Exception:
+            log.exception("refresh failed for field %s", fld.id)
+    return done
+
+
+def _authorized_job(request: Request, token: str) -> bool:
+    if token and token == os.getenv("ADMIN_TOKEN", ""):
+        return True
+    auth = request.headers.get("authorization", "")
+    if not (auth.startswith("Bearer ") and config.SCHEDULER_SA_EMAIL and config.SCHEDULER_AUDIENCE):
+        return False
+    try:
+        from google.auth.transport import requests as g_requests
+        from google.oauth2 import id_token
+
+        claims = id_token.verify_oauth2_token(auth[7:], g_requests.Request(), audience=config.SCHEDULER_AUDIENCE)
+    except Exception:
+        log.warning("rejected scheduler token", exc_info=True)
+        return False
+    return claims.get("email") == config.SCHEDULER_SA_EMAIL and claims.get("email_verified", False)
+
+
+@app.post("/internal/daily")
+def daily_job(request: Request, token: str = Form("")):
+    """Daily: frost/heat/irrigation alerts, then refresh week-old field snapshots. Called by Cloud Scheduler
+    (Google-signed OIDC token) or manually with the admin token."""
+    if not _authorized_job(request, token):
+        raise HTTPException(403)
+    with session() as db:
+        alerts = _send_alerts(db)
+        refreshed = _refresh_stale_fields(db)
+    log.info("daily job: %s alerts, %s fields refreshed", alerts, refreshed)
+    return {"alerts": alerts, "refreshed": refreshed}
+
+
 @app.post("/admin/alerts/run")
 def run_alerts(token: str = Form("")):
     if token != os.getenv("ADMIN_TOKEN", "") or not token:
         raise HTTPException(403)
-    sent = 0
     with session() as db:
-        for fm in db.scalars(select(Farmer).where(Farmer.state == "ready")):
-            fld = service.main_field(fm)
-            if not fld:
-                continue
-            for body in service.check_alerts(db, fld):
-                if not fm.phone.startswith(("web:", "cli:")):
-                    messaging.send(fm.phone, body)
-                sent += 1
-    return {"alerts": sent}
+        return {"alerts": _send_alerts(db)}
 
 
 @app.get("/health")

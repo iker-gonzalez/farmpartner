@@ -19,3 +19,12 @@ def whatsapp_url() -> str:
 
     number = re.sub(r"\D", "", config.TWILIO_WHATSAPP_FROM)
     return f"https://wa.me/{number}?text={quote(config.WHATSAPP_PREFILL)}"
+
+
+def whatsapp_copy() -> dict:
+    """CTA wording that matches the prefilled first message."""
+    if config.WHATSAPP_PREFILL.lower().startswith("join "):
+        return {"cta": "JOIN ON WHATSAPP →", "chip": "Scan to join on WhatsApp",
+                "alt": "QR code: open WhatsApp and join FarmPartner"}
+    return {"cta": "TEXT “HI” ON WHATSAPP →", "chip": "Text “hi” on WhatsApp",
+            "alt": "QR code: open WhatsApp and text “hi” to FarmPartner"}

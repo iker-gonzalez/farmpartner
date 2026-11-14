@@ -48,7 +48,8 @@ def evidence(f: dict) -> list[dict]:
         ev.append({"metric": "Soil", "value": f'{soil["map_unit"]}; organic matter {soil["om_pct"]}%, slope {soil["slope_pct"]}%',
                    "source": "USDA NRCS SSURGO"})
     if g:
-        ev.append({"metric": "Water storage trend (incl. groundwater)", "value": f'{g["trend_cm_per_yr"]:+.1f} cm/yr ({g["period"]})',
+        ev.append({"metric": "Water storage trend (groundwater + soil + surface)",
+                   "value": f'{g["trend_cm_per_yr"] / 2.54:+.2f} in/yr ({g["trend_cm_per_yr"]:+.1f} cm/yr), {g["period"]}',
                    "source": "NASA GRACE/GRACE-FO"})
     return ev
 
@@ -88,10 +89,33 @@ def _benefits(s: dict, f: dict) -> list[str]:
     return b
 
 
+def _water_benefit(s: dict, cur: dict | None, f: dict) -> str | None:
+    decline = _grace_decline(f)
+    if not (decline and cur and not s.get("is_current")):
+        return None
+    saved = cur["metrics"]["water_need_mm_per_yr"] - s["metrics"]["water_need_mm_per_yr"]
+    if saved >= 40:
+        return (f"Needs ~{inch(saved)} in/yr less water than today, where NASA GRACE shows water storage "
+                f"falling ~{decline} in/yr.")
+    return None
+
+
+def _grace_decline(f: dict) -> float | None:
+    """Inches/yr of water-storage loss if NASA GRACE shows a meaningful decline here, else None."""
+    g = f.get("grace")
+    if g and g["trend_cm_per_yr"] <= -0.5:
+        return round(-g["trend_cm_per_yr"] / 2.54, 2)
+    return None
+
+
 def _risks(s: dict, f: dict, irrigated: bool | None) -> list[str]:
     C = crops()
     ids = set(s["years"])
     r = list(s.get("issues", []))
+    decline = _grace_decline(f)
+    if decline and irrigated and s["metrics"]["water_need_mm_per_yr"] >= 450:
+        r.append(f"NASA GRACE shows water storage here falling ~{decline} in/yr since 2002 — a thirsty irrigated "
+                 "rotation adds to the aquifer drawdown.")
     niche = {"sorghum": "grain sorghum", "sunflower": "sunflower", "canola": "canola", "field_peas": "field peas",
              "proso_millet": "proso millet", "cotton": "cotton (needs a gin nearby)", "triticale": "forage triticale",
              "alfalfa": "hay"}
@@ -122,6 +146,8 @@ def gaps(f: dict) -> list[str]:
         g.append("Satellite vegetation (MODIS NDVI) was not available yet for this field.")
     if not f.get("grace"):
         g.append("Groundwater trend (GRACE) not included for this location yet.")
+    else:
+        g.append("GRACE is a regional signal (~300 km) of all water — groundwater, soil and snow — not your well level.")
     if not f.get("soil"):
         g.append("No USDA soil survey data at this point (outside the U.S. or unmapped).")
     return g
@@ -135,6 +161,9 @@ def explain(comparison: dict, f: dict) -> dict:
     for s in strategies:
         s["why"] = _why(s, cur, comparison["priorities"])
         s["benefits"] = _benefits(s, f)
+        wb = _water_benefit(s, cur, f)
+        if wb:
+            s["benefits"].insert(0, wb)
         s["risks"] = _risks(s, f, comparison["irrigated"])
         s["gaps"] = gap_list
         s["evidence"] = ev

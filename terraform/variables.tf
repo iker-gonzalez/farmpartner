@@ -156,3 +156,9 @@ variable "custom_domain_www" {
   type        = bool
   default     = true
 }
+
+variable "daily_schedule" {
+  description = "Cron (America/Chicago) for the daily alerts + refresh job."
+  type        = string
+  default     = "0 6 * * *"
+}

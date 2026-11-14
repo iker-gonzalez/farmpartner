@@ -133,7 +133,9 @@ def _history(farmer_id: int, limit: int = 12) -> list[dict]:
 
 def answer(farmer: Farmer, text: str) -> str:
     """The inbound message must already be recorded in the message table (it is the last user turn)."""
-    if config.llm_enabled():
+    from app import ratelimit
+
+    if config.llm_enabled() and ratelimit.allow(f"llm:{farmer.id}", ratelimit.LLM_PER_FARMER_DAY):
         try:
             return _answer_llm(farmer.id)
         except Exception as e:

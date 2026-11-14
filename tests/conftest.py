@@ -29,7 +29,8 @@ def hastings():
 @pytest.fixture
 def offline(monkeypatch):
     """Stub every network call with the saved real-data fixtures."""
-    from app import onboarding, service
+    from app import onboarding, ratelimit, service
+    ratelimit.reset()
     from app.data import forecast
 
     def fake_build(lat, lon, with_ndvi=True):

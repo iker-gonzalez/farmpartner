@@ -143,7 +143,7 @@
         <input name="zip" inputmode="numeric" autocomplete="postal-code" placeholder="ZIP code or 📍 pin" aria-label="ZIP code — press Enter to try the web demo">
         <a class="btn" href="{{ whatsapp }}" target="_blank" rel="noopener">
           <svg viewBox="0 0 14.6453 14.6344" aria-hidden="true"><path transform="matrix(1 -0.000029 0.000029 1 -1.6875 -1.687)" fill="#0a0a0b" d="{{ whatsapp_path }}"/></svg>
-          TEXT “HI” ON WHATSAPP →
+          {{ wa.cta }}
         </a>
       </form>
       <p class="meta">Free · WhatsApp &amp; SMS · No app to install<span class="sep"> · </span><span class="nl">Open source (MIT) · <a href="/sample">See a sample report →</a></span></p>
@@ -167,8 +167,8 @@
     <div class="art">
       <a class="start" href="{{ whatsapp }}" target="_blank" rel="noopener">
         <span class="label">START</span>
-        <span class="qr"><img src="/static/landing/qr-whatsapp.png" alt="QR code: open WhatsApp and text “hi” to FarmPartner"></span>
-        <span class="chip">Text “hi” on WhatsApp</span>
+        <span class="qr"><img src="/static/landing/qr-whatsapp.png" alt="{{ wa.alt }}"></span>
+        <span class="chip">{{ wa.chip }}</span>
       </a>
       <div class="bar">
         <span>FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT</span>
