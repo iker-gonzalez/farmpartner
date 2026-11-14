@@ -72,7 +72,7 @@ def test_landing_and_simulator_pages():
     assert "reads your field from space" in home.text and 'href="/chat"' in home.text
     assert "https://wa.me/14155238886?text=" in home.text
     assert c.get("/static/landing/hero.jpg").status_code == 200
-    assert "WhatsApp simulator" in c.get("/chat").text
+    assert "same backend as the WhatsApp bot" in c.get("/chat").text
     about = c.get("/what-and-how")
     assert about.status_code == 200 and "Global knowledge exchange" in about.text
     assert 'href="/what-and-how"' in home.text

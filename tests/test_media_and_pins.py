@@ -191,3 +191,43 @@ def test_voice_replies(offline, monkeypatch, tmp_path):
     assert len(media_sent) == n + 1
     assert voice.speakable(["🛰️ *Rain*: ~2 in. Report: https://x.y/r/1", {"text": "Pick one", "buttons": []}]) == \
         "Rain: 2 in. Report: Pick one"
+
+
+def test_browser_demo_voice_photo_and_locale(offline, monkeypatch, tmp_path):
+    """The /chat demo works like WhatsApp: voice notes in and out, photos, and the browser's language and units."""
+    import base64
+
+    from app import agent, config, media, voice
+    from app.db import Farmer, session
+    monkeypatch.setattr(config, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(voice, "synthesize", lambda text, lang: b"OggS" + text.encode()[:20])
+    c = _client()
+    # first visit from a Spanish browser: Spanish and metric
+    j = c.post("/api/chat", json={"phone": "loc1", "text": "hi", "wait": True, "locale": "es-ES"}).json()
+    assert j["audio"] == []
+    with session() as db:
+        fm = db.query(Farmer).filter_by(phone="web:loc1").one()
+        assert fm.language == "es" and fm.constraints["units"] == "metric"
+    # a voice note: transcribed, echoed with "I heard", answered, and answered aloud (a /voice/ clip)
+    monkeypatch.setattr(media, "transcribe", lambda data, ct, langs=None: "hola" if ct == "audio/wav" else None)
+    wav = base64.b64encode(b"RIFF....WAVEfmt ").decode()
+    j = c.post("/api/media", json={"phone": "v1", "kind": "audio", "data": wav, "content_type": "audio/wav",
+                                   "wait": True}).json()
+    assert "hola" in j["messages"][0] and j["messages"][0].startswith("🎙️")
+    assert len(j["messages"]) > 1 and len(j["audio"]) == 1 and j["audio"][0].startswith("/voice/")
+    assert c.get(j["audio"][0]).content.startswith(b"OggS")
+    # unclear note
+    j = c.post("/api/media", json={"phone": "v1", "kind": "audio", "data": wav, "content_type": "audio/webm"}).json()
+    assert "couldn't make out" in j["messages"][0]
+    # a photo after onboarding goes to Claude with the image
+    seen = []
+    monkeypatch.setattr(agent, "answer", lambda f, t, image=None: seen.append(image["type"]) or "Looks like aphids.")
+    c.post("/api/chat", json={"phone": "p1", "text": "hi", "wait": True})
+    with session() as db:
+        db.query(Farmer).filter_by(phone="web:p1").one().state = "ready"
+        db.commit()
+    jpg = base64.b64encode(b"\xff\xd8jpeg").decode()
+    j = c.post("/api/media", json={"phone": "p1", "kind": "image", "data": jpg, "content_type": "image/jpeg",
+                                   "caption": "what is this bug?", "wait": True}).json()
+    assert seen == ["image"] and any("aphids" in m for m in j["messages"])
+    assert c.post("/api/media", json={"phone": "p1", "kind": "video", "data": jpg, "content_type": "x"}).status_code == 400

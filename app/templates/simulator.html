@@ -4,90 +4,382 @@
 <link rel="icon" href="/static/brand/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/static/brand/favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="/static/brand/apple-touch-icon.png">
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#008069">
 <title>FarmPartner · chat demo</title>
 <style>
-  body { margin:0; font:15px/1.45 system-ui,-apple-system,sans-serif; background:#d9dbd5; display:flex; justify-content:center; }
-  .phone { width:400px; max-width:100%; height:100vh; display:flex; flex-direction:column; background:#efeae2; }
-  .top { background:#1f6b47; color:#fff; padding:12px 16px; font-weight:600 } .top small { display:block; font-weight:400; opacity:.8 }
-  #log { flex:1; min-height:0; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:6px }
-  .m { max-width:85%; padding:7px 10px; border-radius:8px; white-space:pre-wrap; word-wrap:break-word; box-shadow:0 1px 1px #0001 }
-  .in { background:#fff; align-self:flex-start } .out { background:#d9fdd3; align-self:flex-end } .sys { align-self:center; font-size:.8rem; color:#555 }
-  .bar { display:flex; gap:6px; padding:8px; background:#f0f0f0 } input { flex:1; padding:10px; border-radius:20px; border:1px solid #ccc }
-  button { border:0; border-radius:20px; padding:8px 12px; background:#1f6b47; color:#fff; cursor:pointer } button.alt { background:#fff; color:#1f6b47; border:1px solid #1f6b47 }
-  .pins { display:flex; gap:6px; padding:6px 8px; flex-wrap:wrap; background:#f7f7f7; font-size:.8rem }
-  a { color:#1f6b47 }
-  .choices { align-self:flex-start; max-width:85%; display:flex; flex-direction:column; gap:4px; margin-top:-2px }
-  .choices button { background:#fff; color:#027eb5; border-radius:8px; padding:9px 12px; text-align:center; box-shadow:0 1px 1px #0001; font-weight:500 }
-  .choices button small { display:block; color:#667; font-weight:400; font-size:.78rem }
-  .choices.used button { opacity:.45; pointer-events:none }
+  :root { --teal:#008069; --green:#00a884; --out:#d9fdd3; --in:#fff; --ink:#111b21; --sub:#667781; --link:#027eb5; --tick:#53bdeb; }
+  * { box-sizing:border-box }
+  html, body { height:100% }
+  body { margin:0; font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink);
+         background:#d1d7db; display:flex; justify-content:center; }
+  .phone { position:relative; width:440px; max-width:100%; height:100dvh; display:flex; flex-direction:column; overflow:hidden;
+           background:#efeae2; box-shadow:0 0 0 1px #0001, 0 10px 40px #0002; }
+  /* header */
+  .hdr { background:var(--teal); color:#fff; display:flex; align-items:center; gap:10px; padding:10px 8px 10px 6px;
+         padding-top:max(10px, env(safe-area-inset-top)); z-index:3 }
+  .hdr a.back { color:#fff; text-decoration:none; font-size:22px; padding:0 4px; line-height:1 }
+  .av { width:40px; height:40px; border-radius:50%; background:#0a0a0b; display:grid; place-items:center; flex:none }
+  .av img { width:30px; height:auto }
+  .who { flex:1; min-width:0 } .who b { display:block; font-size:16.5px; font-weight:600 }
+  .who small { display:block; font-size:13px; color:#d6f5ec; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+  .icon { background:none; border:0; color:inherit; font-size:20px; width:40px; height:40px; border-radius:50%; cursor:pointer; display:grid; place-items:center }
+  .icon:hover { background:#ffffff1f }
+  .menu { position:absolute; right:8px; top:52px; background:#fff; color:var(--ink); border-radius:6px; box-shadow:0 4px 18px #0003;
+          padding:6px 0; min-width:210px; z-index:10 }
+  .menu button { display:block; width:100%; text-align:left; background:none; border:0; padding:11px 18px; font:inherit; cursor:pointer }
+  .menu button:hover { background:#f5f6f6 }
+  /* messages */
+  #log { flex:1; min-height:0; overflow-y:auto; padding:10px 14px 6px; display:flex; flex-direction:column; gap:3px;
+         background:#efeae2 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='%23d9d2c6' fill-opacity='.35'%3E%3Ccircle cx='10' cy='12' r='2'/%3E%3Ccircle cx='50' cy='40' r='1.6'/%3E%3Cpath d='M62 8l4 7h-8z'/%3E%3Crect x='20' y='58' width='6' height='6' rx='1.5'/%3E%3C/g%3E%3C/svg%3E"); }
+  .chip { align-self:center; background:#fff; color:var(--sub); font-size:12px; padding:5px 12px; border-radius:8px;
+          box-shadow:0 1px .5px #0b141a21; margin:8px 0; text-align:center; max-width:90% }
+  .chip.note { background:#ffeecd; color:#54656f }
+  .m { position:relative; max-width:82%; padding:6px 8px 7px 9px; border-radius:8px; box-shadow:0 1px .5px #0b141a21;
+       white-space:pre-wrap; overflow-wrap:anywhere; font-size:14.6px; line-height:1.38; margin-top:2px }
+  .m.in { background:var(--in); align-self:flex-start } .m.out { background:var(--out); align-self:flex-end }
+  .m.first { margin-top:8px }
+  .m.in.first { border-top-left-radius:0 } .m.out.first { border-top-right-radius:0 }
+  .m.in.first::before, .m.out.first::before { content:""; position:absolute; top:0; width:8px; height:13px }
+  .m.in.first::before { left:-8px; background:linear-gradient(to bottom left, var(--in) 50%, transparent 50%) }
+  .m.out.first::before { right:-8px; background:linear-gradient(to bottom right, var(--out) 50%, transparent 50%) }
+  .m a { color:var(--link) }
+  .m.heard { color:#54656f; font-size:13.8px }
+  .meta { float:right; margin:6px 0 -4px 10px; font-size:11px; color:var(--sub); white-space:nowrap; line-height:1 }
+  .meta .t { color:var(--tick); margin-left:3px; letter-spacing:-3px }
+  .m.media { padding:3px; } .m.media .meta { position:absolute; right:9px; bottom:7px; color:#fff; text-shadow:0 0 3px #0008; float:none; margin:0 }
+  .m img.ph { display:block; width:240px; max-width:100%; border-radius:6px }
+  .map { width:240px; height:130px; border-radius:6px; background:#c9dcc4 center/cover; position:relative }
+  .map::after { content:"📍"; position:absolute; left:50%; top:50%; transform:translate(-50%,-85%); font-size:28px }
+  .cap { padding:5px 6px 2px; font-size:14px }
+  /* quick replies & list button, attached under a message like WhatsApp */
+  .qr { align-self:flex-start; width:min(82%, 330px); display:flex; flex-direction:column; gap:2px; margin-top:2px }
+  .qr button { background:#fff; border:0; border-radius:8px; padding:10px; color:var(--link); font:500 14.5px/1.2 inherit;
+               box-shadow:0 1px .5px #0b141a21; cursor:pointer }
+  .qr button:hover { background:#f7f8f8 }
+  .qr.used button { color:#8696a0; cursor:default; pointer-events:none }
+  /* voice notes */
+  .vn { display:flex; align-items:center; gap:9px; width:260px; max-width:100%; padding:2px 2px 8px }
+  .vn .av { width:44px; height:44px } .vn .av img { width:32px }
+  .vn button.play { background:none; border:0; font-size:22px; color:#54656f; cursor:pointer; width:28px; padding:0 }
+  .vn .wave { flex:1; height:26px; display:flex; align-items:center; gap:2px }
+  .vn .wave i { flex:1; border-radius:2px; background:#b8c2c6; min-width:2px }
+  .m.out .vn .wave i { background:#9fc6a8 } .vn .wave i.on { background:#2a9d8f !important }
+  .vn .dur { position:absolute; left:auto; bottom:5px; font-size:11px; color:var(--sub) }
+  .m.in .vn .dur { left:63px } .m.out .vn .dur { left:46px }
+  /* typing bubble */
+  .typing { display:inline-flex; gap:4px; padding:12px 14px } .typing i { width:7px; height:7px; border-radius:50%; background:#8696a0; animation:b 1.2s infinite }
+  .typing i:nth-child(2) { animation-delay:.2s } .typing i:nth-child(3) { animation-delay:.4s }
+  @keyframes b { 0%,60%,100% { transform:none; opacity:.5 } 30% { transform:translateY(-4px); opacity:1 } }
+  /* composer */
+  .bar { display:flex; align-items:flex-end; gap:6px; padding:6px 6px; padding-bottom:max(8px, env(safe-area-inset-bottom)); z-index:3 }
+  .field { flex:1; min-height:46px; background:#fff; border-radius:24px; display:flex; align-items:center; gap:2px; padding:0 6px; box-shadow:0 1px .5px #0b141a21 }
+  .field .icon { color:#54656f; font-size:20px; width:38px; height:38px }
+  .field .icon:hover { background:#f0f2f5 }
+  #t { flex:1; border:0; outline:0; font:16px/1.3 inherit; padding:12px 4px; resize:none; max-height:110px; background:transparent }
+  .fab { width:48px; height:48px; border-radius:50%; background:var(--green); color:#fff; border:0; font-size:21px; cursor:pointer;
+         display:grid; place-items:center; flex:none; box-shadow:0 1px 3px #0003 }
+  .fab svg { width:22px; height:22px; fill:#fff }
+  .rec { flex:1; min-height:46px; background:#fff; border-radius:24px; display:flex; align-items:center; gap:10px; padding:0 14px; box-shadow:0 1px .5px #0b141a21 }
+  .rec .dot { width:10px; height:10px; border-radius:50%; background:#ea0038; animation:p 1s infinite }
+  @keyframes p { 50% { opacity:.25 } }
+  .rec .lvl { flex:1; height:22px; display:flex; align-items:center; gap:2px; overflow:hidden; justify-content:flex-end }
+  .rec .lvl i { width:3px; border-radius:2px; background:#8696a0; flex:none }
+  .rec button { background:none; border:0; font-size:20px; cursor:pointer; color:#54656f }
+  /* attach sheet + list sheet */
+  .attach { position:absolute; left:10px; right:10px; bottom:70px; background:#fff; border-radius:16px; box-shadow:0 6px 24px #0003;
+            padding:18px 12px; display:grid; grid-template-columns:repeat(4,1fr); gap:14px 6px; z-index:8 }
+  .attach button { background:none; border:0; cursor:pointer; font:12.5px inherit; color:#54656f; display:flex; flex-direction:column; align-items:center; gap:6px }
+  .attach button span { width:52px; height:52px; border-radius:50%; display:grid; place-items:center; font-size:22px; color:#fff }
+  .shade { position:absolute; inset:0; background:#0b141a66; z-index:9; display:flex; align-items:flex-end }
+  .sheet { background:#fff; width:100%; border-radius:16px 16px 0 0; max-height:75%; display:flex; flex-direction:column;
+           padding-bottom:env(safe-area-inset-bottom) }
+  .sheet h3 { margin:0; padding:16px 18px 10px; font-size:16px; display:flex; align-items:center; gap:12px }
+  .sheet h3 button { background:none; border:0; font-size:20px; cursor:pointer; color:#54656f }
+  .sheet ul { list-style:none; margin:0; padding:0 0 10px; overflow-y:auto }
+  .sheet li { display:flex; align-items:center; gap:12px; padding:12px 20px; cursor:pointer }
+  .sheet li:hover { background:#f5f6f6 } .sheet li div { flex:1 } .sheet li small { display:block; color:var(--sub); font-size:13px }
+  .sheet li .r { width:20px; height:20px; border:2px solid #8696a0; border-radius:50%; flex:none }
+  .sheet .go { margin:6px 16px 14px; padding:12px; border:0; border-radius:24px; background:var(--green); color:#fff; font:600 15px inherit; cursor:pointer }
+  [hidden] { display:none !important }
 </style>
 </head>
 <body>
 <div class="phone">
-  <div class="top"><a href="/" style="color:inherit;text-decoration:none">FarmPartner 🌾</a> <button class="alt" style="float:right;padding:4px 10px;font-size:.8rem" onclick="newFarmer()">New farmer</button><small>WhatsApp simulator · same backend as the real bot</small></div>
-  <div id="log"></div>
-  <div class="pins">
-    <span>📍 Send pin:</span>
-    <button class="alt" onclick="pin(38.05,-100.75,'Garden City, KS')">Garden City, KS</button>
-    <button class="alt" onclick="pin(40.65,-98.30,'Hastings, NE')">Hastings, NE</button>
-    <button class="alt" onclick="pin(33.68,-102.25,'Lubbock, TX')">Lubbock, TX</button>
-    <button class="alt" onclick="myLocation()">My location</button>
+  <div class="hdr">
+    <a class="back" href="/" aria-label="Back to farmpartner.space">←</a>
+    <div class="av"><img src="/static/brand/orbi.svg" alt=""></div>
+    <div class="who"><b>FarmPartner</b><small id="status">online · same backend as the WhatsApp bot</small></div>
+    <button class="icon" id="menuBtn" aria-label="Menu">⋮</button>
   </div>
-  <div class="bar"><input id="t" placeholder="Type a message" autofocus><button onclick="send()">Send</button></div>
+  <div class="menu" id="menu" hidden>
+    <button data-act="new">New farmer</button>
+    <button data-act="voiceOn">🔊 Spoken replies on</button>
+    <button data-act="voiceOff">Text only</button>
+    <button data-act="report">Open my field report</button>
+    <button data-act="reset">Start over (RESET)</button>
+  </div>
+  <div id="log"></div>
+  <div class="attach" id="attach" hidden>
+    <button data-pin="38.05,-100.75,Garden City, KS"><span style="background:#1fa855">📍</span>Garden City</button>
+    <button data-pin="40.65,-98.30,Hastings, NE"><span style="background:#1fa855">📍</span>Hastings</button>
+    <button data-pin="33.68,-102.25,Lubbock, TX"><span style="background:#1fa855">📍</span>Lubbock</button>
+    <button id="myLoc"><span style="background:#02a698">🧭</span>My location</button>
+    <button id="pickPhoto"><span style="background:#bf59cf">🖼️</span>Gallery</button>
+    <button id="takePhoto"><span style="background:#ff2e74">📷</span>Camera</button>
+  </div>
+  <div class="bar">
+    <div class="field" id="field">
+      <button class="icon" id="attachBtn" aria-label="Attach">📎</button>
+      <textarea id="t" rows="1" placeholder="Message" autocomplete="off"></textarea>
+      <button class="icon" id="camBtn" aria-label="Camera">📷</button>
+    </div>
+    <div class="rec" id="rec" hidden>
+      <button id="recCancel" aria-label="Delete recording">🗑️</button>
+      <span class="dot"></span><span id="recTime">0:00</span>
+      <div class="lvl" id="lvl"></div>
+    </div>
+    <button class="fab" id="fab" aria-label="Record voice note"></button>
+  </div>
+  <input type="file" id="gallery" accept="image/*" hidden>
+  <input type="file" id="camera" accept="image/*" capture="environment" hidden>
 </div>
 <script>
-  let phone = localStorage.fpPhone || (localStorage.fpPhone = 'demo-' + Math.random().toString(36).slice(2, 8));
-  const log = document.getElementById('log'), t = document.getElementById('t');
-  t.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
-  function add(text, cls) {
-    const d = document.createElement('div'); d.className = 'm ' + cls;
-    d.innerHTML = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\*(.+?)\*/g,'<b>$1</b>')
-      .replace(/(https?:\/\/\S+)/g, '<a href="$1" target="_blank">$1</a>');
-    log.appendChild(d); requestAnimationFrame(() => d.scrollIntoView({block: 'end', behavior: 'smooth'})); return d;
+(() => {
+  const $ = id => document.getElementById(id);
+  const log = $('log'), t = $('t'), fab = $('fab'), statusEl = $('status');
+  const LOCALE = navigator.language || 'en-US';
+  const MIC = '<svg viewBox="0 0 24 24"><path d="M12 15a3.5 3.5 0 0 0 3.5-3.5v-6a3.5 3.5 0 0 0-7 0v6A3.5 3.5 0 0 0 12 15zm6.3-3.6a.9.9 0 0 0-1.8 0 4.5 4.5 0 0 1-9 0 .9.9 0 0 0-1.8 0 6.3 6.3 0 0 0 5.4 6.2V20H8.9a.9.9 0 0 0 0 1.8h6.2a.9.9 0 0 0 0-1.8h-2.2v-2.4a6.3 6.3 0 0 0 5.4-6.2z"/></svg>';
+  const SEND = '<svg viewBox="0 0 24 24"><path d="M3.4 20.4 21 12 3.4 3.6v6.5l12.6 1.9-12.6 1.9z"/></svg>';
+  const newId = () => 'demo-' + Math.random().toString(36).slice(2, 8);
+  let phone = localStorage.fpPhone || (localStorage.fpPhone = newId());
+  let lastSide = null, waiting = 0, lastReport = null;
+
+  // ---------- rendering ----------
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const fmt = s => esc(s).replace(/\*([^*\n]+)\*/g, '<b>$1</b>').replace(/(^|\s)_([^_\n]+)_(?=\s|$)/g, '$1<i>$2</i>')
+    .replace(/(^|\s)~(\S[^~\n]*?\S)~(?=\s|$|[.,!?])/g, '$1<s>$2</s>').replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+  const now = () => new Date().toLocaleTimeString(LOCALE, {hour: 'numeric', minute: '2-digit'});
+  const scroll = () => requestAnimationFrame(() => log.scrollTop = log.scrollHeight);
+  function bubble(side, html, cls = '') {
+    const d = document.createElement('div');
+    d.className = `m ${side} ${cls} ${lastSide !== side ? 'first' : ''}`;
+    d.innerHTML = html + `<span class="meta">${now()}${side === 'out' ? '<span class="t">✓✓</span>' : ''}</span>`;
+    lastSide = side; insert(d); return d;
   }
-  async function post(body, label) {
-    phone = localStorage.fpPhone || phone;
-    add(label, 'out');
-    const r = await fetch('/api/chat', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({phone, wait: false, ...body}) });
-    if (r.status === 429) { add('⏳ Too many messages — please wait a minute.', 'sys'); return; }
-    const j = await r.json(); render(j);
-    if (j.pending) poll(add('⏳ working…', 'sys'));
+  function insert(el) { log.insertBefore(el, typingEl && typingEl.isConnected ? typingEl : null); scroll(); }
+  function chip(text, note) { const c = document.createElement('div'); c.className = 'chip' + (note ? ' note' : ''); c.textContent = text; insert(c); lastSide = null; }
+  function text(side, s, cls) {
+    const m = String(s).match(/https?:\/\/\S+\/r\/[\w-]+/); if (m) lastReport = m[0];
+    return bubble(side, fmt(s), cls);
   }
-  // Messages with tap-able choices (same as the WhatsApp quick replies / list picker).
+
+  // Replies with tap-able choices: up to 3 quick-reply buttons, or a list behind a "☰ Choose" button.
+  function choices(a) {
+    text('in', a.text);
+    const box = document.createElement('div'); box.className = 'qr';
+    const pick = (id, title) => { box.classList.add('used'); send({text: id}, title); };
+    if (a.buttons) a.buttons.forEach(b => {
+      const el = document.createElement('button'); el.textContent = '↩ ' + b.title; el.onclick = () => pick(b.id, b.title); box.appendChild(el);
+    });
+    else {
+      const el = document.createElement('button'); el.textContent = '☰ ' + (a.list.button || 'Choose');
+      el.onclick = () => listSheet(a.list, pick); box.appendChild(el);
+    }
+    insert(box); lastSide = null;
+  }
+  function listSheet(list, pick) {
+    const shade = document.createElement('div'); shade.className = 'shade';
+    shade.innerHTML = `<div class="sheet"><h3><button aria-label="Close">✕</button>${esc(list.button || 'Choose')}</h3><ul></ul></div>`;
+    const ul = shade.querySelector('ul');
+    (list.items || []).forEach(it => {
+      const li = document.createElement('li');
+      li.innerHTML = `<div>${esc(it.title)}${it.description ? `<small>${esc(it.description)}</small>` : ''}</div><span class="r"></span>`;
+      li.onclick = () => { shade.remove(); pick(it.id, it.title); }; ul.appendChild(li);
+    });
+    shade.onclick = e => { if (e.target === shade || e.target.closest('h3 button')) shade.remove(); };
+    document.querySelector('.phone').appendChild(shade);
+  }
+
+  // A voice-note bubble (ours: the recording; theirs: the spoken reply) with play/pause and a moving waveform.
+  function voiceNote(side, src, autoplay) {
+    const bars = Array.from({length: 30}, (_, i) => 5 + Math.round(Math.abs(Math.sin(i * 1.7 + src.length)) * 18));
+    const d = bubble(side, `<div class="vn">${side === 'in' ? '<div class="av"><img src="/static/brand/orbi.svg" alt=""></div>' : ''}
+      <button class="play" aria-label="Play">▶</button><div class="wave">${bars.map(h => `<i style="height:${h}px"></i>`).join('')}</div>
+      <span class="dur">0:00</span></div>`);
+    const a = new Audio(src), btn = d.querySelector('.play'), dur = d.querySelector('.dur'), is = d.querySelectorAll('.wave i');
+    const mmss = s => isFinite(s) ? `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}` : '0:00';
+    a.addEventListener('loadedmetadata', () => dur.textContent = mmss(a.duration));
+    a.addEventListener('timeupdate', () => {
+      const k = a.duration ? a.currentTime / a.duration : 0; is.forEach((el, i) => el.classList.toggle('on', i / is.length < k));
+      dur.textContent = mmss(a.currentTime || a.duration);
+    });
+    a.addEventListener('ended', () => { btn.textContent = '▶'; is.forEach(el => el.classList.remove('on')); dur.textContent = mmss(a.duration); });
+    btn.onclick = () => { if (a.paused) { a.play(); btn.textContent = '❚❚'; } else { a.pause(); btn.textContent = '▶'; } };
+    if (autoplay) a.play().then(() => btn.textContent = '❚❚').catch(() => {});
+  }
+
   function render(j) {
     (j.messages || []).forEach((m, i) => {
       const a = (j.actions || [])[i];
-      if (!a) { add(m, 'in'); return; }
-      add(a.text, 'in');
-      const box = document.createElement('div'); box.className = 'choices';
-      const opts = a.buttons ? a.buttons.map(b => [b.id, b.title, ''])
-                             : a.list.items.map(it => [it.id, it.title, it.description]);
-      opts.forEach(([id, title, desc]) => {
-        const b = document.createElement('button');
-        b.innerHTML = title.replace(/</g, '&lt;') + (desc ? '<small>' + desc.replace(/</g, '&lt;') + '</small>' : '');
-        b.onclick = () => { box.classList.add('used'); post({text: id}, title); };
-        box.appendChild(b);
-      });
-      log.appendChild(box); requestAnimationFrame(() => box.scrollIntoView({block: 'end', behavior: 'smooth'}));
+      if (a) choices(a);
+      else text('in', m, /^🎙️ /.test(m) && /[“"]/.test(m) ? 'heard' : '');
     });
+    (j.audio || []).forEach(src => voiceNote('in', src, true));
   }
-  async function poll(waitEl) {
-    const j = await (await fetch('/api/poll?phone=' + encodeURIComponent(phone))).json();
-    render(j);
-    if (j.pending) { setTimeout(() => poll(waitEl), 1500); } else { waitEl.remove(); }
+
+  // ---------- typing indicator ----------
+  let typingEl = null;
+  function typing(on) {
+    waiting = Math.max(0, waiting + (on ? 1 : -1));
+    if (waiting && !typingEl) {
+      typingEl = document.createElement('div'); typingEl.className = 'm in first';
+      typingEl.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
+      log.appendChild(typingEl); scroll(); statusEl.textContent = 'typing…';
+    } else if (!waiting && typingEl) {
+      typingEl.remove(); typingEl = null; statusEl.textContent = 'online'; lastSide = null;
+    }
   }
-  function newFarmer() { localStorage.fpPhone = 'demo-' + Math.random().toString(36).slice(2, 8); location.reload(); }
-  function send() { const v = t.value.trim(); if (!v) return; t.value = ''; post({text: v}, v); }
-  function pin(lat, lon, name) { post({lat, lon, text: ''}, '📍 Location: ' + name); }
-  function myLocation() { navigator.geolocation.getCurrentPosition(p => pin(p.coords.latitude, p.coords.longitude, 'my location')); }
-  add('Say "hi" to start. Type RESET to start over, or tap "New farmer" for a fresh session.', 'sys');
+
+  // ---------- talking to the backend ----------
+  async function call(url, body) {
+    phone = localStorage.fpPhone || phone;
+    typing(true);
+    try {
+      const r = await fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'},
+                                  body: JSON.stringify({phone, wait: false, locale: LOCALE, ...body})});
+      if (r.status === 429) { chip('⏳ Too many messages — please wait a minute.', true); return; }
+      if (!r.ok) { chip('Something went wrong — please try again.', true); return; }
+      const j = await r.json(); render(j);
+      if (j.pending) await poll();
+    } catch (e) { chip('No connection — please try again.', true); }
+    finally { typing(false); }
+  }
+  async function poll() {
+    for (;;) {
+      await new Promise(r => setTimeout(r, 1500));
+      const j = await (await fetch('/api/poll?phone=' + encodeURIComponent(phone))).json();
+      render(j);
+      if (!j.pending) return;
+    }
+  }
+  function send(body, label) { if (label) text('out', label); return call('/api/chat', body); }
+  function pin(lat, lon, name) {
+    const z = 12, n = 2 ** z, x = Math.floor((lon + 180) / 360 * n);
+    const y = Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * n);
+    bubble('out', `<div class="map" style="background-image:url(https://tile.openstreetmap.org/${z}/${x}/${y}.png)"></div><div class="cap">${esc(name)}</div>`, 'media');
+    return call('/api/chat', {lat, lon, text: ''});
+  }
+
+  // ---------- composer: text ⇄ mic ----------
+  const syncFab = () => { const has = t.value.trim().length > 0; fab.innerHTML = has ? SEND : MIC; fab.setAttribute('aria-label', has ? 'Send' : 'Record voice note'); };
+  t.addEventListener('input', () => { t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 110) + 'px'; syncFab(); });
+  t.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendText(); } });
+  function sendText() { const v = t.value.trim(); if (!v) return; t.value = ''; t.style.height = 'auto'; syncFab(); send({text: v}, v); }
+  fab.onclick = () => { if (rec) stopRec(true); else if (t.value.trim()) sendText(); else startRec(); };
+  syncFab();
+
+  // ---------- voice notes: 16 kHz mono WAV (works in every browser, and Speech-to-Text reads it directly) ----------
+  let rec = null;
+  async function startRec() {
+    let stream;
+    try { stream = await navigator.mediaDevices.getUserMedia({audio: {channelCount: 1, echoCancellation: true, noiseSuppression: true}}); }
+    catch (e) { chip('🎙️ Allow the microphone to send voice notes.', true); return; }
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const src = ctx.createMediaStreamSource(stream), proc = ctx.createScriptProcessor(4096, 1, 1);
+    rec = {stream, ctx, src, proc, chunks: [], t0: Date.now()};
+    proc.onaudioprocess = e => {
+      const d = e.inputBuffer.getChannelData(0); rec.chunks.push(new Float32Array(d));
+      let peak = 0; for (let i = 0; i < d.length; i += 64) peak = Math.max(peak, Math.abs(d[i]));
+      const bar = document.createElement('i'); bar.style.height = Math.max(3, Math.min(22, peak * 60)) + 'px';
+      $('lvl').appendChild(bar); if ($('lvl').children.length > 60) $('lvl').firstChild.remove();
+    };
+    src.connect(proc); proc.connect(ctx.destination);
+    $('field').hidden = true; $('rec').hidden = false; $('lvl').innerHTML = ''; fab.innerHTML = SEND; fab.setAttribute('aria-label', 'Send voice note');
+    rec.timer = setInterval(() => {
+      const s = Math.floor((Date.now() - rec.t0) / 1000); $('recTime').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+      if (s >= 58) stopRec(true);  // Speech-to-Text takes up to a minute per note
+    }, 250);
+  }
+  function stopRec(sendIt) {
+    const r = rec; rec = null; clearInterval(r.timer);
+    r.proc.disconnect(); r.src.disconnect(); r.stream.getTracks().forEach(x => x.stop());
+    const rate = r.ctx.sampleRate; r.ctx.close();
+    $('field').hidden = false; $('rec').hidden = true; syncFab();
+    if (!sendIt || Date.now() - r.t0 < 700) return;
+    const wav = toWav(r.chunks, rate, 16000);
+    voiceNote('out', URL.createObjectURL(wav), false);
+    wav.arrayBuffer().then(buf => call('/api/media', {kind: 'audio', data: b64(buf), content_type: 'audio/wav'}));
+  }
+  $('recCancel').onclick = () => rec && stopRec(false);
+  function toWav(chunks, inRate, outRate) {
+    const len = chunks.reduce((n, c) => n + c.length, 0), all = new Float32Array(len);
+    let o = 0; chunks.forEach(c => { all.set(c, o); o += c.length; });
+    const ratio = inRate / outRate, n = Math.floor(len / ratio), pcm = new Int16Array(n);
+    for (let i = 0; i < n; i++) {  // average each window: a simple low-pass before downsampling
+      const a = Math.floor(i * ratio), b = Math.min(len, Math.floor((i + 1) * ratio)); let s = 0;
+      for (let k = a; k < b; k++) s += all[k];
+      const v = Math.max(-1, Math.min(1, s / Math.max(1, b - a))); pcm[i] = v < 0 ? v * 0x8000 : v * 0x7fff;
+    }
+    const buf = new ArrayBuffer(44 + pcm.length * 2), dv = new DataView(buf);
+    const w = (p, s) => [...s].forEach((ch, i) => dv.setUint8(p + i, ch.charCodeAt(0)));
+    w(0, 'RIFF'); dv.setUint32(4, 36 + pcm.length * 2, true); w(8, 'WAVE'); w(12, 'fmt ');
+    dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true); dv.setUint32(24, outRate, true);
+    dv.setUint32(28, outRate * 2, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true); w(36, 'data');
+    dv.setUint32(40, pcm.length * 2, true); new Int16Array(buf, 44).set(pcm);
+    return new Blob([buf], {type: 'audio/wav'});
+  }
+  function b64(buf) { let s = ''; const u = new Uint8Array(buf); for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s); }
+
+  // ---------- photos: shrunk to ≤1280 px JPEG before upload ----------
+  async function sendPhoto(file) {
+    if (!file) return;
+    const img = await createImageBitmap(file).catch(() => null);
+    if (!img) { chip('Could not open that image.', true); return; }
+    const k = Math.min(1, 1280 / Math.max(img.width, img.height)), c = document.createElement('canvas');
+    c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    const url = c.toDataURL('image/jpeg', 0.85), caption = t.value.trim();
+    t.value = ''; syncFab();
+    bubble('out', `<img class="ph" src="${url}" alt="">${caption ? `<div class="cap">${fmt(caption)}</div>` : ''}`, 'media');
+    call('/api/media', {kind: 'image', data: url.split(',')[1], content_type: 'image/jpeg', caption});
+  }
+  $('gallery').onchange = e => { sendPhoto(e.target.files[0]); e.target.value = ''; };
+  $('camera').onchange = e => { sendPhoto(e.target.files[0]); e.target.value = ''; };
+  $('camBtn').onclick = () => $('camera').click();
+
+  // ---------- attach sheet & menu ----------
+  const attach = $('attach'), menu = $('menu');
+  $('attachBtn').onclick = e => { e.stopPropagation(); attach.hidden = !attach.hidden; menu.hidden = true; };
+  $('menuBtn').onclick = e => { e.stopPropagation(); menu.hidden = !menu.hidden; attach.hidden = true; };
+  document.addEventListener('click', e => { if (!attach.contains(e.target)) attach.hidden = true; if (!menu.contains(e.target)) menu.hidden = true; });
+  attach.querySelectorAll('[data-pin]').forEach(b => b.onclick = () => {
+    const [lat, lon, ...name] = b.dataset.pin.split(','); attach.hidden = true; pin(+lat, +lon, name.join(',').trim());
+  });
+  $('myLoc').onclick = () => { attach.hidden = true; navigator.geolocation.getCurrentPosition(
+    p => pin(+p.coords.latitude.toFixed(5), +p.coords.longitude.toFixed(5), 'My location'),
+    () => chip('📍 Allow location access, or pick one of the sample farms.', true)); };
+  $('pickPhoto').onclick = () => { attach.hidden = true; $('gallery').click(); };
+  $('takePhoto').onclick = () => { attach.hidden = true; $('camera').click(); };
+  menu.onclick = e => {
+    const act = e.target.dataset.act; menu.hidden = true;
+    if (act === 'new') { localStorage.fpPhone = newId(); location.reload(); }
+    if (act === 'voiceOn') send({text: 'voice replies'}, '🔊 Voice replies, please');
+    if (act === 'voiceOff') send({text: 'text only'}, 'text only');
+    if (act === 'reset') send({text: 'RESET'}, 'RESET');
+    if (act === 'report') { if (lastReport) window.open(lastReport, '_blank'); else send({text: 'report'}, 'report'); }
+  };
+
+  // ---------- start ----------
+  chip('TODAY');
+  chip('🔒 Demo in your browser — same FarmPartner as on WhatsApp. Type, send a 🎙️ voice note or a 📷 crop photo, '
+       + 'and share a 📍 location with the 📎 button. Say "hi" to start.', true);
   const zip = new URLSearchParams(location.search).get('zip');
   if (zip) {
-    localStorage.fpPhone = 'demo-' + Math.random().toString(36).slice(2, 8);
+    localStorage.fpPhone = phone = newId();
     history.replaceState(null, '', '/chat');
-    (async () => { await post({text: 'hi'}, 'hi'); await post({text: zip}, zip); })();
-  }
+    (async () => { await send({text: 'hi'}, 'hi'); await send({text: zip}, zip); })();
+  } else t.focus();
+})();
 </script>
 </body>
 </html>

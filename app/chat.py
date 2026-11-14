@@ -140,6 +140,23 @@ def _set_voice(farmer, on: bool) -> None:
         farmer.constraints = fm.constraints
 
 
+def apply_locale(phone: str, channel: str, lang: str | None, unit: str | None) -> None:
+    """First visit from a browser: start in the browser's language and units. Once only, never over a choice."""
+    from app.db import Farmer
+    with session() as db:
+        fm = service.get_or_create_farmer(db, phone, channel)
+        c = dict(fm.constraints or {})
+        if c.get("locale_set"):
+            return
+        if lang in i18n.LANGS:
+            fm.language = lang
+        if unit in ("metric", "imperial") and "units" not in c:
+            c["units"] = unit
+        c["locale_set"] = True
+        fm.constraints = c
+        db.commit()
+
+
 def wants_voice(phone: str) -> tuple[bool, str]:
     """(spoken replies on?, language) for this farmer."""
     from app.db import Farmer

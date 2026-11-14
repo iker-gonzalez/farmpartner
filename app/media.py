@@ -55,12 +55,33 @@ SPEECH_CODES = {"en": "en-US", "es": "es-ES", "eu": "eu-ES", "ca": "ca-ES", "gl"
                 "am": "am-ET", "my": "my-MM", "cs": "cs-CZ", "hu": "hu-HU", "sv": "sv-SE", "af": "af-ZA"}
 
 
+def _wav_pcm(data: bytes) -> tuple[int, bytes] | None:
+    """(sample rate, raw 16-bit mono samples) from a WAV file, walking its chunks (some writers add extra ones)."""
+    i, rate, fmt_ok = 12, None, False
+    while i + 8 <= len(data):
+        cid, size = data[i:i + 4], int.from_bytes(data[i + 4:i + 8], "little")
+        body = data[i + 8:i + 8 + size]
+        if cid == b"fmt " and len(body) >= 16:
+            fmt_ok = int.from_bytes(body[0:2], "little") == 1 and int.from_bytes(body[2:4], "little") == 1 \
+                and int.from_bytes(body[14:16], "little") == 16
+            rate = int.from_bytes(body[4:8], "little")
+        elif cid == b"data":
+            return (rate, body) if fmt_ok and rate else None
+        i += 8 + size + (size & 1)
+    return None
+
+
 def transcribe(data: bytes, content_type: str, langs: list[str] | None = None) -> str | None:
     """Transcript of a short voice note (≤ 1 minute) in the first of langs (up to 3 alternatives also heard).
     None if nothing was understood."""
     codes = list(dict.fromkeys(SPEECH_CODES[x] for x in (langs or ["en", "es"]) if x in SPEECH_CODES)) or ["en-US"]
     if "ogg" in content_type or "opus" in content_type:
         audio_cfg = {"encoding": "OGG_OPUS", "sampleRateHertz": _opus_rate(data)}
+    elif data[:4] == b"RIFF" and data[8:12] == b"WAVE" and (pcm := _wav_pcm(data)):
+        rate, data = pcm
+        audio_cfg = {"encoding": "LINEAR16", "sampleRateHertz": rate}
+    elif "webm" in content_type:
+        audio_cfg = {"encoding": "WEBM_OPUS", "sampleRateHertz": 48000}
     elif "amr" in content_type:
         audio_cfg = {"encoding": "AMR", "sampleRateHertz": 8000}
     else:
@@ -75,6 +96,8 @@ def transcribe(data: bytes, content_type: str, langs: list[str] | None = None) -
         log.warning("speech-to-text %s: %s", r.status_code, r.text[:300])
         r.raise_for_status()
     parts = [res["alternatives"][0]["transcript"].strip() for res in r.json().get("results", []) if res.get("alternatives")]
+    if not parts:
+        log.warning("speech-to-text heard nothing (%s, %d bytes, %s)", content_type, len(data), codes[:4])
     return " ".join(p for p in parts if p) or None
 
 

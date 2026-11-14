@@ -160,51 +160,142 @@ class ChatIn(BaseModel):
     lat: float | None = None
     lon: float | None = None
     wait: bool = True  # False: return the immediate reply now and deliver slow follow-ups via /api/poll
+    locale: str | None = None  # the browser's language tag ("es-ES"): first-visit language and units
 
 
 _outbox: dict[str, list[str]] = {}
+_audio: dict[str, list[str]] = {}
 _pending: dict[str, int] = {}
 _lock = threading.Lock()
 
 
-def _deliver_later(key: str, later):
+def _web_voice(key: str, msgs: list, force: bool = False) -> str | None:
+    """The spoken version of a web turn (same rules as WhatsApp): a /voice/… path, or None."""
+    try:
+        on, lang = chat.wants_voice(key)
+        if not (on or force) or not msgs:
+            return None
+        text = voice.speakable(msgs)
+        if len(text) < 2:
+            return None
+        url = voice.store(voice.synthesize(text, lang))
+        return url[url.index("/voice/"):]
+    except Exception:
+        log.exception("spoken reply failed")
+        return None
+
+
+def _deliver_later(key: str, later, spoken: list | None = None, force: bool = False):
     try:
         msgs = later()
     except Exception:
         log.exception("background job failed")
         msgs = ["Sorry — something went wrong fetching your data. Please try again in a minute."]
+    clip = _web_voice(key, (spoken or []) + list(msgs), force)
     with _lock:
         _outbox.setdefault(key, []).extend(msgs)
+        if clip:
+            _audio.setdefault(key, []).append(clip)
         _pending[key] -= 1
 
 
-def _api_messages(msgs: list, pending: bool = False) -> dict:
-    """messages: plain text (what SMS would show); actions: the tap-able choices for the simulator, if any."""
+def _api_messages(msgs: list, pending: bool = False, audio: list | None = None) -> dict:
+    """messages: plain text (what SMS would show); actions: the tap-able choices for the simulator, if any;
+    audio: spoken replies (voice-note clips) to play after the messages."""
     return {"messages": [as_text(m) for m in msgs],
             "actions": [({k: v for k, v in m.items() if k != "text"} | {"text": m["text"]}) if is_prompt(m) else None
                         for m in msgs],
+            "audio": [a for a in (audio or []) if a],
             "pending": pending}
+
+
+def _web_turn(key: str, turn, wait: bool, before: list | None = None, force: bool = False) -> dict:
+    """Answer a web turn: the quick part now, the slow part now (wait) or later through /api/poll.
+    before: messages shown first but not spoken (the "I heard" echo)."""
+    out = list(turn.now)
+    if turn.later and wait:
+        out += turn.later()
+        return _api_messages((before or []) + out, audio=[_web_voice(key, out, force)])
+    if turn.later:
+        with _lock:
+            _pending[key] = _pending.get(key, 0) + 1
+        threading.Thread(target=_deliver_later, args=(key, turn.later, out, force), daemon=True).start()
+        return _api_messages((before or []) + out, pending=True)
+    return _api_messages((before or []) + out, audio=[_web_voice(key, out, force)],
+                         pending=_pending.get(key, 0) > 0)
+
+
+def _web_locale(key: str, locale: str | None) -> None:
+    """"es-ES" → Spanish and metric; "en-US" → English and imperial. Applied once, on a farmer's first visit."""
+    if not locale or len(locale) > 35:
+        return
+    parts = re.split(r"[-_]", locale)
+    lang = parts[0].lower()
+    region = next((p.upper() for p in parts[1:] if len(p) == 2), None)
+    unit = None if region is None else ("imperial" if region in ("US", "LR", "MM") else "metric")
+    try:
+        chat.apply_locale(key, "web", lang, unit)
+    except Exception:
+        log.exception("locale not applied")
+
+
+def _check_web(phone: str, request: Request) -> str:
+    if len(phone) > 64:
+        raise HTTPException(400, "message too long")
+    if not (ratelimit.allow("ip:" + ratelimit.client_ip(request), ratelimit.API_PER_IP)
+            and ratelimit.allow("ph:" + phone, ratelimit.API_PER_PHONE)):
+        raise HTTPException(429, "Too many messages — please wait a minute.")
+    return "web:" + phone
 
 
 @app.post("/api/chat")
 def api_chat(msg: ChatIn, request: Request):
     """Chat for the web simulator, tests and demos without WhatsApp."""
-    if len(msg.phone) > 64 or len(msg.text) > 1000:
+    if len(msg.text) > 1000:
         raise HTTPException(400, "message too long")
-    if not (ratelimit.allow("ip:" + ratelimit.client_ip(request), ratelimit.API_PER_IP)
-            and ratelimit.allow("ph:" + msg.phone, ratelimit.API_PER_PHONE)):
-        raise HTTPException(429, "Too many messages — please wait a minute.")
-    key = "web:" + msg.phone
-    turn = chat.inbound(key, "web", msg.text, msg.lat, msg.lon)
-    out = list(turn.now)
-    if turn.later and msg.wait:
-        out += turn.later()
-        return _api_messages(out)
-    elif turn.later:
-        with _lock:
-            _pending[key] = _pending.get(key, 0) + 1
-        threading.Thread(target=_deliver_later, args=(key, turn.later), daemon=True).start()
-    return _api_messages(out, pending=_pending.get(key, 0) > 0)
+    key = _check_web(msg.phone, request)
+    _web_locale(key, msg.locale)
+    return _web_turn(key, chat.inbound(key, "web", msg.text, msg.lat, msg.lon), msg.wait)
+
+
+class MediaIn(BaseModel):
+    phone: str
+    kind: str  # "audio" (a recorded voice note) or "image"
+    data: str  # base64
+    content_type: str
+    caption: str = ""
+    wait: bool = False
+    locale: str | None = None
+
+
+@app.post("/api/media")
+def api_media(msg: MediaIn, request: Request):
+    """A voice note or photo from the browser demo, handled like the WhatsApp ones."""
+    import base64
+    import binascii
+
+    if msg.kind not in ("audio", "image") or len(msg.data) > 8_000_000 or len(msg.caption) > 1000:
+        raise HTTPException(400, "file too large")
+    key = _check_web(msg.phone, request)
+    _web_locale(key, msg.locale)
+    try:
+        raw = base64.b64decode(msg.data, validate=True)
+    except (binascii.Error, ValueError):
+        raise HTTPException(400, "bad file")
+    if msg.kind == "image":
+        turn = chat.photo(key, "web", media.image_block(raw, msg.content_type), msg.caption)
+        return _web_turn(key, turn, msg.wait)
+    try:
+        heard = media.transcribe(raw, msg.content_type, chat.speech_languages(key))
+    except Exception:
+        log.exception("transcription failed")
+        heard = None
+    if not heard:
+        return _api_messages(["🎙️ Sorry, I couldn't make out that voice note. Could you type it, or record a "
+                              "shorter one (under a minute)?"])
+    heard_lang = i18n.analyze(heard)[0] or chat.wants_voice(key)[1]
+    echo = "🎙️ " + i18n.translate(["I heard:"], heard_lang)[0] + f" “{heard}”"
+    return _web_turn(key, chat.inbound(key, "web", heard), msg.wait, before=[echo], force=True)
 
 
 class OptIn(BaseModel):
@@ -244,8 +335,8 @@ def api_optin(body: OptIn, request: Request):
 def api_poll(phone: str):
     key = "web:" + phone
     with _lock:
-        msgs = _outbox.pop(key, [])
-        return _api_messages(msgs, pending=_pending.get(key, 0) > 0)
+        msgs, audio = _outbox.pop(key, []), _audio.pop(key, [])
+        return _api_messages(msgs, pending=_pending.get(key, 0) > 0, audio=audio)
 
 
 def _site_ctx() -> dict:
