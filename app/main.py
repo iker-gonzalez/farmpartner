@@ -26,6 +26,13 @@ app.mount("/static", StaticFiles(directory=str(config.ROOT / "app" / "static")),
 init_db()
 
 
+@app.on_event("startup")
+def _warm_up():
+    if os.getenv("WARMUP", "1") == "1":
+        from app import warmup
+        warmup.start()
+
+
 def _twiml(messages: list[str]) -> Response:
     from twilio.twiml.messaging_response import MessagingResponse
 
@@ -74,6 +81,8 @@ async def twilio_webhook(request: Request, background: BackgroundTasks):
 
 
 def _text_turn(sender: str, channel: str, text: str, lat, lon, message_sid: str | None = None):
+    import time
+    t0 = time.monotonic()
     with messaging.typing_while(message_sid, first_after_s=0):  # "typing…" until the first reply is ready
         try:
             turn = chat.inbound(sender, channel, text, lat, lon)
@@ -81,10 +90,12 @@ def _text_turn(sender: str, channel: str, text: str, lat, lon, message_sid: str 
             log.exception("inbound message failed")
             messaging.send(sender, "Sorry — something went wrong on my side. Please try again in a minute.")
             return
+    t_now = time.monotonic() - t0
     for m in turn.now:
         messaging.send(sender, m)
     if turn.later:
         _run_later(sender, turn.later, message_sid)
+    log.info("turn timing: first reply ready %.1fs, done %.1fs", t_now, time.monotonic() - t0)
 
 
 def _media_turn(sender: str, channel: str, url: str, kind: str, caption: str, message_sid: str | None = None):

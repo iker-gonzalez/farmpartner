@@ -400,3 +400,24 @@ def record(farmer_id: int, direction: str, body: str, lat=None, lon=None, media_
         if direction == "in":
             db.get(Farmer, farmer_id).last_inbound_at = now()
         db.commit()
+
+
+def static_messages() -> list:
+    """FarmPartner's fixed messages (for translation prewarm)."""
+    return [WELCOME, HELP, PRIORITY_PROMPT, CROPS_PROMPT, IRRIGATION_PROMPT, NEXT_PROMPT, GOAL_TEXT_PROMPT,
+            WELCOME.split("\n\n")[-1],
+            "🔄 Starting over.\n\n📍 *Step 1 of 3:* send your field location — tap 📎 → *Location* and drop the pin on "
+            "your field (or text your ZIP code).",
+            "📡 Got your pin! Checking it's on a field and pulling 20 years of NASA satellite & weather data for it — "
+            "about 30 seconds…",
+            "🧮 Scoring rotations against your field's climate, soil and goals…",
+            "🌱 I compared your rotation with alternatives that fit your climate:",
+            "I need your field's location to look it up. Tap 📎 → Location and send a pin on the field, paste a Google "
+            "Maps link, type coordinates (e.g. 38.05, -100.75), or text a U.S. ZIP code.",
+            "Which crops do you grow on this field? Type them in order, e.g. \"corn, soybeans\". Add \"irrigated\" or "
+            "\"dryland\".",
+            "No problem — which crops do you grow on this field? Type them in order, e.g. \"corn, soybeans\" or "
+            "\"wheat, sorghum, fallow\". Add \"irrigated\" or \"dryland\".",
+            "📷 Got it — taking a look…", "I heard:",
+            "👍 Got it — I'll use metric units: mm of rain and water, °C, hectares.",
+            "Pick another goal."]

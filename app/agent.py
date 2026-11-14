@@ -30,6 +30,10 @@ WhatsApp *bold* is fine. Use the farmer's units (see the last rule).
 extension agent or agronomist. Do not lecture.
 - Reply in the language the farmer writes in (many U.S. farm workers write in Spanish).
 - Share the report link when they want details, maps or charts.
+- Below these rules you get a snapshot of THIS farmer's field: profile, climate, the 7-day weather outlook and \
+this week's watering numbers. When it covers the question (frost, heat, rain, should I water…), answer from it \
+directly without calling a tool. Call tools for anything else: comparing rotations, saving reports, profile changes, \
+or details not in the snapshot.
 - Voice notes reach you already transcribed; answer them like any message.
 - You can search the web (web_search) for general agronomy knowledge your field data doesn't cover: crops outside \
 your list, rotation research, pests and diseases, practices for their region. Search only when it really helps \
@@ -97,6 +101,9 @@ def run_tool(name: str, args: dict, farmer_id: int) -> dict:
         field = service.main_field(farmer)
         if field is None:
             return {"error": "No field yet. Ask the farmer to share a location pin or ZIP code."}
+        _ = field.observations  # load what the read-only tools need, then give the connection back before any fetch
+        if name not in ("compare_rotations", "log_observation", "update_farm_profile"):
+            service.release(db)
         if name == "get_field_conditions":
             return service.conditions(field)
         if name == "compare_rotations":
@@ -209,8 +216,12 @@ WEB_TOOLS = [{"type": "web_search_20260209", "name": "web_search", "max_uses": 3
 _web = {"ok": True}  # switched off for this process if the account doesn't allow web search
 
 
-def _create(client, messages, system=SYSTEM):
-    kw = dict(model=config.ANTHROPIC_MODEL, max_tokens=4000, system=system, messages=messages,
+def _create(client, messages, system=None, max_tokens: int = 4000):
+    """system: the farmer-specific text that follows the shared, cached instructions."""
+    blocks = [{"type": "text", "text": SYSTEM, "cache_control": {"type": "ephemeral"}}]  # tools + rules: cached prefix
+    if system:
+        blocks.append({"type": "text", "text": system})
+    kw = dict(model=config.ANTHROPIC_MODEL, max_tokens=max_tokens, system=blocks, messages=messages,
               output_config={"effort": config.ANTHROPIC_EFFORT},
               betas=["server-side-fallback-2026-07-01"], fallbacks="default")
     if _web["ok"]:
@@ -224,21 +235,53 @@ def _create(client, messages, system=SYSTEM):
     return client.beta.messages.create(tools=TOOLS, **kw)
 
 
+def _snapshot(fm: Farmer) -> str:
+    """Compact facts about this farmer's field so common questions need no tool round trip."""
+    from app.engine.features import rotation_label
+
+    fld = service.main_field(fm) if fm else None
+    if fld is None or not fld.features:
+        return ""
+    c = (fld.features or {}).get("climate") or {}
+    snap = {
+        "field": {"place": fld.place, "irrigated": fld.irrigated, "goals": fm.priorities,
+                  "current_rotation": rotation_label(fld.current_rotation) if fld.current_rotation else None,
+                  "report_url": service.report_url(fld)},
+        "climate_20yr": {k: c.get(k) for k in ("annual_precip_mm", "annual_et0_mm", "median_last_spring_frost",
+                                               "median_first_fall_frost", "heat_days_recent5", "heat_days_early")},
+    }
+    for key, fn in (("weather_next_7_days", service.weather_outlook), ("watering_this_week", service.irrigation_advice)):
+        try:
+            snap[key] = fn(fld)
+        except Exception:
+            log.warning("snapshot %s unavailable", key, exc_info=True)
+    return "\n\nFIELD SNAPSHOT (from FarmPartner's tools):\n" + json.dumps(snap, default=str, separators=(",", ":"))
+
+
 def _system_for(farmer_id: int) -> str:
+    """Farmer-specific instructions and data (sent after the cached shared prefix)."""
     from app import units
     with session() as db:
         fm = db.get(Farmer, farmer_id)
         metric = fm is not None and units.preferred(fm) == "metric"
         note = ((fm.constraints or {}).get("goal_note") if fm else None)
+        fld = service.main_field(fm) if fm else None
+        _ = fld.observations if fld else None
+        service.release(db)  # the snapshot fetches the forecast: don't hold a connection meanwhile
+        snapshot = _snapshot(fm) if fm else ""
     goal = f"\n- The farmer's own goal, in their words: “{note}”. Keep it in mind." if note else ""
-    return SYSTEM + goal + ("\n- Units: this farmer uses METRIC. Tools report inches, °F and acres: convert to mm, °C and "
+    return "This farmer:" + goal + ("\n- Units: this farmer uses METRIC. Tools report inches, °F and acres: convert to mm, °C and "
                      "hectares in your reply (1 in = 25.4 mm; °C = (°F − 32) × 5/9; 1 acre = 0.405 ha)." if metric else
-                     "\n- Units: inches, °F and acres.")
+                     "\n- Units: inches, °F and acres.") + snapshot
 
 
 def _answer_llm(farmer_id: int, image: dict | None = None) -> str:
+    import time
+
+    t0 = time.monotonic()
     client = claude_client()
     system = _system_for(farmer_id)
+    t_ctx = time.monotonic() - t0
     messages = _history(farmer_id)
     while messages and messages[-1]["role"] == "assistant":
         messages.pop()  # e.g. "📷 Got it — taking a look…" sent while we work; the request must end on the farmer's turn
@@ -246,7 +289,7 @@ def _answer_llm(farmer_id: int, image: dict | None = None) -> str:
         return HELP
     if image:
         messages[-1]["content"] = [image, {"type": "text", "text": messages[-1]["content"]}]
-    for _ in range(8):
+    for calls in range(1, 9):
         resp = _create(client, messages, system)
         if resp.stop_reason == "pause_turn":  # a long web search: send the turn back and the server resumes it
             messages.append({"role": "assistant", "content": resp.content})
@@ -254,6 +297,10 @@ def _answer_llm(farmer_id: int, image: dict | None = None) -> str:
         if resp.stop_reason == "refusal":
             return "Sorry, I can't help with that one. I can help with rotations, watering, frost and heat on your field."
         if resp.stop_reason != "tool_use":
+            u = getattr(resp, "usage", None)
+            log.info("answer in %.1fs (context %.1fs, %d calls, cache read %s / write %s tokens)",
+                     time.monotonic() - t0, t_ctx, calls, getattr(u, "cache_read_input_tokens", "?"),
+                     getattr(u, "cache_creation_input_tokens", "?"))
             return "".join(b.text for b in resp.content if b.type == "text").strip() or HELP
         messages.append({"role": "assistant", "content": resp.content})
         results = []
@@ -322,3 +369,14 @@ def _answer_rules(farmer_id: int, text: str) -> str:
         with session() as db:
             return "📊 " + service.report_url(service.main_field(db.get(Farmer, farmer_id)))
     return HELP
+
+
+def prewarm() -> None:
+    """Startup/keep-alive: exchange the Claude credentials and write the shared prompt prefix to the cache with a
+    max_tokens=0 request (prefill only, no output billed), so the first farmer doesn't pay for either."""
+    if not config.llm_enabled():
+        return
+    resp = _create(claude_client(), [{"role": "user", "content": "ping"}], max_tokens=0)
+    u = getattr(resp, "usage", None)
+    log.info("Claude prewarm: cache write %s / read %s tokens", getattr(u, "cache_creation_input_tokens", "?"),
+             getattr(u, "cache_read_input_tokens", "?"))

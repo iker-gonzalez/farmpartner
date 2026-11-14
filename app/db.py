@@ -117,7 +117,7 @@ if DATABASE_URL.startswith("sqlite"):
 else:
     # Small pool (Supabase free tier caps connections); prepare_threshold=None keeps it compatible with
     # Supabase's transaction pooler (port 6543) as well as the session pooler (5432).
-    engine = create_engine(DATABASE_URL, pool_size=3, max_overflow=2, pool_pre_ping=True, pool_recycle=300,
+    engine = create_engine(DATABASE_URL, pool_size=4, max_overflow=4, pool_timeout=10, pool_pre_ping=True, pool_recycle=300,
                            connect_args={"prepare_threshold": None})
 SessionLocal = sessionmaker(bind=engine, expire_on_commit=False)
 

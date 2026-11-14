@@ -16,6 +16,41 @@ from app.prompts import is_prompt
 log = logging.getLogger(__name__)
 _cache: dict[tuple[str, str], str] = {}
 _lock = threading.Lock()
+_loaded: set[str] = set()
+
+
+def _store_name(lang: str) -> str:
+    return f"translations-{lang}.json"
+
+
+def _load(lang: str) -> None:
+    """Translations survive restarts: one JSON file per language in the cache bucket (or local cache dir)."""
+    if lang in _loaded:
+        return
+    from app.data import http
+    text = None
+    p = http.CACHE_DIR / _store_name(lang)
+    if p.exists():
+        text = p.read_text()
+    else:
+        text = http._gcs_get(_store_name(lang), 0)
+    with _lock:
+        if text:
+            for k, v in json.loads(text).items():
+                _cache.setdefault((lang, k), v)
+        _loaded.add(lang)
+
+
+def _save(lang: str) -> None:
+    from app.data import http
+    with _lock:
+        text = json.dumps({k: v for (lg, k), v in _cache.items() if lg == lang}, ensure_ascii=False)
+    try:
+        http.CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        (http.CACHE_DIR / _store_name(lang)).write_text(text)
+        http._gcs_put(_store_name(lang), 0, text)
+    except Exception:
+        log.warning("could not save translations", exc_info=True)
 
 LANGS = {"es": "Spanish", "pt": "Portuguese", "fr": "French", "de": "German", "it": "Italian", "ja": "Japanese",
          "zh": "Chinese (Simplified)", "ko": "Korean", "ru": "Russian", "ar": "Arabic", "hi": "Hindi", "th": "Thai",
@@ -127,6 +162,10 @@ def translate(msgs: list, lang: str) -> list:
     if lang in (None, "en") or lang not in LANGS or not msgs or not config.llm_enabled():
         return msgs
     wanted = list(dict.fromkeys(s for m in msgs for s in _strings(m) if s and s.strip()))
+    try:
+        _load(lang)
+    except Exception:
+        log.warning("could not load saved translations", exc_info=True)
     with _lock:
         missing = [s for s in wanted if (lang, s) not in _cache]
     if missing:
@@ -134,9 +173,22 @@ def translate(msgs: list, lang: str) -> list:
             for src, dst in zip(missing, _translate_batch(missing, lang)):
                 with _lock:
                     _cache[(lang, src)] = dst
+            _save(lang)
         except Exception:
             log.exception("translation failed; sending English")
             return msgs
     with _lock:
         tr = {s: _cache[(lang, s)] for s in wanted if (lang, s) in _cache}
     return [_rebuild(m, tr) for m in msgs]
+
+
+PREWARM_LANGS = ("es", "pt", "fr", "ja", "de", "it", "zh")
+
+
+def prewarm(messages: list, langs=PREWARM_LANGS) -> None:
+    """Translate FarmPartner's fixed messages ahead of time, so no farmer waits for a first-time translation."""
+    for lang in langs:
+        try:
+            translate(messages, lang)
+        except Exception:
+            log.warning("translation prewarm failed for %s", lang, exc_info=True)

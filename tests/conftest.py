@@ -8,6 +8,7 @@ os.environ["DATABASE_URL"] = f"sqlite:///{tempfile.mkdtemp()}/test.db"
 os.environ.pop("ANTHROPIC_API_KEY", None)
 os.environ["TWILIO_ACCOUNT_SID"] = ""
 os.environ["TWILIO_AUTH_TOKEN"] = ""
+os.environ["WARMUP"] = "0"
 
 import pytest  # noqa: E402
 

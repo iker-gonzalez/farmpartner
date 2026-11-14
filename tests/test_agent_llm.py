@@ -69,3 +69,29 @@ def test_photo_request_ends_on_the_farmers_turn_with_the_image(offline, monkeypa
     assert last["role"] == "user" and last["content"][0]["type"] == "image"
     assert "Is my corn healthy?" in last["content"][1]["text"]
     assert sent == ["📷 Got it — taking a look…", "Looks like northern corn leaf blight."]
+
+
+def test_cached_prefix_and_field_snapshot(offline, monkeypatch):
+    """Shared rules are a cached system block; the farmer's snapshot (weather, watering) follows, uncached."""
+    from fastapi.testclient import TestClient
+
+    from app import agent, config
+    from app.main import app
+
+    c = TestClient(app)
+    for kw in ({"text": "hi"}, {"lat": 40.65, "lon": -98.3}, {"text": "yes irrigated"}, {"text": "1"}, {"text": "compare now"}):
+        c.post("/api/chat", json={"phone": "snap", **kw})
+    seen = []
+
+    def create(**kw):
+        seen.append(kw)
+        return NS(stop_reason="end_turn", content=[NS(type="text", text="❄️ No frost this week.")],
+                  usage=NS(cache_read_input_tokens=1800, cache_creation_input_tokens=0))
+
+    monkeypatch.setattr(config, "llm_enabled", lambda: True)
+    monkeypatch.setattr(agent, "_client", NS(beta=NS(messages=NS(create=create))))
+    assert c.post("/api/chat", json={"phone": "snap", "text": "is frost coming?"}).json()["messages"] == ["❄️ No frost this week."]
+    system = seen[0]["system"]
+    assert system[0]["cache_control"] == {"type": "ephemeral"} and system[0]["text"] == agent.SYSTEM
+    assert "FIELD SNAPSHOT" in system[1]["text"] and "weather_next_7_days" in system[1]["text"]
+    assert len(seen) == 1  # answered from the snapshot: one Claude call, no tool round trip

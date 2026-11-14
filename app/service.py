@@ -33,7 +33,14 @@ def report_url(field: Field) -> str:
 SATELLITE_KEYS = ("smap", "ecostress", "appeears", "ndvi")
 
 
+def release(db: Session) -> None:
+    """End the open transaction so the pooled connection goes back while we wait on outside APIs (objects stay usable:
+    expire_on_commit=False). Holding it through a 30 s NASA pull starved the 5-connection pool and stalled chats."""
+    db.commit()
+
+
 def analyze_field(db: Session, field: Field, with_ndvi: bool = False) -> dict:
+    release(db)
     f = build_features(field.lat, field.lon, with_ndvi=with_ndvi)
     for k in SATELLITE_KEYS:  # a refresh must not drop slower satellite results that already arrived
         if (field.features or {}).get(k) and not f.get(k):
@@ -53,6 +60,7 @@ def analyze_field(db: Session, field: Field, with_ndvi: bool = False) -> dict:
 
 def enrich_ndvi(db: Session, field: Field) -> None:
     if field.features and not field.features.get("ndvi"):
+        release(db)
         field.features = add_ndvi(dict(field.features))
         db.commit()
 
@@ -221,6 +229,7 @@ def request_satellite(db: Session, field: Field, max_age_days: int = 7) -> list[
     jobs = _jobs(f)
     fresh_after = (now() - dt.timedelta(days=max_age_days)).isoformat()
     active = []
+    release(db)
     for kind, (layers, days) in appeears.JOBS.items():
         j = jobs.get(kind) or {}
         if j.get("status") in PENDING or (j.get("status") == "done" and j.get("collected_at", "") > fresh_after):
@@ -246,6 +255,7 @@ def collect_satellite(db: Session, field: Field) -> str:
 
     f = dict(field.features or {})
     jobs = _jobs(f)
+    release(db)
     for kind, j in jobs.items():
         if not j or j.get("status") not in PENDING:
             continue
