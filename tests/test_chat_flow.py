@@ -193,3 +193,30 @@ def test_goals_typed_together_and_in_own_words(offline):
         p2 = db.query(Farmer).filter_by(phone="web:g2").one()
         assert p1.priorities == ["save_water", "soil_health"] and p1.state == "ready"
         assert p2.constraints["goal_note"] == "I want to use less fertilizer" and p2.priorities and p2.state == "ready"
+
+
+def test_never_cropped_field_moves_on_and_dryland_plans_stay_dryland(offline):
+    """'Mi parcela es de secano y nunca he plantado nada' answers the crop step: bare today, dryland, no re-ask."""
+    from fastapi.testclient import TestClient
+
+    from app.db import Farmer, session
+    from app.main import app
+    c = TestClient(app)
+    say = lambda t: c.post("/api/chat", json={"phone": "never1", "text": t, "wait": True}).json()["messages"]  # noqa: E731
+    say("hi")
+    say("67846")
+    out = say("Mi parcela es de secano y nunca he plantado nada")
+    with session() as db:
+        fm = db.query(Farmer).filter_by(phone="web:never1").one()
+        fld = fm.fields[-1]
+        assert fm.state == "awaiting_priority" and fld.current_rotation == ["fallow", "fallow"] and fld.irrigated is False
+    assert len(out) == 2 and "3" in out[1]   # "got it" + step 3 of 3 (goals), no crop re-ask
+    from app.onboarding import NEVER_CROPPED
+    for t in ("never planted anything", "it's a new field", "nada", "ez dut ezer landatu", "campo sin cultivar"):
+        assert NEVER_CROPPED.search(t), t
+    assert not NEVER_CROPPED.search("wheat, sorghum, fallow")
+    # the comparison that follows never puts thirsty irrigated-style crops on this dryland field
+    from app.engine.scoring import compare
+    from tests.conftest import load
+    res = compare(load("garden_city_ks"), ["soil_health"], irrigated=False, current=["fallow", "fallow"])
+    assert all("corn" not in s["years"] and "soybeans" not in s["years"] for s in res["strategies"][1:])

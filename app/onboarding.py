@@ -67,7 +67,19 @@ TREE_CROPS = re.compile(
     r"caf[eé]|cacao|cocoa|bananas?|pl[aá]tan\w*|mangos?|kiwis?|tea plantation|t[eé]|lemons?|lim[oó]n\w*)\b", re.I)
 
 
+# "never planted anything", "it's a new field", "nunca he sembrado nada", "ez dut ezer landatu"
+NEVER_CROPPED = re.compile(
+    r"\b(never (been )?(planted|grown|sown|farmed|cropped|cultivated)|not (been )?(planted|cropped|farmed) (yet|before)|"
+    r"(haven'?t|have not|didn'?t) (planted|grown|sown) (anything|yet|before)|nothing (planted|grown|yet)|new field|"
+    r"bare (land|field)|empty (field|plot|land)|no crops?( yet)?$|nunca (he |hemos |se ha |ha )?(plantad|sembrad|cultivad)o|"
+    r"no (he|hemos|se ha) (plantado|sembrado|cultivado)|(campo|parcela|terreno) (nuev[oa]|vac[ií][oa]|sin cultivar)|"
+    r"sin cultivar|nunca (se ha )?cultivad|bald[ií]o|ezer ez|ez dut ezer)\b|^\W*(nothing|nada|ninguno|none)\W*$", re.I)
+
+
 def _got_it(current: list[str], label: str, irr_txt: str = "") -> str:
+    if current == ["fallow", "fallow"]:
+        return (f"👍 Got it: a field that hasn't been cropped yet{irr_txt}. I'll compare starting rotations with "
+                "leaving it bare.")
     if current and len(set(current)) == 1 and current[0] != "fallow":
         name = crop_name(current[0]).lower()
         return (f"👍 Got it: you grow {name}{irr_txt}. I'll compare growing it every year with rotations built "
@@ -338,6 +350,8 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
                 return Reply(now=["Please send your field location first (📎 → Location or a ZIP code)."])
             named = crops_in_text(t)
             unknown: list[str] = []
+            if not named and NEVER_CROPPED.search(t):
+                named = ["fallow", "fallow"]  # nothing grown yet: today's "rotation" is bare ground
             said_no_word = re.search(r"\b(no|nope|wrong|different|incorrect|incorrecto|otro|otros|distinto)\b", low)
             if not named and not said_no_word and re.search(r"\w{3}", t) and not re.fullmatch(
                     r"(dry ?land|irrigated|secano|regad[ií]o|de secano|de regad[ií]o|ureztatua|lehorrekoa)\W*", low) \
