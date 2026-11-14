@@ -350,6 +350,14 @@ def _answer_llm(farmer_id: int, image: dict | None = None) -> str:
 
 
 def _answer_rules(farmer_id: int, text: str) -> str:
+    try:
+        return _answer_rules_inner(farmer_id, text)
+    except (KeyError, TypeError):
+        return ("📍 Send me your field's location first (📎 → Location, a Google Maps link or coordinates) and "
+                "I'll answer with your field's NASA data.")
+
+
+def _answer_rules_inner(farmer_id: int, text: str) -> str:
     t = text.lower()
     if re.search(r"\b(water|irrigat|riego|regar)", t) and "?" in t or re.search(r"should i (water|irrigate)", t):
         r = run_tool("irrigation_advice", {}, farmer_id)
