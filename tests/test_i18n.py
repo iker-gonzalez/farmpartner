@@ -165,7 +165,7 @@ def test_tree_crops_become_an_orchard_and_photos_name_the_crop(offline, monkeypa
     sent.clear()
     c.post("/twilio/webhook", data={"From": "whatsapp:+15550003333", "MediaUrl0": "u", "MediaContentType0": "image/jpeg",
                                     "NumMedia": "1"})
-    assert sent[0] == "📷 That looks like *corn*." and "Continuous corn" in sent[1]
+    assert sent[0] == "📷 That looks like *corn*." and "you grow corn" in sent[1]
 
 
 def test_button_taps_keep_language_and_questions_see_the_last_photo(offline, monkeypatch):
@@ -214,7 +214,7 @@ def test_unknown_crop_uses_closest_and_nothing_is_echoed(offline, monkeypatch):
     monkeypatch.setattr(onboarding, "crops_any_language", lambda t: ([], ["LIKE:field_peas:Lupinus mutabilis"]))
     out = say(text="Lupinus mutabilis, secano")
     assert out[0].startswith("🌱 I don't have Lupinus mutabilis") and "Field peas" in out[0]
-    assert "Continuous field peas" in out[1] and "Step 3 of 3" in out[2]
+    assert "you grow field peas" in out[1] and "Step 3 of 3" in out[2]
 
 
 def test_any_language_switch_via_claude(offline, monkeypatch):

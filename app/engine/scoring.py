@@ -79,6 +79,11 @@ def score_rotation(rot: dict, f: dict, irrigated: bool | None) -> dict:
             issues.append(f"{c['name']} needs ~{c['gdd_c']} growing degree days; this site gets ~{gdd}")
     if not irrigated and rain < rot.get("min_rain_mm", 0):
         issues.append(f"needs ~{rot['min_rain_mm']} mm rain/yr without irrigation; this site averages {rain:.0f} mm")
+    if not irrigated and rain < 900:
+        for c in main:
+            if c.get("irrigated_only"):
+                issues.append(f"{c['name']} normally needs irrigation; this field is dryland")
+                break
     for cv in set(cover_map.values()):
         g = covers()[cv]
         if g.get("min_gdd_c") and gdd < g["min_gdd_c"]:
@@ -91,6 +96,8 @@ def score_rotation(rot: dict, f: dict, irrigated: bool | None) -> dict:
     need = sum(c["water_need_mm"] for c in main) / n + cover_water
     eff = rain * 0.7
     ratio = need / eff if eff else 2
+    if not irrigated and need > eff * 1.25:  # dryland: the rotation would need far more water than rain supplies
+        issues.append(f"needs ~{need:.0f} mm of water a year; dryland rain here supplies ~{eff:.0f} mm")
     drought = sum(c["drought_tolerance"] for c in main) / n
     water = clamp(110 - 55 * ratio + (drought - 3) * 6)
     if irrigated:  # irrigation removes the yield risk but not the aquifer cost: score stays need-based
@@ -315,6 +322,10 @@ def compare(f: dict, priorities: list[str], irrigated: bool | None, current: lis
         s["total"] = total(s["scores"], weights)
         s["overall"] = overall(s["scores"])
     cands.sort(key=lambda s: rank_key(s, weights), reverse=True)
+    if current and len(set(current)) == 1 and current[0] != "fallow":
+        keeping = [s for s in cands if current[0] in s["years"]]
+        if len(keeping) >= 2:  # "I grow wheat, give me a rotation": options built around the farmer's crop
+            cands = keeping
     specialty_ids = {r["id"] for r in rotations() if r.get("requires_any")}
     specialty = [s for s in cands if s["id"] in specialty_ids]
     if len(specialty) >= 2:  # a vegetable/beet/rice grower gets options that keep their crop

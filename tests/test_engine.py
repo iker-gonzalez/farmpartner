@@ -63,10 +63,13 @@ def test_dryland_filter_excludes_corn_soy_in_semi_arid(garden_city):
 def test_priorities_change_the_answer(hastings):
     soil = compare(hastings, ["soil_health"], irrigated=True)["strategies"]
     water = compare(hastings, ["save_water"], irrigated=True)["strategies"]
-    income = compare(hastings, ["income"], irrigated=True)["strategies"]
+    forage = compare(hastings, ["forage"], irrigated=True)["strategies"]
     assert soil[1]["total"] != water[1]["total"]  # the goal score always reflects the goal
     # a plan that wins on almost everything may top several goals (overall score counts too), but not all of them
-    assert [s["id"] for s in soil[1:]] != [s["id"] for s in income[1:]]
+    assert [s["id"] for s in soil[1:]] != [s["id"] for s in water[1:]]
+    assert [s["id"] for s in soil[1:]] != [s["id"] for s in forage[1:]]
+    # the farmer's own crop (continuous corn here) stays in every alternative
+    assert all("corn" in s["years"] for s in soil[1:])
 
 
 def test_search_goes_beyond_templates_with_seasonal_second_crops(garden_city):
@@ -121,3 +124,10 @@ def test_search_outside_us_uses_country_crops(garden_city):
     grown = {"barley", "canola", "corn", "cotton", "field_peas", "oats", "potatoes", "rice", "sunflower", "tomatoes",
              "triticale", "vegetables", "winter_wheat", "fallow"}
     assert all(set(s["years"]) <= grown for s in res["strategies"])
+
+
+def test_dryland_never_gets_irrigated_only_crops(garden_city):
+    res = compare(garden_city, ["income"], irrigated=False, current=["winter_wheat", "winter_wheat"])
+    bad = {"vegetables", "tomatoes", "potatoes", "sugarbeets", "rice"}
+    assert all(not (set(s["years"]) & bad) for s in res["strategies"][1:])
+    assert all("winter_wheat" in s["years"] for s in res["strategies"][1:])   # built around the farmer's wheat

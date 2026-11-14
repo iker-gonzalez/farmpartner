@@ -99,7 +99,7 @@ def test_crop_step_unknown_crop_and_irrigation_alone(offline, monkeypatch):
     out = say(text="Dryland")[0]
     assert out.startswith("👍 Dryland — noted.") and "Add" not in out
     out = say(text="Corn")
-    assert "Continuous corn (dryland)" in out[0] and "Step 3 of 3" in out[1]
+    assert "you grow corn (dryland)" in out[0] and "Step 3 of 3" in out[1]
 
 
 def test_typing_indicator_while_slow_work(monkeypatch):

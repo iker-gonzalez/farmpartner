@@ -67,6 +67,14 @@ TREE_CROPS = re.compile(
     r"caf[eé]|cacao|cocoa|bananas?|pl[aá]tan\w*|mangos?|kiwis?|tea plantation|t[eé]|lemons?|lim[oó]n\w*)\b", re.I)
 
 
+def _got_it(current: list[str], label: str, irr_txt: str = "") -> str:
+    if current and len(set(current)) == 1 and current[0] != "fallow":
+        name = crop_name(current[0]).lower()
+        return (f"👍 Got it: you grow {name}{irr_txt}. I'll compare growing it every year with rotations built "
+                f"around {name}.")
+    return f"👍 Got it: {label}{irr_txt}."
+
+
 def _orchard(farmer: Farmer, crop: str, irrigated: bool | None) -> "Reply":
     """Tree crops stay for decades: no rotation to compare. Set the field up as an orchard and move on."""
     with session() as db:
@@ -389,11 +397,11 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
             if fld.irrigated is None:
                 fm.state = "awaiting_irrigation"
                 db.commit()
-                return Reply(now=([note] if note else []) + [f"👍 Got it: {rot}.", IRRIGATION_PROMPT])
+                return Reply(now=([note] if note else []) + [_got_it(fld.current_rotation, rot), IRRIGATION_PROMPT])
             fm.state = "awaiting_priority"
             db.commit()
             irr_txt = " (irrigated)" if fld.irrigated else " (dryland)"
-        return Reply(now=([note] if note else []) + [f"👍 Got it: {rot}{irr_txt}.", PRIORITY_PROMPT])
+        return Reply(now=([note] if note else []) + [_got_it(fld.current_rotation, rot, irr_txt), PRIORITY_PROMPT])
 
     if state == "awaiting_irrigation":
         irr = parse_irrigated(t)
@@ -436,9 +444,11 @@ def _goals_step(farmer: Farmer, state: str, t: str, low: str) -> Reply:
         _save_goals(farmer, chosen, "awaiting_goal_text")
         return Reply(now=[GOAL_TEXT_PROMPT])
     if state == "awaiting_more_goals":
-        if low in ("compare now", "compare", "done", "no", "that's all", "listo", "comparar"):
+        if low in ("compare now", "compare", "done", "no", "that's all", "listo", "comparar") or re.search(
+                r"\b(compare|comparar|compara|alderatu|comparer|vergleichen|confrontare)\b", low):
             return _compare(farmer, chosen or ["soil_health"])
-        if low in ("add goal", "add", "another", "more", "otro objetivo"):
+        if low in ("add goal", "add", "another", "more") or re.search(
+                r"\b(add|another|añadir|anadir|otro objetivo|otra meta|gehitu|ajouter|adicionar|hinzufügen)\b", low):
             left = [g for g in GOALS if PRIORITY_KEYS[g[0]] not in chosen]
             return Reply(now=[picker("Pick another goal.", "Choose a goal", *left, OTHER_GOAL)])
         added = parse_priorities(t)
