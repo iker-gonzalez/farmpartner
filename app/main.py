@@ -252,7 +252,12 @@ def _site_ctx() -> dict:
     """Values shared by the public pages (landing and What & How)."""
     return {"repo": landing.REPO_URL, "whatsapp": landing.whatsapp_url(), "wa": landing.whatsapp_copy(),
             "sprout_path": landing.SPROUT_PATH, "whatsapp_path": landing.WHATSAPP_PATH,
-            "video_id": landing.VIDEO_ID}
+            "video_id": landing.VIDEO_ID, "langs": _lang_counts()}
+
+
+def _lang_counts() -> dict:
+    """Languages FarmPartner handles, straight from the code so the website never overclaims."""
+    return {"text": len(i18n.LANGS), "voice_in": len(media.SPEECH_CODES), "voice_out": len(voice.TTS_CODES)}
 
 
 @app.get("/", response_class=HTMLResponse)

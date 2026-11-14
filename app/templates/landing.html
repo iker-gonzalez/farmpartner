@@ -70,6 +70,11 @@
   form.optin .btn[disabled] { opacity: .6; cursor: wait; }
   form.optin label { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 12px; color: var(--ink-2); cursor: pointer; }
   form.optin label input { accent-color: var(--lime); width: 15px; height: 15px; }
+  .caps { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; padding: 0; margin-top: -8px; list-style: none;
+    font-family: var(--mono); font-size: 12.5px; letter-spacing: .4px; color: var(--ink); }
+  .caps li { display: inline-flex; align-items: center; gap: 7px; }
+  .caps .ic { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-size: 14px; }
+  .caps .dir { color: var(--lime); }
   .channels { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 0; list-style: none;
     font-family: var(--mono); font-size: 12px; margin-top: -6px; }
   .channels li { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px;
@@ -140,6 +145,7 @@
     form.optin .btn { width: 100%; justify-content: center; padding: 16px 20px; }
     form.optin label { font-size: 11px; text-align: left; }
     .channels { font-size: 11px; gap: 6px; margin-top: 0; }
+    .caps { font-size: 11px; gap: 6px 14px; margin-top: -4px; }
     .channels li { padding: 5px 8px; gap: 6px; }
     .meta { font-size: 12px; line-height: 1.7; }
     .meta .nl { display: block; }
@@ -169,7 +175,13 @@
     <div class="copy">
       <p class="kicker">● NASA SPACE APPS 2026<span class="sep"> · </span><span class="nl">FIELD SHIFT CHALLENGE</span></p>
       <h1>The farm advisor that <br>reads your field from space.</h1>
-      <p class="sub">Send a location pin on WhatsApp. FarmPartner reads 20 years of NASA climate, soil-moisture and vegetation data for that field, then compares your crop rotation with two that fit your climate — with the evidence and the risks to check locally.</p>
+      <p class="sub">Send a location pin on WhatsApp — by text or voice note, in your own language. FarmPartner reads 20 years of NASA climate, soil-moisture and vegetation data for that field, then compares your crop rotation with two that fit your climate — with the evidence and the risks to check locally — and answers back in text and voice.</p>
+      <ul class="caps" aria-label="What FarmPartner supports">
+        <li><span class="ic" aria-hidden="true">✍️</span>TEXT <span class="dir">IN &amp; OUT</span></li>
+        <li><span class="ic" aria-hidden="true">🎙️</span>VOICE NOTES <span class="dir">IN &amp; OUT</span></li>
+        <li title="Text in {{ langs.text }} languages · voice notes understood in {{ langs.voice_in }} · spoken replies in {{ langs.voice_out }}"><span class="ic" aria-hidden="true">🌍</span>{{ langs.text }} LANGUAGES</li>
+        <li><span class="ic" aria-hidden="true">📷</span>CROP PHOTOS</li>
+      </ul>
       <form class="optin" data-optin novalidate>
         <div class="row">
           <div class="cc" data-picker><input type="hidden" name="cc" value="1"></div>
