@@ -366,6 +366,13 @@ def run_alerts(token: str = Form("")):
         return {"alerts": _send_alerts(db)}
 
 
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    from fastapi.responses import FileResponse
+    return FileResponse(config.ROOT / "app" / "static" / "brand" / "favicon-32.png", media_type="image/png",
+                        headers={"Cache-Control": "public, max-age=86400"})
+
+
 @app.get("/health")
 @app.get("/healthz")  # note: Cloud Run reserves paths ending in "z"; use /health there
 def healthz():

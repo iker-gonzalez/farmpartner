@@ -114,3 +114,30 @@ def test_typing_indicator_while_slow_work(monkeypatch):
     assert n >= 2 and set(calls) == {"SM1"} and len(calls) == n  # refreshed while working, stops after
     with messaging.typing_while(None):
         pass
+
+
+def test_location_from_text(monkeypatch):
+    from app.data import maplinks
+    f = maplinks.location_from_text
+    assert f("36.314251,-98.116206") == (36.314251, -98.116206)
+    assert f(" 36.31 , -98.11 ") == (36.31, -98.11)
+    assert f("https://www.google.com/maps/place/36.3,-98.1/data=!3m5!3d36.3142512!4d-98.1162062") == (36.3142512, -98.1162062)
+    assert f("look: https://maps.apple.com/?ll=38.05,-100.75&q=Pin") == (38.05, -100.75)
+    assert f("https://evil.example/?q=1.0,2.0") is None
+    assert f("67846") is None and f("got 1.2, maybe 1.5 inches") is None
+    monkeypatch.setattr(maplinks, "_resolve", lambda url: "https://www.google.com/maps/place/@38.05,-100.75,15z")
+    assert f("https://maps.app.goo.gl/abc") == (38.05, -100.75)
+
+
+def test_pasted_coordinates_and_duplicate_pins(offline):
+    c = _client()
+    say = lambda **kw: c.post("/api/chat", json={"phone": "dup", **kw}).json()["messages"]  # noqa: E731
+    say(text="hi")
+    assert "Step 2 of 3" in say(text="38.05, -100.75")[-1]          # typed coordinates work as a pin
+    assert say(lat=38.05, lon=-100.75) == []                         # the same pin delivered twice: ignored
+    assert "Save water" in "\n".join(say(text="yes dryland"))        # and the crop step is undisturbed
+
+
+def test_favicon(offline):
+    r = _client().get("/favicon.ico")
+    assert r.status_code == 200 and r.headers["content-type"] == "image/png"

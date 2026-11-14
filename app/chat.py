@@ -1,10 +1,12 @@
 """One entry point for every channel (WhatsApp, SMS, web simulator, CLI)."""
+import re
 from dataclasses import dataclass
 from typing import Callable
 
 from app import agent, onboarding, service
+from app.data import maplinks
 from app.prompts import as_text
-from app.db import session
+from app.db import now, session
 
 
 @dataclass
@@ -26,8 +28,19 @@ def inbound(phone: str, channel: str, text: str, lat: float | None = None, lon: 
             if fld:
                 return _out(farmer.id, Turn(now=[f"📊 Your field report: {service.report_url(fld)}"], later=None))
 
-    if lat is not None and farmer.state == "ready":
-        farmer.state = "awaiting_location"  # a new pin from an onboarded farmer = add/replace the field
+    if lat is None and re.search(r"https?://|\d\.\d+\s*[,;]", text or ""):
+        pt = maplinks.location_from_text(text)
+        if pt:  # a pasted Google/Apple Maps link or "lat, lon" counts as a pin
+            lat, lon, text = pt[0], pt[1], ""
+    if lat is not None and farmer.state not in ("new", "awaiting_location"):
+        with session() as db:
+            from app.db import Farmer
+            last = service.main_field(db.get(Farmer, farmer.id))
+            dup = (last is not None and abs(last.lat - lat) < 1e-4 and abs(last.lon - lon) < 1e-4
+                   and (now() - last.created_at).total_seconds() < 300)
+        if dup:  # WhatsApp sometimes delivers the same pin twice; the first one is already being analyzed
+            return Turn(now=[], later=None)
+        farmer.state = "awaiting_location"  # a new pin at any step = add/replace the field
     reply = onboarding.handle(farmer, text or "", lat, lon)
     if reply is None:  # onboarded: free conversation, answered in the background (LLM can take a few seconds)
         def later():
