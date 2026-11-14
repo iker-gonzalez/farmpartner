@@ -11,7 +11,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from sqlalchemy import select
 
-from app import chat, config, i18n, landing, media, messaging, ratelimit, report_view, service, team
+from app import chat, config, i18n, landing, media, messaging, ratelimit, report_view, service, team, voice
 from app.prompts import as_text, is_prompt
 from app.db import Farmer, Field, init_db, session
 from app.engine.explain import DISCLAIMER, SCORE_LABELS, evidence, gaps, inch, short_name
@@ -42,15 +42,42 @@ def _twiml(messages: list[str]) -> Response:
     return Response(str(r), media_type="application/xml")
 
 
-def _run_later(to: str, later, message_sid: str | None = None, first_after_s: float = 2):
+def _run_later(to: str, later, message_sid: str | None = None, first_after_s: float = 2) -> list:
+    """Run the slow part of a turn and send its messages; returns them (for the spoken version)."""
     try:
         with messaging.typing_while(message_sid, first_after_s=first_after_s):  # "typing…" while NASA data or Claude is working
             msgs = later()
         for m in msgs:
             messaging.send(to, m)
+        return msgs
     except Exception:
         log.exception("background job failed")
         messaging.send(to, "Sorry — something went wrong fetching your data. Please try again in a minute.")
+        return []
+
+
+def _speak(to: str, msgs: list, force: bool = False) -> None:
+    """Also send the turn as a voice note when the farmer wants it (or just sent one). Never breaks the chat."""
+    if not to.startswith("whatsapp:") or not msgs:
+        return
+    try:
+        on, lang = chat.wants_voice(to)
+        if not (on or force):
+            return
+        text = voice.speakable(msgs)
+        if len(text) < 2:
+            return
+        messaging.send_media(to, voice.store(voice.synthesize(text, lang)))
+    except Exception:
+        log.exception("spoken reply failed")
+
+
+@app.get("/voice/{vid}.ogg", include_in_schema=False)
+def voice_clip(vid: str):
+    audio = voice.load(vid)
+    if audio is None:
+        raise HTTPException(404)
+    return Response(audio, media_type="audio/ogg", headers={"Cache-Control": "public, max-age=86400"})
 
 
 @app.post("/twilio/webhook")
@@ -93,8 +120,8 @@ def _text_turn(sender: str, channel: str, text: str, lat, lon, message_sid: str 
     t_now = time.monotonic() - t0
     for m in turn.now:
         messaging.send(sender, m)
-    if turn.later:
-        _run_later(sender, turn.later, message_sid)
+    sent = list(turn.now) + (_run_later(sender, turn.later, message_sid) if turn.later else [])
+    _speak(sender, sent)
     log.info("turn timing: first reply ready %.1fs, done %.1fs", t_now, time.monotonic() - t0)
 
 
@@ -122,8 +149,8 @@ def _media_turn(sender: str, channel: str, url: str, kind: str, caption: str, me
         turn = chat.photo(sender, channel, media.image_block(data, content_type), caption, url)
     for m in turn.now:
         messaging.send(sender, m)
-    if turn.later:
-        _run_later(sender, turn.later, message_sid)
+    sent = list(turn.now) + (_run_later(sender, turn.later, message_sid) if turn.later else [])
+    _speak(sender, sent, force=(kind == "audio"))  # a voice note gets a voice note back
 
 
 class ChatIn(BaseModel):

@@ -177,3 +177,10 @@ resource "google_project_service" "speech" {
   service            = "speech.googleapis.com"
   disable_on_destroy = false
 }
+
+# Spoken replies (app/voice.py). Uses the runtime service account; no key.
+resource "google_project_service" "texttospeech" {
+  project            = var.project_id
+  service            = "texttospeech.googleapis.com"
+  disable_on_destroy = false
+}

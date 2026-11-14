@@ -158,3 +158,36 @@ def test_degree_minute_second_coordinates():
     assert f("38° 3' N, 100° 45' W") == (38.05, -100.75)
     assert f("33°34′30″S 70°39′W") == (-33.575, -70.65)
     assert f("hace 31° de calor") is None
+
+
+def test_voice_replies(offline, monkeypatch, tmp_path):
+    from app import config, media, messaging, voice
+    from app.db import Farmer, session
+    monkeypatch.setattr(config, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(voice, "synthesize", lambda text, lang: b"OggS" + text.encode()[:20])
+    texts, media_sent = [], []
+    monkeypatch.setattr(messaging, "send", lambda to, m: texts.append(m))
+    monkeypatch.setattr(messaging, "send_media", lambda to, url: media_sent.append(url))
+    c = _client()
+    hook = lambda **f: c.post("/twilio/webhook", data={"From": "whatsapp:+15550007777", **f})  # noqa: E731
+    hook(Body="hi")
+    assert media_sent == []                                         # text farmer: text only
+    hook(Body="please reply with voice notes")
+    assert texts[-2].startswith("🔊 Done") and len(media_sent) == 1  # asked for audio: confirmation is spoken too
+    with session() as db:
+        assert db.query(Farmer).filter_by(phone="whatsapp:+15550007777").one().constraints["voice_replies"] is True
+    clip = media_sent[-1].rsplit("/", 1)[1]
+    r = c.get(f"/voice/{clip}")
+    assert r.status_code == 200 and r.headers["content-type"] == "audio/ogg" and r.content.startswith(b"OggS")
+    assert c.get("/voice/../../etc.ogg").status_code == 404
+    hook(Body="text only")
+    n = len(media_sent)
+    hook(Body="hi")
+    assert len(media_sent) == n                                      # turned off
+    # a voice note gets a voice note back even when the preference is off
+    monkeypatch.setattr(media, "download", lambda url: (b"OggS", "audio/ogg"))
+    monkeypatch.setattr(media, "transcribe", lambda data, ct, langs=None: "hi")
+    hook(MediaUrl0="u", MediaContentType0="audio/ogg", NumMedia="1")
+    assert len(media_sent) == n + 1
+    assert voice.speakable(["🛰️ *Rain*: ~2 in. Report: https://x.y/r/1", {"text": "Pick one", "buttons": []}]) == \
+        "Rain: 2 in. Report: Pick one"

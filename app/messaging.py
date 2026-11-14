@@ -146,3 +146,11 @@ def typing_while(message_sid: str | None, every_s: float = 20, max_s: float = 18
         yield
     finally:
         stop.set()
+
+
+def send_media(to: str, url: str) -> None:
+    """A media message (e.g. a voice note) on WhatsApp; Twilio fetches the file from url."""
+    if not (config.TWILIO_ACCOUNT_SID and config.TWILIO_AUTH_TOKEN) or not to.startswith("whatsapp:"):
+        log.warning("would send media to %s: %s", to, url)
+        return
+    _client().messages.create(from_=config.TWILIO_WHATSAPP_FROM, to=to, media_url=[url])

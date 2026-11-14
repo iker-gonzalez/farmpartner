@@ -4,7 +4,7 @@ import time
 from dataclasses import dataclass
 from typing import Callable
 
-from app import agent, i18n, onboarding, service, units
+from app import agent, i18n, onboarding, service, units, voice
 from app.data import maplinks
 from app.prompts import as_text
 from app.db import now, session
@@ -28,6 +28,13 @@ def inbound(phone: str, channel: str, text: str, lat: float | None = None, lon: 
             db.get(Farmer, farmer.id).language = lang
             db.commit()
         farmer.language = lang
+    want_voice = voice.asked(text or "") if lat is None and not i18n.explicit_language(text or "") else None
+    if want_voice is not None and not onboarding.is_question(text or ""):
+        _set_voice(farmer, want_voice)
+        msg = ("🔊 Done — I'll also send my answers as voice notes. Say \"text only\" to stop." if want_voice
+               else "👍 OK — text only from now on.")
+        step = onboarding.current_step(farmer) if farmer.state not in ("ready",) else []
+        return _out(farmer.id, Turn(now=[msg] + step, later=None), farmer.language, units.preferred(farmer))
     if i18n.is_switch(text or "") or i18n.explicit_language(text or ""):
         hello = ("👍 Sure, let's continue in English." if farmer.language == "en"
                  else f"👍 Sure — I'll write to you in {i18n.LANGS.get(farmer.language, farmer.language)}.")
@@ -121,6 +128,25 @@ def _remind(farmer_id: int) -> bool:
         return False
     _reminded[farmer_id] = now_t
     return True
+
+
+def _set_voice(farmer, on: bool) -> None:
+    from app.db import Farmer
+    with session() as db:
+        fm = db.get(Farmer, farmer.id)
+        fm.constraints = {**(fm.constraints or {}), "voice_replies": on}
+        db.commit()
+        farmer.constraints = fm.constraints
+
+
+def wants_voice(phone: str) -> tuple[bool, str]:
+    """(spoken replies on?, language) for this farmer."""
+    from app.db import Farmer
+    with session() as db:
+        fm = db.query(Farmer).filter(Farmer.phone == phone).first()
+        if not fm:
+            return False, "en"
+        return bool((fm.constraints or {}).get("voice_replies")), fm.language or "en"
 
 
 def speech_languages(phone: str) -> list[str]:
