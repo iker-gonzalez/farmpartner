@@ -56,6 +56,12 @@ def _run_later(to: str, later, message_sid: str | None = None, first_after_s: fl
         return []
 
 
+def _spoken_lang(text: str, lang: str) -> str:
+    """Read the reply in the language it is written in (a farmer may ask for an answer in Arabic), else theirs."""
+    said = i18n.detect(text)
+    return said if said in voice.TTS_CODES else lang
+
+
 def _speak(to: str, msgs: list, force: bool = False) -> None:
     """Also send the turn as a voice note when the farmer wants it (or just sent one). Never breaks the chat."""
     if not to.startswith("whatsapp:") or not msgs:
@@ -67,7 +73,7 @@ def _speak(to: str, msgs: list, force: bool = False) -> None:
         text = voice.speakable(msgs)
         if len(text) < 2:
             return
-        messaging.send_media(to, voice.store(voice.synthesize(text, lang)))
+        messaging.send_media(to, voice.store(voice.synthesize(text, _spoken_lang(text, lang))))
     except Exception:
         log.exception("spoken reply failed")
 
@@ -178,7 +184,7 @@ def _web_voice(key: str, msgs: list, force: bool = False) -> str | None:
         text = voice.speakable(msgs)
         if len(text) < 2:
             return None
-        url = voice.store(voice.synthesize(text, lang))
+        url = voice.store(voice.synthesize(text, _spoken_lang(text, lang)))
         return url[url.index("/voice/"):]
     except Exception:
         log.exception("spoken reply failed")

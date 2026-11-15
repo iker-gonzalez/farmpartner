@@ -247,3 +247,12 @@ def test_transcript_skips_silent_stretches(monkeypatch):
     assert media.transcribe(b"RIFF\x00\x00\x00\x00WAVE", "audio/wav", ["en"]) == "should I water"
     R.json = lambda self: {"results": [{"alternatives": [{}]}]}
     assert media.transcribe(b"x", "audio/wav", ["en"]) is None
+
+
+def test_coordinates_with_words_and_reply_read_in_its_own_language():
+    from app.data.maplinks import location_from_text
+    from app.main import _spoken_lang
+    assert location_from_text("43.416425, -2.914102 \n ahora mismo no tengo cultivos") == (43.416425, -2.914102)
+    assert location_from_text("we got 1.5, 2.0 inches of rain") is None
+    assert _spoken_lang("قارنتُ دورتك الزراعية مع بدائل تناسب مناخ حقلك", "es") == "ar"
+    assert _spoken_lang("ok", "es") == "es"

@@ -82,4 +82,6 @@ def location_from_text(text: str) -> tuple[float, float] | None:
         if pt:
             return pt
     m = re.fullmatch(r"\s*" + _PAIR + r"\s*", t.replace(";", ","))
+    if not m:  # coordinates with words around them ("43.416425, -2.914102 ahora no tengo cultivos"): only precise
+        m = re.search(r"(?<![\d.])(-?\d{1,2}\.\d{3,})\s*[,;]\s*(-?\d{1,3}\.\d{3,})(?![\d.])", t)  # ones, not "1.5, 2.0"
     return _valid(float(m.group(1)), float(m.group(2))) if m else None
