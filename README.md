@@ -1,4 +1,4 @@
-<p align="center"><img src="app/static/brand/orbi.svg" width="120" alt="Orbi, the FarmPartner mascot"></p>
+<p align="center"><a href="https://farmpartner.space"><img src="docs/readme-banner.jpg" alt="farmpartner — the farm advisor that reads your field from space. NASA Space Apps 2026, Field Shift challenge."></a></p>
 
 # farm**partner**
 
