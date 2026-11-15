@@ -23,7 +23,6 @@
  "dcdf66479f": "<span class=\"nl\">Gratis · Tanpa instal aplikasi · Open source (MIT)<span class=\"sep\"> · </span></span><span class=\"nl\"><a href=\"/sample\">Lihat contoh laporan →</a></span><span class=\"row2\"><span class=\"nl\">Regenerasi petani<span class=\"sep\"> · </span></span><span class=\"nl\">Inklusi digital<span class=\"sep\"> · </span></span><span class=\"nl\">Tanpa hambatan bahasa</span></span>",
  "677ed83d46": "■ SELALU MEMANTAU LANGIT UNTUK LAHAN ANDA",
  "2b387a91fb": "<span class=\"label\">MULAI</span> <span class=\"qr\"><img src=\"/static/landing/qr-whatsapp.png\" alt=\"QR code: open WhatsApp and text “hi” to FarmPartner\"></span> <span class=\"chip\">Kirim “hi” di WhatsApp</span>",
- "5543413a6e": "<span>FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT</span> <span>DIBANGUN DENGAN DATA TERBUKA NASA &amp; USDA · © 2026</span>",
  "654b4bd400": "Kirim pin lokasi di WhatsApp. FarmPartner membaca 20 tahun data iklim, kelembapan tanah, dan vegetasi NASA untuk lahan Anda, lalu membandingkan rotasi tanaman Anda dengan dua rotasi yang cocok dengan iklim Anda.",
  "02acf22e99": "Beranda FarmPartner",
  "2f17b9e1e7": "Bahasa / language",
@@ -467,5 +466,8 @@
  "e877ff631a": "<span class=\"txt\">hello@farmpartner.space</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
  "b3af20d50f": "Tertarik dengan FarmPartner? Tulis ke tim di hello@farmpartner.space.",
  "20a7366432": "Email ke hello@farmpartner.space",
- "bb2a16f7cc": "Kirim <code>RESET</code> untuk menghapus lahan Anda beserta riwayatnya. Untuk menghapus juga nomor dan percakapan Anda, kirim e‑mail ke <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a> dari mana saja, dengan menyebutkan nomor yang Anda pakai."
+ "bb2a16f7cc": "Kirim <code>RESET</code> untuk menghapus lahan Anda beserta riwayatnya. Untuk menghapus juga nomor dan percakapan Anda, kirim e‑mail ke <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a> dari mana saja, dengan menyebutkan nomor yang Anda pakai.",
+ "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
+ "c198c23b25": "DIBANGUN DENGAN DATA TERBUKA NASA &amp; USDA · © 2026",
+ "d40d479bd7": "<span class=\"miss\">Aplikasi email tidak terbuka?</span> Tulis dari <a href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\">Gmail</a> · <a href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\">Outlook</a>"
 }

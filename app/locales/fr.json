@@ -23,7 +23,6 @@
  "dcdf66479f": "<span class=\"nl\">Gratuit · Aucune appli à installer · Open source (MIT)<span class=\"sep\"> · </span></span><span class=\"nl\"><a href=\"/sample\">Voir un exemple de rapport →</a></span><span class=\"row2\"><span class=\"nl\">Relève générationnelle<span class=\"sep\"> · </span></span><span class=\"nl\">Inclusion numérique<span class=\"sep\"> · </span></span><span class=\"nl\">Sans barrière de langue</span></span>",
  "677ed83d46": "■ TOUJOURS À L’AFFÛT DU CIEL POUR VOTRE CHAMP",
  "2b387a91fb": "<span class=\"label\">COMMENCER</span> <span class=\"qr\"><img src=\"/static/landing/qr-whatsapp.png\" alt=\"QR code: open WhatsApp and text “hi” to FarmPartner\"></span> <span class=\"chip\">Écrivez « hi » sur WhatsApp</span>",
- "5543413a6e": "<span>FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT</span> <span>CONSTRUIT SUR LES DONNÉES OUVERTES DE LA NASA &amp; DE L’USDA · © 2026</span>",
  "654b4bd400": "Envoyez une localisation sur WhatsApp. FarmPartner lit 20 ans de données NASA sur le climat, l’humidité du sol et la végétation de votre champ, et compare votre rotation avec deux autres adaptées à votre climat.",
  "02acf22e99": "Accueil FarmPartner",
  "2f17b9e1e7": "Langue / language",
@@ -467,5 +466,8 @@
  "e877ff631a": "<span class=\"txt\">hello@farmpartner.space</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
  "b3af20d50f": "FarmPartner vous intéresse ? Écrivez à l’équipe à hello@farmpartner.space.",
  "20a7366432": "Écrire à hello@farmpartner.space",
- "bb2a16f7cc": "Écrivez <code>RESET</code> pour supprimer vos champs et leur historique. Pour effacer aussi votre numéro et la conversation, écrivez depuis n’importe où à <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a>, en indiquant le numéro utilisé."
+ "bb2a16f7cc": "Écrivez <code>RESET</code> pour supprimer vos champs et leur historique. Pour effacer aussi votre numéro et la conversation, écrivez depuis n’importe où à <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a>, en indiquant le numéro utilisé.",
+ "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
+ "c198c23b25": "CONSTRUIT SUR LES DONNÉES OUVERTES DE LA NASA &amp; DE L’USDA · © 2026",
+ "d40d479bd7": "<span class=\"miss\">Aucune application de messagerie ne s’est ouverte ?</span> Écrivez depuis <a href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\">Gmail</a> · <a href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\">Outlook</a>"
 }

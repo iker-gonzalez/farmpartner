@@ -118,6 +118,8 @@
   .qr { width: 132px; height: 132px; padding: 8px; background: #fff; border: 2px solid #0b0b0c; box-shadow: 6px 6px 0 #000; }
   .qr img { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
   .chip { background: #0a0a0bcc; padding: 6px 10px; font-size: 16px; font-weight: 500; color: var(--ink); }
+  .bar a.bar-mail { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  .bar a.bar-mail:hover { color: var(--lime); }
   .bar { position: absolute; inset: auto 0 0 0; height: 103px; display: flex; justify-content: space-between; align-items: flex-end;
     padding: 0 64px 28px; background: linear-gradient(180deg, #00000000 0%, #000000e6 100%);
     font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); }
@@ -163,7 +165,7 @@
     .art { height: 600px; background-image: url("/static/landing/footer-800.jpg"); }
     .art::before { height: 300px; }
     .start { left: 50%; right: auto; top: 56px; transform: translateX(-50%); }
-    .bar { flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 6px; height: 110px;
+    .bar { flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 6px; height: 130px;
       padding: 0 20px 20px; font-size: 10.5px; letter-spacing: .4px; }
   }
 </style>
@@ -239,6 +241,7 @@
       </a>
       <div class="bar">
         <span>FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT</span>
+        <a class="bar-mail" href="mailto:{{ contact_email }}?subject=FarmPartner" translate="no">{{ contact_email }}</a>
         <span>BUILT ON OPEN NASA &amp; USDA DATA · © 2026</span>
       </div>
     </div>

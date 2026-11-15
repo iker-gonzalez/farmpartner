@@ -23,7 +23,6 @@
  "dcdf66479f": "<span class=\"nl\">Ücretsiz · Uygulama kurmak yok · Açık kaynak (MIT)<span class=\"sep\"> · </span></span><span class=\"nl\"><a href=\"/sample\">Örnek raporu görün →</a></span><span class=\"row2\"><span class=\"nl\">Kuşak yenilenmesi<span class=\"sep\"> · </span></span><span class=\"nl\">Dijital kapsayıcılık<span class=\"sep\"> · </span></span><span class=\"nl\">Dil engeli yok</span></span>",
  "677ed83d46": "■ TARLANIZ İÇİN GÖKYÜZÜNÜ HEP İZLİYORUZ",
  "2b387a91fb": "<span class=\"label\">BAŞLA</span> <span class=\"qr\"><img src=\"/static/landing/qr-whatsapp.png\" alt=\"QR code: open WhatsApp and text “hi” to FarmPartner\"></span> <span class=\"chip\">WhatsApp’tan “hi” yazın</span>",
- "5543413a6e": "<span>FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT</span> <span>AÇIK NASA &amp; USDA VERİLERİYLE YAPILDI · © 2026</span>",
  "654b4bd400": "WhatsApp’tan bir konum pini gönderin. FarmPartner tarlanızın 20 yıllık NASA iklim, toprak nemi ve bitki örtüsü verilerini okur ve ekim nöbetinizi ikliminize uyan iki alternatifle karşılaştırır.",
  "02acf22e99": "FarmPartner ana sayfa",
  "2f17b9e1e7": "Dil / Language",
@@ -467,5 +466,8 @@
  "e877ff631a": "<span class=\"txt\">hello@farmpartner.space</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
  "b3af20d50f": "FarmPartner ile ilgileniyor musunuz? Ekibe hello@farmpartner.space adresinden yazın.",
  "20a7366432": "hello@farmpartner.space adresine e-posta gönderin",
- "bb2a16f7cc": "Tarlalarınızı ve geçmişlerini silmek için <code>RESET</code> yazın. Numaranızı ve sohbetinizi de silmek için, kullandığınız numarayı belirterek, istediğiniz yerden <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a> adresine e‑posta gönderin."
+ "bb2a16f7cc": "Tarlalarınızı ve geçmişlerini silmek için <code>RESET</code> yazın. Numaranızı ve sohbetinizi de silmek için, kullandığınız numarayı belirterek, istediğiniz yerden <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a> adresine e‑posta gönderin.",
+ "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
+ "c198c23b25": "AÇIK NASA &amp; USDA VERİLERİYLE YAPILDI · © 2026",
+ "d40d479bd7": "<span class=\"miss\">E-posta uygulaması açılmadı mı?</span> Şuradan yazın: <a href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\">Gmail</a> · <a href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\">Outlook</a>"
 }

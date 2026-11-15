@@ -23,7 +23,6 @@
  "dcdf66479f": "<span class=\"nl\">免费 · 无需安装应用 · 开源（MIT）<span class=\"sep\"> · </span></span><span class=\"nl\"><a href=\"/sample\">查看报告示例 →</a></span><span class=\"row2\"><span class=\"nl\">代际传承<span class=\"sep\"> · </span></span><span class=\"nl\">数字包容<span class=\"sep\"> · </span></span><span class=\"nl\">没有语言障碍</span></span>",
  "677ed83d46": "■ 时刻从天空守望你的田地",
  "2b387a91fb": "<span class=\"label\">开始</span> <span class=\"qr\"><img src=\"/static/landing/qr-whatsapp.png\" alt=\"QR code: open WhatsApp and text “hi” to FarmPartner\"></span> <span class=\"chip\">在 WhatsApp 上发送“hi”</span>",
- "5543413a6e": "<span>FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT</span> <span>基于 NASA 和 USDA 开放数据构建 · © 2026</span>",
  "654b4bd400": "在 WhatsApp 上发送一个位置定位。FarmPartner 会读取你田地 20 年的 NASA 气候、土壤湿度和植被数据，把你的轮作方式和两种适合当地气候的方案做对比。",
  "02acf22e99": "FarmPartner 首页",
  "2f17b9e1e7": "语言 / Language",
@@ -467,5 +466,8 @@
  "e877ff631a": "<span class=\"txt\">hello@farmpartner.space</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
  "b3af20d50f": "对 FarmPartner 感兴趣？请写信给团队：hello@farmpartner.space。",
  "20a7366432": "发邮件至 hello@farmpartner.space",
- "bb2a16f7cc": "发送 <code>RESET</code> 即可删除你的田地及其历史记录。如果还想删除你的号码和对话，请用你使用的号码，从任何地方发邮件至 <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a>。"
+ "bb2a16f7cc": "发送 <code>RESET</code> 即可删除你的田地及其历史记录。如果还想删除你的号码和对话，请用你使用的号码，从任何地方发邮件至 <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a>。",
+ "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
+ "c198c23b25": "基于 NASA 和 USDA 开放数据构建 · © 2026",
+ "d40d479bd7": "<span class=\"miss\">没有打开邮件应用？</span> 通过以下方式发信： <a href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\">Gmail</a> · <a href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\">Outlook</a>"
 }

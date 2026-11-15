@@ -23,7 +23,6 @@
  "dcdf66479f": "<span class=\"nl\">Бесплатно · Без установки приложений · Открытый код (MIT)<span class=\"sep\"> · </span></span><span class=\"nl\"><a href=\"/sample\">Пример отчёта →</a></span><span class=\"row2\"><span class=\"nl\">Смена поколений<span class=\"sep\"> · </span></span><span class=\"nl\">Цифровая доступность<span class=\"sep\"> · </span></span><span class=\"nl\">Без языковых барьеров</span></span>",
  "677ed83d46": "■ ВСЕГДА СЛЕДИМ ЗА НЕБОМ НАД ВАШИМ ПОЛЕМ",
  "2b387a91fb": "<span class=\"label\">СТАРТ</span> <span class=\"qr\"><img src=\"/static/landing/qr-whatsapp.png\" alt=\"QR code: open WhatsApp and text “hi” to FarmPartner\"></span> <span class=\"chip\">Напишите «hi» в WhatsApp</span>",
- "5543413a6e": "<span>FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT</span> <span>НА ОТКРЫТЫХ ДАННЫХ NASA И USDA · © 2026</span>",
  "654b4bd400": "Отправьте геометку в WhatsApp. FarmPartner изучит данные NASA о климате, влажности почвы и растительности на вашем поле за 20 лет и сравнит ваш севооборот с двумя другими, подходящими для вашего климата.",
  "02acf22e99": "FarmPartner — главная",
  "2f17b9e1e7": "Язык / idioma",
@@ -467,5 +466,8 @@
  "e877ff631a": "<span class=\"txt\">hello@farmpartner.space</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
  "b3af20d50f": "Интересен FarmPartner? Напишите команде на hello@farmpartner.space.",
  "20a7366432": "Написать на hello@farmpartner.space",
- "bb2a16f7cc": "Напишите <code>RESET</code>, чтобы удалить свои поля и их историю. Чтобы стереть также номер и переписку, напишите на <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a> откуда угодно, указав номер, которым вы пользовались."
+ "bb2a16f7cc": "Напишите <code>RESET</code>, чтобы удалить свои поля и их историю. Чтобы стереть также номер и переписку, напишите на <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a> откуда угодно, указав номер, которым вы пользовались.",
+ "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
+ "c198c23b25": "НА ОТКРЫТЫХ ДАННЫХ NASA И USDA · © 2026",
+ "d40d479bd7": "<span class=\"miss\">Почтовое приложение не открылось?</span> Напишите из <a href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\">Gmail</a> · <a href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\">Outlook</a>"
 }

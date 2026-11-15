@@ -23,7 +23,6 @@
  "dcdf66479f": "<span class=\"nl\">無料 · アプリのインストール不要 · オープンソース（MIT）<span class=\"sep\"> · </span></span><span class=\"nl\"><a href=\"/sample\">レポートの例を見る →</a></span><span class=\"row2\"><span class=\"nl\">世代交代の後押し<span class=\"sep\"> · </span></span><span class=\"nl\">デジタル・インクルージョン<span class=\"sep\"> · </span></span><span class=\"nl\">言葉の壁なし</span></span>",
  "677ed83d46": "■ あなたの畑のために、いつも空を見守っています",
  "2b387a91fb": "<span class=\"label\">はじめる</span> <span class=\"qr\"><img src=\"/static/landing/qr-whatsapp.png\" alt=\"QR code: open WhatsApp and text “hi” to FarmPartner\"></span> <span class=\"chip\">WhatsAppで「hi」と送信</span>",
- "5543413a6e": "<span>FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT</span> <span>NASA &amp; USDAのオープンデータで構築 · © 2026</span>",
  "654b4bd400": "WhatsAppで位置情報を送るだけ。FarmPartnerがあなたの畑について、NASAの20年分の気候・土壌水分・植生データを読み取り、今の輪作とあなたの気候に合う2つの輪作を比較します。",
  "02acf22e99": "FarmPartner ホーム",
  "2f17b9e1e7": "言語 / Language",
@@ -467,5 +466,8 @@
  "e877ff631a": "<span class=\"txt\">hello@farmpartner.space</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
  "b3af20d50f": "FarmPartnerに興味がありますか？チーム（hello@farmpartner.space）までご連絡ください。",
  "20a7366432": "hello@farmpartner.space にメールする",
- "bb2a16f7cc": "<code>RESET</code>と送ると、畑の情報とその履歴を削除します。電話番号と会話も消去したい場合は、使用した電話番号を添えて、どこからでも<a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a>までメールしてください。"
+ "bb2a16f7cc": "<code>RESET</code>と送ると、畑の情報とその履歴を削除します。電話番号と会話も消去したい場合は、使用した電話番号を添えて、どこからでも<a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a>までメールしてください。",
+ "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
+ "c198c23b25": "NASA &amp; USDAのオープンデータで構築 · © 2026",
+ "d40d479bd7": "<span class=\"miss\">メールアプリが開きませんでしたか？</span> こちらから送信： <a href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\">Gmail</a> · <a href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\">Outlook</a>"
 }

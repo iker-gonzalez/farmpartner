@@ -23,7 +23,6 @@
  "dcdf66479f": "<span class=\"nl\">मुफ़्त · कोई app इंस्टॉल नहीं · ओपन सोर्स (MIT)<span class=\"sep\"> · </span></span><span class=\"nl\"><a href=\"/sample\">नमूना रिपोर्ट देखें →</a></span><span class=\"row2\"><span class=\"nl\">नई पीढ़ी को ज्ञान<span class=\"sep\"> · </span></span><span class=\"nl\">डिजिटल समावेश<span class=\"sep\"> · </span></span><span class=\"nl\">भाषा की कोई रुकावट नहीं</span></span>",
  "677ed83d46": "■ आपके खेत के लिए हमेशा आसमान पर नज़र",
  "2b387a91fb": "<span class=\"label\">शुरू करें</span> <span class=\"qr\"><img src=\"/static/landing/qr-whatsapp.png\" alt=\"QR code: open WhatsApp and text “hi” to FarmPartner\"></span> <span class=\"chip\">WhatsApp पर “hi” लिखें</span>",
- "5543413a6e": "<span>FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT</span> <span>NASA &amp; USDA के खुले डेटा पर बना · © 2026</span>",
  "654b4bd400": "WhatsApp पर लोकेशन पिन भेजें। FarmPartner आपके खेत के लिए NASA का 20 साल का मौसम, मिट्टी की नमी और हरियाली का डेटा पढ़ता है और आपके फसल चक्र की तुलना आपके मौसम के हिसाब से सही दो फसल चक्रों से करता है।",
  "02acf22e99": "FarmPartner होम",
  "2f17b9e1e7": "भाषा / Language",
@@ -467,5 +466,8 @@
  "e877ff631a": "<span class=\"txt\">hello@farmpartner.space</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
  "b3af20d50f": "FarmPartner में दिलचस्पी है? टीम को hello@farmpartner.space पर लिखें।",
  "20a7366432": "hello@farmpartner.space पर ईमेल करें",
- "bb2a16f7cc": "अपने खेत और उनका इतिहास हटाने के लिए <code>RESET</code> लिखें। अपना नंबर और बातचीत भी मिटाने के लिए, कहीं से भी उसी नंबर के साथ <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a> पर ई‑मेल करें जिसका आपने इस्तेमाल किया था।"
+ "bb2a16f7cc": "अपने खेत और उनका इतिहास हटाने के लिए <code>RESET</code> लिखें। अपना नंबर और बातचीत भी मिटाने के लिए, कहीं से भी उसी नंबर के साथ <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a> पर ई‑मेल करें जिसका आपने इस्तेमाल किया था।",
+ "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
+ "c198c23b25": "NASA &amp; USDA के खुले डेटा पर बना · © 2026",
+ "d40d479bd7": "<span class=\"miss\">कोई मेल ऐप नहीं खुला?</span> यहाँ से लिखें: <a href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\">Gmail</a> · <a href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\">Outlook</a>"
 }

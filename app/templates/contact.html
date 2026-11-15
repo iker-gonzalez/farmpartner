@@ -73,6 +73,12 @@
   .actions .btn { padding: 15px 20px; }
   .actions .ghost { cursor: pointer; transition: border-color .2s, color .2s; }
   .actions .ghost.ok { border-color: var(--lime); color: var(--lime); }
+  .alt { margin-top: 18px; font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); transition: color .2s; }
+  .alt a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  .alt a:hover { color: var(--lime); }
+  .alt .miss { display: none; color: var(--lime); }
+  .alt.flash .miss { display: inline; }
+  .alt.flash { color: var(--ink); }
 
   /* ---------- Who should write: three cards that rise in one after another ---------- */
   .who { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 48px; padding: 0; list-style: none;
@@ -138,6 +144,7 @@
         <a class="btn" href="mailto:{{ email }}?subject=FarmPartner">SEND US AN EMAIL →</a>
         <button class="ghost" type="button" id="copy" data-email="{{ email }}" data-i18n-copied="COPIED ✓">COPY ADDRESS</button>
       </div>
+      <p class="alt" id="alt"><span class="miss">No mail app opened?</span> Write from <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to={{ email }}&amp;su=FarmPartner" target="_blank" rel="noopener">Gmail</a> · <a href="https://outlook.live.com/mail/0/deeplink/compose?to={{ email }}&amp;subject=FarmPartner" target="_blank" rel="noopener">Outlook</a></p>
     </section>
 
     <ul class="who">
@@ -164,6 +171,17 @@
         else mail.classList.add("done");
       })();
     })();
+
+    // mailto: links do nothing when the browser has no mail app set up (common with webmail). If the page
+    // keeps focus after the click, no app opened: point to the Gmail / Outlook compose links instead.
+    document.querySelectorAll('main a[href^="mailto:"]').forEach(function (a) {
+      a.addEventListener("click", function () {
+        var left = false, mark = function () { left = true; };
+        window.addEventListener("blur", mark, {once: true});
+        document.addEventListener("visibilitychange", mark, {once: true});
+        setTimeout(function () { if (!left && document.hasFocus()) document.getElementById("alt").classList.add("flash"); }, 900);
+      });
+    });
 
     // Copy the address to the clipboard.
     document.getElementById("copy").addEventListener("click", function () {

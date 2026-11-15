@@ -23,7 +23,6 @@
  "dcdf66479f": "<span class=\"nl\">مجاني · بلا تطبيق للتثبيت · مفتوح المصدر (MIT)<span class=\"sep\"> · </span></span><span class=\"nl\"><a href=\"/sample\">شاهد نموذج تقرير ←</a></span><span class=\"row2\"><span class=\"nl\">تجديد الأجيال<span class=\"sep\"> · </span></span><span class=\"nl\">الشمول الرقمي<span class=\"sep\"> · </span></span><span class=\"nl\">بلا حواجز لغوية</span></span>",
  "677ed83d46": "■ نراقب السماء دائمًا من أجل حقلك",
  "2b387a91fb": "<span class=\"label\">ابدأ</span> <span class=\"qr\"><img src=\"/static/landing/qr-whatsapp.png\" alt=\"QR code: open WhatsApp and text “hi” to FarmPartner\"></span> <span class=\"chip\">أرسل “hi” على WhatsApp</span>",
- "5543413a6e": "<span>FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT</span> <span>مبني على بيانات NASA و USDA المفتوحة · © 2026</span>",
  "654b4bd400": "أرسل موقعك على WhatsApp. يقرأ FarmPartner بيانات NASA عن المناخ ورطوبة التربة والغطاء النباتي لحقلك على مدى 20 عامًا، ويقارن دورتك الزراعية بدورتين تناسبان مناخك.",
  "02acf22e99": "الصفحة الرئيسية لـ FarmPartner",
  "2f17b9e1e7": "اللغة / Language",
@@ -467,5 +466,8 @@
  "e877ff631a": "<span class=\"txt\">hello@farmpartner.space</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
  "b3af20d50f": "مهتم بـ FarmPartner؟ راسل الفريق على hello@farmpartner.space.",
  "20a7366432": "راسلنا على hello@farmpartner.space",
- "bb2a16f7cc": "أرسل <code>RESET</code> لحذف حقولك وسجلّها. ولمحو رقمك ومحادثتك أيضًا، راسلنا على <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a> من أي مكان، مع ذكر الرقم الذي استخدمته."
+ "bb2a16f7cc": "أرسل <code>RESET</code> لحذف حقولك وسجلّها. ولمحو رقمك ومحادثتك أيضًا، راسلنا على <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a> من أي مكان، مع ذكر الرقم الذي استخدمته.",
+ "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
+ "c198c23b25": "مبني على بيانات NASA و USDA المفتوحة · © 2026",
+ "d40d479bd7": "<span class=\"miss\">لم يُفتح أي تطبيق بريد؟</span> اكتب من <a href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\">Gmail</a> · <a href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\">Outlook</a>"
 }
