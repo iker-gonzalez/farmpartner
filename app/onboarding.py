@@ -208,6 +208,18 @@ def parse_irrigated(text: str) -> bool | None:
     return None
 
 
+def _country_crops(features: dict, n: int) -> list[str]:
+    """The country's top crops by FAOSTAT harvested area, lower-case, without FAOSTAT's qualifiers after a comma or "("."""
+    top = ((features or {}).get("country") or {}).get("top") or []
+    return [t["item"].split(",")[0].split(" (")[0].lower() for t in top[:n]]
+
+
+def crop_example(features: dict | None) -> str:
+    """Example answer for "what do you grow?": two crops common where the field is, else a generic pair."""
+    local = _country_crops(features or {}, 2)
+    return ", ".join(local) if len(local) == 2 else "wheat, corn"
+
+
 def _first_insight(field: Field) -> list:
     f = field.features or {}
     c = f.get("climate") or {}
@@ -236,11 +248,11 @@ def _first_insight(field: Field) -> list:
         outside_us = not (f.get("soil") or (f.get("rotation") or {}).get("sequence"))
         c = f.get("country")
         if outside_us and c and c.get("top"):
-            names = ", ".join(t["item"].split(",")[0].split(" (")[0].lower() for t in c["top"][:6])
+            names = ", ".join(_country_crops(f, 6))
             lines.append(f"\n🌾 Main crops in {c['country']} (FAOSTAT): {names}.")
         lines.append("\n" + ("Crop-history maps only cover the U.S., so I can't see your past crops from space here. "
                               if outside_us else "I couldn't see crops at that spot from space. ")
-                     + "*Step 2 of 3:* what do you grow there? E.g. \"wheat, corn\" — and is it irrigated or dryland?")
+                     + f"*Step 2 of 3:* what do you grow there? E.g. \"{crop_example(f)}\" — and is it irrigated or dryland?")
     return ["\n".join(lines)]
 
 

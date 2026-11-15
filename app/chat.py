@@ -202,7 +202,11 @@ def photo(phone: str, channel: str, image: dict | None, caption: str, media_url:
         def from_photo():
             name = agent.identify_crop(image)
             if not name:
-                msgs = ["📷 I couldn't tell the crop from the photo — please type it (e.g. \"wheat, corn\")."]
+                with session() as db:
+                    from app.db import Farmer
+                    fld = service.main_field(db.get(Farmer, farmer.id))
+                    example = onboarding.crop_example(fld.features if fld else None)
+                msgs = [f"📷 I couldn't tell the crop from the photo — please type it (e.g. \"{example}\")."]
             else:
                 r = onboarding.handle(farmer, name, None, None)
                 msgs = [f"📷 That looks like *{name}*."] + ((r.now + (r.later() if r.later else [])) if r else [])
