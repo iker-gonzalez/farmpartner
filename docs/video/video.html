@@ -17,7 +17,7 @@
   /* A — the problem */
   #A .art { position:absolute; inset:-40px; background:url(../../app/static/landing/hero.jpg) center/cover; image-rendering:pixelated }
   #A .shade { position:absolute; inset:0; background:linear-gradient(180deg,#0a0a0bcc 0%,#0a0a0b55 45%,#0a0a0bee 100%) }
-  #A .copy { position:absolute; left:120px; right:120px; bottom:120px }
+  #A .copy { position:absolute; left:120px; right:120px; bottom:250px }
   #A h1 { font:700 84px/1.05 var(--display); letter-spacing:-2.5px; max-width:1700px }
   #A h1 + h1 { color:var(--lime); margin-top:18px }
   #A .kicker { position:absolute; left:120px; top:90px }
@@ -32,7 +32,7 @@
 
   /* C + D — the product: phone on the left, what's happening on the right */
   #C { background:radial-gradient(1200px 800px at 75% 40%, #16161a 0%, var(--bg) 70%) }
-  .phone { position:absolute; left:150px; top:60px; width:520px; height:960px; border-radius:56px; background:#000; padding:14px;
+  .phone { position:absolute; left:160px; top:44px; transform:scale(.88); transform-origin:top left; width:520px; height:960px; border-radius:56px; background:#000; padding:14px;
            box-shadow:0 0 0 2px #2a2a30, 0 40px 120px #000c }
   .screen { width:100%; height:100%; border-radius:44px; overflow:hidden; background:#efeae2; display:flex; flex-direction:column; color:#111b21 }
   .hdr { background:#008069; color:#fff; display:flex; align-items:center; gap:14px; padding:46px 18px 14px }
@@ -89,6 +89,10 @@
   .qrbox img { width:330px; height:330px; display:block }
   .qrbox span { font:700 24px var(--mono); color:#0a0a0b; letter-spacing:2px }
   #B .kicker { margin-top:44px; color:var(--ink3) }
+  /* Subtitles, streaming style: white, centred near the bottom, soft black edge, two lines at most */
+  #sub { position:absolute; left:0; right:0; bottom:64px; z-index:50; text-align:center; white-space:pre-line; pointer-events:none;
+         font:600 46px/1.28 var(--sans); color:#fff; letter-spacing:.2px;
+         text-shadow:0 0 6px #000, 0 0 12px #000c, 2px 2px 3px #000, -2px 2px 3px #000, 2px -2px 3px #000, -2px -2px 3px #000 }
 </style>
 </head>
 <body>
@@ -161,6 +165,8 @@ Looks like <b>Winter wheat → Grain sorghum → Fallow</b>. Is that your rotati
   </div>
 </div>
 
+<div id="sub"></div>
+
 <script>
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const clamp = x => Math.max(0, Math.min(1, x));
@@ -173,12 +179,28 @@ const rise = (el, p, dy = 40) => { el.style.opacity = p; el.style.transform = `t
 [['#wv1', 3], ['#wv2', 7]].forEach(([id, seed]) => { $(id).innerHTML = Array.from({length: 26}, (_, i) =>
   `<i style="height:${6 + Math.round(Math.abs(Math.sin(i * 1.9 + seed)) * 24)}px"></i>`).join(''); });
 
+// Subtitles: [start, end, text], timed to the pauses in the voice-over (vo.py prints the clip lengths).
+const SUBS = [
+  [0.85, 3.15, "A new generation is taking over the farm."],
+  [3.3, 6.05, "With hotter summers, new pests,\nand tired soil."],
+  [6.85, 8.85, "FarmPartner is their advisor."],
+  [9.0, 10.1, "Right in the chat."],
+  [11.0, 12.1, "Drop a pin."],
+  [12.35, 14.85, "Our AI reads 20 years of NASA data\nfor that field,"],
+  [14.85, 17.5, "and compares your crop rotation\nwith better options."],
+  [17.75, 19.9, "With the evidence, and the risks."],
+  [21.4, 22.35, "No forms."],
+  [22.45, 25.3, "Type, or just talk,\nin 46 languages."],
+  [26.3, 27.3, "FarmPartner."],
+  [27.5, 29.85, "Your field, read from space."],
+];
 const SCENES = {A: [0, 6.3], B: [6.3, 10.2], C: [10.2, 25.6], E: [25.6, 30.1]};
 let heights = null;
 function measure() { heights = $$('.w').map(w => w.scrollHeight); }
 
 window.seek = t => {
   if (!heights) measure();
+  $('#sub').textContent = (SUBS.find(([a, b]) => t >= a && t < b) || [0, 0, ''])[2];
   for (const [id, [a, b]] of Object.entries(SCENES))
     $('#' + id).style.opacity = id === 'A' ? 1 - ramp(t, b - .35, .35) : id === 'E' ? ramp(t, a - .1, .5) : span(t, a - .15, b + .1, .4);
 
