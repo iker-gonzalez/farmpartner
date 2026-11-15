@@ -5,8 +5,6 @@ import re
 from app import config
 
 REPO_URL = "https://github.com/iker-gonzalez/farmpartner"
-# Explainer video on the landing page. Placeholder until our own video is ready: swap the YouTube ID here.
-VIDEO_ID = "5l-_0LwnpSo"
 SAMPLE_PHONE = "sample:garden-city"  # reserved: /api/chat always prefixes "web:", so visitors can't touch it
 SAMPLE_FIELD = {"lat": 38.05, "lon": -100.75, "irrigated": False, "priorities": ["soil_health"]}
 

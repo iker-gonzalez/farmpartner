@@ -349,7 +349,7 @@ def _site_ctx() -> dict:
     """Values shared by the public pages (landing and What & How)."""
     return {"repo": landing.REPO_URL, "whatsapp": landing.whatsapp_url(), "wa": landing.whatsapp_copy(),
             "sprout_path": landing.SPROUT_PATH, "whatsapp_path": landing.WHATSAPP_PATH,
-            "video_id": landing.VIDEO_ID, "langs": _lang_counts()}
+            "langs": _lang_counts()}
 
 
 def _lang_counts() -> dict:

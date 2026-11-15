@@ -230,3 +230,15 @@ def test_pin_instructions_fit_the_channel(offline):
     assert "*drag* the map" in whatsapp and "Google Maps" in whatsapp
     web = "\n".join(say(_client(), "pins", text="hi"))
     assert onboarding.WEB_PIN_HOWTO in web and "drag" not in web
+
+
+def test_landing_plays_our_own_video(offline):
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+    c = TestClient(app)
+    home = c.get("/").text
+    assert '/static/video/farmpartner-30s.mp4' in home and "youtube" not in home.lower()
+    assert c.get("/static/video/poster.jpg").status_code == 200
+    part = c.get("/static/video/farmpartner-30s.mp4", headers={"Range": "bytes=0-99"})   # Safari needs byte ranges
+    assert part.status_code == 206 and len(part.content) == 100

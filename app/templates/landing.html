@@ -84,11 +84,7 @@
   .video h2 { max-width: 760px; font-size: 40px; font-weight: 600; line-height: 1.15; letter-spacing: -.8px; color: var(--ink); }
   .player { position: relative; width: 960px; max-width: 100%; aspect-ratio: 16 / 9; margin-top: 20px;
     background: #000; border: 1px solid var(--line-2); box-shadow: 8px 8px 0 #000; }
-  .player iframe, .facade, .facade img { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
-  .facade img { object-fit: cover; filter: grayscale(1) contrast(1.15) brightness(.75); transition: filter .25s; }
-  .facade:hover img, .facade:focus-visible img { filter: grayscale(.6) contrast(1.1) brightness(.85); }
-  .facade .btn { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 15px 20px; }
-  .facade:focus-visible { outline: 2px solid var(--lime); outline-offset: 4px; }
+  .player video { position: absolute; inset: 0; width: 100%; height: 100%; display: block; background: #000; }
 
   /* ---------- Footer ---------- */
   .links { display: flex; flex-direction: column; align-items: center; gap: 48px; padding: 96px 64px 72px; }
@@ -143,7 +139,6 @@
     .video { padding: 64px 20px 0; gap: 16px; }
     .video h2 { font-size: 26px; letter-spacing: -.5px; }
     .player { margin-top: 12px; box-shadow: 5px 5px 0 #000; }
-    .facade .btn { padding: 12px 16px; font-size: 12px; }
     .links { padding: 64px 20px 48px; gap: 32px; }
     .tagline { font-size: 12px; text-align: center; }
     .grid { grid-template-columns: repeat(2, 1fr); gap: 32px 16px; text-align: center; }
@@ -195,10 +190,10 @@
   <section class="video" id="video">
     <h2>NASA satellite data, AI and farmers’ know-how — turned into advice for your field.</h2>
     <div class="player">
-      <a class="facade" href="https://www.youtube.com/watch?v={{ video_id }}" target="_blank" rel="noopener" data-id="{{ video_id }}" aria-label="Play the FarmPartner explainer video">
-        <img src="https://i.ytimg.com/vi/{{ video_id }}/maxresdefault.jpg" alt="" loading="lazy">
-        <span class="btn">▶ PLAY VIDEO</span>
-      </a>
+      <video controls playsinline preload="none" poster="/static/video/poster.jpg" aria-label="FarmPartner in 30 seconds">
+        <source src="/static/video/farmpartner-30s.mp4" type="video/mp4">
+        <a href="/static/video/farmpartner-30s.mp4">Watch FarmPartner in 30 seconds (MP4)</a>
+      </video>
     </div>
   </section>
 
@@ -226,17 +221,5 @@
       </div>
     </div>
   </footer>
-  <script>
-    // Video: show a grayscale thumbnail first and only load YouTube when the visitor presses play.
-    document.querySelector(".facade").addEventListener("click", e => {
-      e.preventDefault();
-      const f = document.createElement("iframe");
-      f.src = `https://www.youtube-nocookie.com/embed/${e.currentTarget.dataset.id}?autoplay=1&rel=0`;
-      f.title = "FarmPartner explainer video";
-      f.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
-      f.allowFullscreen = true;
-      e.currentTarget.replaceWith(f);
-    });
-  </script>
 </body>
 </html>

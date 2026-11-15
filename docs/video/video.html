@@ -1,0 +1,216 @@
+<!doctype html>
+<!-- FarmPartner 30-second video. Every frame is a pure function of time: window.seek(seconds) draws it,
+     so render.mjs can capture it frame by frame. Open with ?play to preview in real time. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0a0a0b; --ink:#f4f4f5; --ink2:#c8c8ce; --ink3:#adadb7; --line:#34343a; --lime:#a8f326;
+          --mono:"IBM Plex Mono",ui-monospace,monospace; --sans:"Inter",system-ui,sans-serif; --display:"Space Grotesk","Inter",sans-serif; }
+  * { box-sizing:border-box; margin:0; padding:0 }
+  html, body { width:1920px; height:1080px; overflow:hidden; background:var(--bg); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased }
+  .scene { position:absolute; inset:0; opacity:0; overflow:hidden }
+  .kicker { font:600 22px var(--mono); color:var(--lime); letter-spacing:2px }
+  .emo { font-family:"Apple Color Emoji","Noto Color Emoji",sans-serif }
+
+  /* A — the problem */
+  #A .art { position:absolute; inset:-40px; background:url(../../app/static/landing/hero.jpg) center/cover; image-rendering:pixelated }
+  #A .shade { position:absolute; inset:0; background:linear-gradient(180deg,#0a0a0bcc 0%,#0a0a0b55 45%,#0a0a0bee 100%) }
+  #A .copy { position:absolute; left:120px; right:120px; bottom:120px }
+  #A h1 { font:700 84px/1.05 var(--display); letter-spacing:-2.5px; max-width:1700px }
+  #A h1 + h1 { color:var(--lime); margin-top:18px }
+  #A .kicker { position:absolute; left:120px; top:90px }
+
+  /* B — the answer */
+  #B, #E { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center }
+  .logo { display:flex; align-items:center; gap:34px }
+  .logo img { width:210px }
+  .logo b { font:700 150px/1 var(--display); letter-spacing:-6px }
+  #B p { margin-top:48px; font:600 58px var(--display); letter-spacing:-1px }
+  #B p i { font-style:normal; color:var(--lime) }
+
+  /* C + D — the product: phone on the left, what's happening on the right */
+  #C { background:radial-gradient(1200px 800px at 75% 40%, #16161a 0%, var(--bg) 70%) }
+  .phone { position:absolute; left:150px; top:60px; width:520px; height:960px; border-radius:56px; background:#000; padding:14px;
+           box-shadow:0 0 0 2px #2a2a30, 0 40px 120px #000c }
+  .screen { width:100%; height:100%; border-radius:44px; overflow:hidden; background:#efeae2; display:flex; flex-direction:column; color:#111b21 }
+  .hdr { background:#008069; color:#fff; display:flex; align-items:center; gap:14px; padding:46px 18px 14px }
+  .hdr .av, .vn .av { width:52px; height:52px; border-radius:50%; background:#0a0a0b; display:grid; place-items:center; flex:none }
+  .hdr .av img { width:38px } .hdr b { display:block; font:600 22px var(--sans) } .hdr small { font:400 16px var(--sans); color:#d6f5ec }
+  .hdr .back { font-size:28px }
+  .chat { flex:1; min-height:0; display:flex; flex-direction:column; justify-content:flex-end; padding:0 16px 14px; overflow:hidden }
+  .w { overflow:hidden; flex:none }                 /* height animated from 0 → natural, so older messages glide up */
+  .m { max-width:88%; width:fit-content; margin-top:8px; padding:9px 12px 8px; border-radius:11px; font:400 19px/1.36 var(--sans);
+       box-shadow:0 1px 1px #0b141a26; white-space:pre-line }
+  .m.in { background:#fff; border-top-left-radius:0 } .m.out { background:#d9fdd3; margin-left:auto; border-top-right-radius:0 }
+  .m b { font-weight:600 } .m .t { display:block; text-align:right; font-size:13px; color:#667781; margin-top:2px }
+  .m .t i { font-style:normal; color:#53bdeb; letter-spacing:-3px; margin-left:4px }
+  .m.map { padding:5px; width:300px } .m.map div { height:150px; border-radius:8px; position:relative; overflow:hidden;
+       background:repeating-linear-gradient(90deg,#b9d3a8 0 58px,#c8dcb6 58px 60px,#a9c796 60px 118px,#c8dcb6 118px 120px),#b9d3a8 }
+  .m.map div::before { content:""; position:absolute; inset:0; background:repeating-linear-gradient(0deg,transparent 0 48px,#d9e6cc 48px 50px) }
+  .m.map div::after { content:"📍"; position:absolute; left:50%; top:50%; transform:translate(-50%,-80%); font-size:44px }
+  .m.map span { display:block; padding:6px 6px 0; font-size:17px }
+  .qr { display:flex; flex-direction:column; gap:3px; margin-top:4px; width:88% }
+  .qr span { background:#fff; border-radius:10px; padding:11px; text-align:center; color:#027eb5; font:500 19px var(--sans); box-shadow:0 1px 1px #0b141a26 }
+  .score { display:flex; align-items:center; gap:10px; margin-top:7px; font-size:17px }
+  .score .bar { flex:1; height:12px; border-radius:6px; background:#e9edef; overflow:hidden } .score .bar u { display:block; height:100%; background:#8696a0; border-radius:6px }
+  .score.best .bar u { background:#00a884 } .score em { font:600 17px var(--mono); font-style:normal; width:64px; text-align:right }
+  .vn { display:flex; align-items:center; gap:10px; width:320px } .vn .av img { width:36px } .vn .p { font-size:24px; color:#54656f }
+  .vn .wave { flex:1; display:flex; align-items:center; gap:3px; height:32px } .vn .wave i { flex:1; border-radius:2px; background:#9aa6ab }
+  .m.out .vn .wave i { background:#7fb38e } .vn .wave i.on { background:#00a884 }
+  .bar-in { display:flex; gap:8px; padding:8px 10px 20px; align-items:center }
+  .bar-in div { flex:1; height:54px; border-radius:27px; background:#fff; color:#667781; font:400 20px var(--sans); display:flex; align-items:center; padding:0 20px }
+  .bar-in span { width:56px; height:56px; border-radius:50%; background:#00a884; display:grid; place-items:center; font-size:24px }
+
+  .side { position:absolute; left:800px; right:110px; top:0; bottom:0 }
+  .step { position:absolute; left:0; right:0; top:50%; transform:translateY(-50%); opacity:0 }
+  .step h2 { font:700 96px/1.02 var(--display); letter-spacing:-3px; margin-top:22px }
+  .step h2 i { font-style:normal; color:var(--lime) }
+  .step p { font:400 34px/1.35 var(--sans); color:var(--ink2); margin-top:26px; max-width:900px }
+  .chips { display:flex; flex-wrap:wrap; gap:14px; margin-top:40px; max-width:960px }
+  .chips span { border:1.5px solid var(--line); padding:14px 22px; font:600 24px var(--mono); color:var(--ink); opacity:0; background:#111114 }
+  .chips span b { color:var(--lime); font-weight:700 }
+  .hello { display:flex; flex-wrap:wrap; gap:12px 30px; margin-top:38px; max-width:980px; font:600 40px var(--display); color:var(--ink3) }
+  .hello span { opacity:0 } .hello span:nth-child(3n+1) { color:var(--ink) } .hello span:nth-child(4n+2) { color:var(--lime) }
+
+  /* E — call to action */
+  #E .art { position:absolute; inset:-40px; background:url(../../app/static/landing/hero.jpg) center/cover; image-rendering:pixelated; opacity:.5 }
+  #E .shade { position:absolute; inset:0; background:radial-gradient(900px 600px at 50% 50%, #0a0a0bf2 0%, #0a0a0bb0 60%, #0a0a0b80 100%) }
+  #E .row { position:relative; display:flex; align-items:center; gap:110px }
+  #E .col { display:flex; flex-direction:column; align-items:flex-start; text-align:left }
+  #E .logo { gap:22px } #E .logo img { width:130px } #E .logo b { font-size:104px; letter-spacing:-4px }
+  #E .tag { margin-top:26px; font:600 56px var(--display); letter-spacing:-1.5px }
+  #E .cta { margin-top:50px; display:flex; gap:22px }
+  #E .cta span { padding:20px 28px; font:700 30px var(--mono); border:2px solid var(--lime); white-space:nowrap }
+  #E .cta .a { background:var(--lime); color:var(--bg) } #E .cta .b { color:var(--lime) }
+  #E .foot { margin-top:40px; font:600 21px var(--mono); color:var(--ink2); letter-spacing:1.5px }
+  .qrbox { background:#fff; padding:22px 22px 16px; display:flex; flex-direction:column; align-items:center; gap:10px; border:6px solid var(--lime) }
+  .qrbox img { width:330px; height:330px; display:block }
+  .qrbox span { font:700 24px var(--mono); color:#0a0a0b; letter-spacing:2px }
+  #B .kicker { margin-top:44px; color:var(--ink3) }
+</style>
+</head>
+<body>
+
+<div class="scene" id="A">
+  <div class="art"></div><div class="shade"></div>
+  <div class="kicker">NASA SPACE APPS 2026 · FIELD SHIFT</div>
+  <div class="copy">
+    <h1 id="a1">A new generation is taking over the farm.</h1>
+    <h1 id="a2">Hotter summers. New pests. Tired soil.</h1>
+  </div>
+</div>
+
+<div class="scene" id="B">
+  <div class="logo" id="b1"><img src="../../app/static/brand/orbi.svg" alt=""><b>FarmPartner</b></div>
+  <p id="b2">Their farm advisor, <i>right in the chat.</i></p>
+  <div class="kicker" id="b3">WHATSAPP TODAY · BUILT FOR ANY MESSAGING APP</div>
+</div>
+
+<div class="scene" id="C">
+  <div class="phone"><div class="screen">
+    <div class="hdr"><span class="back">←</span><div class="av"><img src="../../app/static/brand/orbi.svg" alt=""></div>
+      <div><b>FarmPartner</b><small id="presence">online</small></div></div>
+    <div class="chat" id="chat">
+      <div class="w" data-at="10.6"><div class="m out map"><div></div><span>Garden City, KS</span><span class="t">10:02<i>✓✓</i></span></div></div>
+      <div class="w" data-at="11.5"><div class="m in"><span class="emo">📡</span> Got your pin! Pulling 20 years of NASA satellite &amp; weather data for it…<span class="t">10:02</span></div></div>
+      <div class="w" data-at="12.8"><div class="m in"><span class="emo">🛰️</span> Here's what NASA sees at Finney County, KS:
+• Rain ~546 mm/yr vs ~1295 mm evaporation demand
+• 48 days above 35°C a year (was 45)
+
+Looks like <b>Winter wheat → Grain sorghum → Fallow</b>. Is that your rotation?<span class="t">10:02</span></div>
+        <div class="qr"><span>↩ Yes, irrigated</span><span>↩ Yes, dryland</span></div></div>
+      <div class="w" data-at="14.6"><div class="m out">Yes, dryland<span class="t">10:03<i>✓✓</i></span></div></div>
+      <div class="w" data-at="15.3"><div class="m out">Save water<span class="t">10:03<i>✓✓</i></span></div></div>
+      <div class="w" data-at="16.1"><div class="m in"><span class="emo">🌱</span> I compared your rotation with alternatives that fit your climate:
+        <div class="score"><span>Today</span><div class="bar"><u data-w="57"></u></div><em>57/100</em></div><div class="score best"><span>Option 1</span><div class="bar"><u data-w="75"></u></div><em>75/100</em></div><b>Winter canola + clover → Proso millet + winter forage → Grain sorghum</b>
+<span class="emo">📚</span> 3,663 field trials: ~15% more yield than monoculture
+<span class="emo">⚠️</span> New combination — try it on part of a field first<span class="t">10:03</span></div></div>
+      <div class="w" data-at="21.3"><div class="m out"><div class="vn"><span class="p">▶</span><div class="wave" id="wv1"></div></div><span class="t">10:05<i>✓✓</i></span></div></div>
+      <div class="w" data-at="22.2"><div class="m in" style="color:#54656f"><span class="emo">🎙️</span> I heard: “Should I water this week?”<span class="t">10:05</span></div></div>
+      <div class="w" data-at="23.0"><div class="m in"><span class="emo">💧</span> <b>No need to water this week.</b>
+• Rain expected: about 28 mm over 7 days
+• Crop water use: about 10 mm<span class="t">10:05</span></div></div>
+      <div class="w" data-at="23.9"><div class="m in"><div class="vn"><div class="av"><img src="../../app/static/brand/orbi.svg" alt=""></div><span class="p">▶</span><div class="wave" id="wv2"></div></div><span class="t">10:05</span></div></div>
+    </div>
+    <div class="bar-in"><div>Message</div><span class="emo">🎙️</span></div>
+  </div></div>
+
+  <div class="side">
+    <div class="step" data-in="10.3" data-out="11.6"><div class="kicker">STEP 1</div><h2>Drop a <i>pin.</i></h2><p>No app. No login. No forms.</p></div>
+    <div class="step" data-in="11.8" data-out="15.5"><div class="kicker">OUR AI ENGINE READS YOUR FIELD FROM SPACE</div><h2>20 years of <i>NASA data</i></h2>
+      <div class="chips" id="chips"><span><b>POWER</b> climate</span><span><b>MODIS</b> vegetation</span><span><b>GRACE</b> groundwater</span><span><b>SMAP</b> soil moisture</span><span><b>ECOSTRESS</b> crop stress</span><span><b>USDA</b> crop &amp; soil maps</span></div></div>
+    <div class="step" data-in="15.7" data-out="20.9"><div class="kicker">CROP ROTATION, COMPARED</div><h2>Your rotation vs. <i>better options</i></h2>
+      <p id="c3p">Grounded in NASA data and 3,663 field trials. Every option shows its evidence, its gaps and its risks.</p></div>
+    <div class="step" data-in="21.1" data-out="25.6"><div class="kicker">NO FORMS · NO APP · NO READING REQUIRED</div><h2>Type or talk, <i>in 46 languages</i></h2>
+      <div class="hello" id="hello"><span>Hello</span><span>Hola</span><span>Kaixo</span><span>नमस्ते</span><span>مرحبا</span><span>你好</span><span>Bonjour</span><span>Olá</span><span>Habari</span><span>こんにちは</span><span>Merhaba</span><span>Xin chào</span></div></div>
+  </div>
+</div>
+
+<div class="scene" id="E">
+  <div class="art"></div><div class="shade"></div>
+  <div class="row">
+    <div class="col">
+      <div class="logo" id="e1"><img src="../../app/static/brand/orbi.svg" alt=""><b>FarmPartner</b></div>
+      <div class="tag" id="e2">Your field, read from space.</div>
+      <div class="cta" id="e3"><span class="a">farmpartner.space</span><span class="b">WhatsApp +1 620 318 1728</span></div>
+      <div class="foot" id="e4">FREE · OPEN SOURCE (MIT) · NASA SPACE APPS 2026</div>
+    </div>
+    <div class="qrbox" id="e5"><img src="qr-site.svg" alt=""><span>SCAN TO TRY IT</span></div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const clamp = x => Math.max(0, Math.min(1, x));
+const ease = x => { x = clamp(x); return 1 - Math.pow(1 - x, 3); };           // ease-out cubic
+const ramp = (t, a, d = .5) => ease((t - a) / d);                              // 0 → 1 starting at a over d seconds
+const span = (t, a, b, d = .4) => Math.min(ramp(t, a, d), 1 - ramp(t, b - d, d)); // fade in at a, out by b
+const rise = (el, p, dy = 40) => { el.style.opacity = p; el.style.transform = `translateY(${(1 - p) * dy}px)`; };
+
+// waveforms
+[['#wv1', 3], ['#wv2', 7]].forEach(([id, seed]) => { $(id).innerHTML = Array.from({length: 26}, (_, i) =>
+  `<i style="height:${6 + Math.round(Math.abs(Math.sin(i * 1.9 + seed)) * 24)}px"></i>`).join(''); });
+
+const SCENES = {A: [0, 6.3], B: [6.3, 10.2], C: [10.2, 25.6], E: [25.6, 30.1]};
+let heights = null;
+function measure() { heights = $$('.w').map(w => w.scrollHeight); }
+
+window.seek = t => {
+  if (!heights) measure();
+  for (const [id, [a, b]] of Object.entries(SCENES))
+    $('#' + id).style.opacity = id === 'A' ? 1 - ramp(t, b - .35, .35) : id === 'E' ? ramp(t, a - .1, .5) : span(t, a - .15, b + .1, .4);
+
+  // A: slow push-in on the art, two lines
+  $('#A .art').style.transform = `scale(${1 + t * .012}) translateX(${-t * 4}px)`;
+  rise($('#a1'), ramp(t, .4, .7)); rise($('#a2'), ramp(t, 3.0, .7));
+
+  // B
+  const b1 = ramp(t, 6.4, .6); $('#b1').style.opacity = b1; $('#b1').style.transform = `scale(${.92 + b1 * .08})`;
+  rise($('#b2'), ramp(t, 7.9, .6)); rise($('#b3'), ramp(t, 8.8, .6), 16);
+
+  // C: chat messages grow in; side steps
+  $$('.w').forEach((w, i) => { const p = ramp(t, +w.dataset.at, .45); w.style.height = heights[i] * p + 'px'; w.style.opacity = clamp(p * 1.4); });
+  $$('.score u').forEach(u => u.style.width = ramp(t, 16.8, 1.1) * u.dataset.w + '%');
+  const typing = (t > 11.0 && t < 11.5) || (t > 12.0 && t < 12.8) || (t > 15.6 && t < 16.1) || (t > 21.8 && t < 23.0);
+  $('#presence').textContent = typing ? 'typing…' : 'online';
+  $$('.step').forEach(s => { const p = span(t, +s.dataset.in, +s.dataset.out, .4); s.style.opacity = p;
+    s.style.transform = `translateY(calc(-50% + ${(1 - ramp(t, +s.dataset.in, .5)) * 30}px))`; });
+  $$('#chips span').forEach((c, i) => rise(c, ramp(t, 12.3 + i * .4, .4), 16));
+  rise($('#c3p'), ramp(t, 17.9, .5), 20);
+  $$('#hello span').forEach((c, i) => rise(c, ramp(t, 22.6 + i * .2, .35), 14));
+  $$('#wv1 i').forEach((el, i, a) => el.classList.toggle('on', i / a.length < (t - 21.4) / .8));
+  $$('#wv2 i').forEach((el, i, a) => el.classList.toggle('on', i / a.length < (t - 24.1) / 3));
+
+  // E
+  $('#E .art').style.transform = `scale(${1.05 + (t - 25.6) * .01})`;
+  rise($('#e1'), ramp(t, 25.8, .6)); rise($('#e2'), ramp(t, 26.5, .6)); rise($('#e3'), ramp(t, 27.2, .6)); rise($('#e4'), ramp(t, 27.8, .6));
+  const e5 = ramp(t, 26.3, .7); $('#e5').style.opacity = e5; $('#e5').style.transform = `scale(${.9 + e5 * .1})`;
+};
+
+document.fonts.ready.then(() => { measure(); window.ready = true; seek(0);
+  if (location.search.includes('play')) { const t0 = performance.now(); (function f() { seek(((performance.now() - t0) / 1000) % 30); requestAnimationFrame(f); })(); } });
+</script>
+</body>
+</html>
