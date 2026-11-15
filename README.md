@@ -1,7 +1,5 @@
 <p align="center"><a href="https://farmpartner.space"><img src="docs/readme-banner.jpg" alt="farmpartner — the farm advisor that reads your field from space. NASA Space Apps 2026, Field Shift challenge."></a></p>
 
-# farm**partner**
-
 **The farm advisor that reads your field from space.** A WhatsApp and SMS advisor built on open NASA Earth data,
 for NASA Space Apps 2026, challenge *Field Shift: Adapting Farms with NASA Data*.
 
