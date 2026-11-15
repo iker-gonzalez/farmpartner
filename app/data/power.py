@@ -12,6 +12,16 @@ PARAMS = "T2M_MAX,T2M_MIN,PRECTOTCORR,GWETROOT"
 FILL = -999.0
 
 
+def grid_lat(lat: float) -> float:
+    """Centre of the MERRA-2 cell (0.5° lat x 0.625° lon) holding the point. POWER answers per cell, so this returns
+    the same data as the exact point, sends NASA only the ~50 km cell, and lets nearby fields share one cached copy."""
+    return round(round(lat / 0.5) * 0.5, 4)
+
+
+def grid_lon(lon: float) -> float:
+    return round(round(lon / 0.625) * 0.625, 4)
+
+
 def fetch_daily(lat: float, lon: float, years: int = 20) -> dict[str, dict[str, float]]:
     # POWER lags a few days. End on the last Sunday at least 7 days ago, so the request (and its cache key)
     # stays the same for a week instead of changing every day.
@@ -19,7 +29,7 @@ def fetch_daily(lat: float, lon: float, years: int = 20) -> dict[str, dict[str, 
     end -= dt.timedelta(days=(end.weekday() + 1) % 7)
     start = dt.date(end.year - years, 1, 1)
     data = get_json(URL, {
-        "parameters": PARAMS, "community": "AG", "latitude": round(lat, 3), "longitude": round(lon, 3),
+        "parameters": PARAMS, "community": "AG", "latitude": grid_lat(lat), "longitude": grid_lon(lon),
         "start": start.strftime("%Y%m%d"), "end": end.strftime("%Y%m%d"), "format": "JSON",
     }, ttl_s=7 * 86400)
     return data["properties"]["parameter"]

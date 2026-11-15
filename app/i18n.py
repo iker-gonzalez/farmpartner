@@ -248,11 +248,12 @@ def _llm_language(text: str) -> tuple[str | None, str | None]:
         return _llm_cache[key]
     try:
         from app.agent import quick
+        from app.privacy import scrub
         raw = quick("Identify the language of a farmer's chat message, and whether the farmer is asking to be "
                     "answered in a particular language (e.g. 'speak Turkish to me', 'speak my language', 'say it in "
                     "Arabic', 'can you detect my language'). Reply ONLY JSON: {\"lang\": \"<ISO 639-1 code of the "
                     "message, or null if too short to tell>\", \"wants\": \"<ISO 639-1 code they ask for; if they ask "
-                    "for 'my language', the language they are writing in; else null>\"}", key, max_tokens=60)
+                    "for 'my language', the language they are writing in; else null>\"}", scrub(key), max_tokens=60)
         d = json.loads(re.search(r"\{.*\}", raw, re.S).group(0))
         lang = d.get("lang") if d.get("lang") in LANGS else None
         wants = d.get("wants") if d.get("wants") in LANGS else None

@@ -8,6 +8,7 @@ import logging
 import re
 
 from app import config, service
+from app.privacy import scrub
 from app.db import Farmer, Message, session
 from app.engine import explain as ex
 from app.engine.knowledge import crops, crops_in_text
@@ -165,7 +166,7 @@ def _history(farmer_id: int, limit: int = 12) -> list[dict]:
     turns: list[dict] = []
     for m in reversed(msgs):
         role = "user" if m.direction == "in" else "assistant"
-        body = m.body or ("[shared a location pin]" if m.lat is not None else "")
+        body = scrub(m.body) or ("[shared a location pin]" if m.lat is not None else "")
         if not body:
             continue
         if turns and turns[-1]["role"] == role:

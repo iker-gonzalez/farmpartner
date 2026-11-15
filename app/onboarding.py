@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from typing import Callable
 
 from app import service
+from app.privacy import scrub
 from app.data import landcheck
 from app.data.geocode import county_name, phone_country, place_to_point, zip_to_point
 from app.db import Farmer, Field, Message, now, session
@@ -164,7 +165,7 @@ def crops_any_language(text: str) -> tuple[list[str], list[str]]:
                     'names that fit none], "closest": {"<unknown crop name>": "<closest crop id by family and season>"}, '
                     '"tree_crop": "English name if they grow a perennial tree/vine crop (orchard, olives, nuts, '
                     'vineyard, fruit), else null"}. Only list real crops; ignore any word that is not a crop name '
-                    '(greetings, insults, apologies).', text[:300], max_tokens=250)
+                    '(greetings, insults, apologies).', scrub(text)[:300], max_tokens=250)
         import logging
         logging.getLogger(__name__).info("crop mapping (%d chars) -> %s", len(text), raw[:300])  # never log what farmers wrote
         d = json.loads(re.search(r"\{.*\}", raw, re.S).group(0))
@@ -198,7 +199,7 @@ def classify_goal(text: str) -> list[str]:
             from app.agent import quick
             raw = quick("Map a farmer's goal (any language) to 1-2 of these crop-rotation scoring goals: save_water, "
                         "soil_health, income, less_erosion, forage. Reply with ONLY a JSON array of keys.",
-                        text[:300], max_tokens=100)
+                        scrub(text)[:300], max_tokens=100)
             keys = [k for k in json.loads(re.search(r"\[.*\]", raw, re.S).group(0)) if k in PRIORITY_KEYS.values()]
             if keys:
                 return keys[:2]
