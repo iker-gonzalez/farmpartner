@@ -425,7 +425,6 @@
  "1ba6a7c53a": "<span class=\"no\">✕</span> 電話番号、名前、メッセージ",
  "73029ca759": "Claude（Anthropic）— AI",
  "44b8ce9bf7": "あなたのメッセージと写真、畑の地域とデータ",
- "03e57776cc": "<span class=\"no\">✕</span> 電話番号",
  "90c5fa29ed": "Google Cloud 音声認識",
  "5ca45114a0": "<span class=\"no\">✕</span> 電話番号、位置情報",
  "49671ad7b2": "Twilio · WhatsApp · SMS",
@@ -460,9 +459,7 @@
  "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
  "c198c23b25": "NASA &amp; USDAのオープンデータで構築 · © 2026",
  "f1127fb709": "衛星データや気象データを取得するため、畑の座標——または入力された地名——を公開サービス（NASA、USDA、Open‑Meteo）に送ります。番号や名前が送られることはありません。",
- "f1ca62a47d": "アドバイスを担う AI の Claude は、あなたのメッセージと畑のデータを受け取りますが、付いているのは郡や町の名前で、電話番号ではありません。農業の情報をウェブで検索するときも、あなたの情報は検索に含まれません。",
  "5c0038f031": "<b>STOP</b>と送れば、こちらから先にメッセージを送ることはなくなります。<b>RESET</b>と送れば、畑の情報と送った位置情報を消去します。ご連絡いただければ、すべて削除します。",
- "a8a3ef2f87": "畑の座標、または入力された地名や郵便番号",
  "0932362829": "<span class=\"no\">✕</span> 電話番号、名前、その他のメッセージ",
  "3f34fe059f": "ウェブ検索（Claude 経由）",
  "11877f1cf5": "作物や農業についての短い検索",
@@ -492,5 +489,8 @@
  "05c3029084": "<span class=\"ic\" aria-hidden=\"true\">⧉</span>アドレスをコピー",
  "1664a484ce": "コピーしました ✓",
  "74fdd49abb": "<a role=\"menuitem\" href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Gmail</a>",
- "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>"
+ "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>",
+ "051b0e59d4": "アドバイスを担う AI の Claude は、あなたのメッセージと畑のデータを受け取りますが、付いているのは郡や町の名前で、電話番号ではありません。入力された電話番号、メールアドレス、正確な座標はメッセージを読む前に取り除かれ、農業の情報をウェブで検索するときもあなたの情報は含まれません。",
+ "2764e68daf": "畑の座標（NASA の気候サービスが受け取るのは約 50 km の範囲のみ）、または入力された地名や郵便番号",
+ "a3b1b8293f": "<span class=\"no\">✕</span> 電話番号、入力された番号・メールアドレス・座標"
 }

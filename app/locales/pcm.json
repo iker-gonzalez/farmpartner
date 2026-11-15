@@ -425,7 +425,6 @@
  "1ba6a7c53a": "<span class=\"no\">✕</span> Phone number, name, messages",
  "73029ca759": "Claude (Anthropic) — the AI",
  "44b8ce9bf7": "Your messages and fotos, your farm area and data",
- "03e57776cc": "<span class=\"no\">✕</span> Phone number",
  "90c5fa29ed": "Google Cloud speech",
  "5ca45114a0": "<span class=\"no\">✕</span> Phone number, location",
  "49671ad7b2": "Twilio · WhatsApp · SMS",
@@ -460,9 +459,7 @@
  "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
  "c198c23b25": "WE BUILD AM ON OPEN NASA &amp; USDA DATA · © 2026",
  "f1127fb709": "To get satellite and weather data, we dey send the farm coordinates — or the place name wey you type — go public services (NASA, USDA, Open‑Meteo). Dem no dey ever collect your number or your name.",
- "f1ca62a47d": "Claude, the AI wey dey give the advice, dey get your messages and your farm data, wey dem label with the county or town — no be your phone number. When e dey search internet for farm matter, the search no dey ever carry your details.",
  "5c0038f031": "Send <b>STOP</b> and we no go message you first again. Send <b>RESET</b> to clear your farms and the locations wey you send. Write us and we go delete everything.",
- "a8a3ef2f87": "Farm coordinates, or the place name or ZIP code wey you type",
  "0932362829": "<span class=\"no\">✕</span> Phone number, name, the rest of your messages",
  "3f34fe059f": "Web search (through Claude)",
  "11877f1cf5": "Short search about crops and farming",
@@ -492,5 +489,8 @@
  "05c3029084": "<span class=\"ic\" aria-hidden=\"true\">⧉</span>Copy di address",
  "1664a484ce": "E don copy ✓",
  "74fdd49abb": "<a role=\"menuitem\" href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Gmail</a>",
- "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>"
+ "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>",
+ "051b0e59d4": "Claude, the AI wey dey give the advice, dey get your messages and your farm data, wey dem label with the county or town — no be your phone number. Phone numbers, e‑mails and exact coordinates wey you type, we dey remove dem before e read your messages, and the web search wey e dey do for farm matter no dey ever carry your details.",
+ "2764e68daf": "Farm coordinates (NASA climate service dey get only the ~50 km area), or the place name or ZIP code wey you type",
+ "a3b1b8293f": "<span class=\"no\">✕</span> Phone number, or the numbers, e‑mails and coordinates wey you type"
 }

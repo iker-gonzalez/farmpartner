@@ -425,7 +425,6 @@
  "1ba6a7c53a": "<span class=\"no\">✕</span> Telefonnummer, Name, Nachrichten",
  "73029ca759": "Claude (Anthropic) — die KI",
  "44b8ce9bf7": "Deine Nachrichten und Fotos, die Gegend und die Daten deines Feldes",
- "03e57776cc": "<span class=\"no\">✕</span> Telefonnummer",
  "90c5fa29ed": "Google Cloud Spracherkennung",
  "5ca45114a0": "<span class=\"no\">✕</span> Telefonnummer, Standort",
  "49671ad7b2": "Twilio · WhatsApp · SMS",
@@ -460,9 +459,7 @@
  "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
  "c198c23b25": "AUF OFFENEN NASA- &amp; USDA-DATEN AUFGEBAUT · © 2026",
  "f1127fb709": "Für Satelliten- und Wetterdaten senden wir die Koordinaten des Feldes – oder den Ortsnamen, den du eintippst – an öffentliche Dienste (NASA, USDA, Open‑Meteo). Sie erhalten nie deine Nummer oder deinen Namen.",
- "f1ca62a47d": "Claude, die KI hinter den Ratschlägen, bekommt deine Nachrichten und die Daten deines Feldes, beschriftet mit Landkreis oder Ort – nicht mit deiner Telefonnummer. Wenn sie im Web nach Agrarwissen sucht, enthält die Suche nie deine Daten.",
  "5c0038f031": "Schreib <b>STOP</b>, und wir schreiben dir nicht mehr zuerst. Schreib <b>RESET</b>, um deine Felder und die gesendeten Standorte zu löschen. Schreib uns, und wir löschen alles.",
- "a8a3ef2f87": "Feldkoordinaten oder der Ortsname bzw. die Postleitzahl, die du eintippst",
  "0932362829": "<span class=\"no\">✕</span> Telefonnummer, Name, der Rest deiner Nachrichten",
  "3f34fe059f": "Websuche (über Claude)",
  "11877f1cf5": "Kurze Suchen zu Kulturen und Landwirtschaft",
@@ -492,5 +489,8 @@
  "05c3029084": "<span class=\"ic\" aria-hidden=\"true\">⧉</span>Adresse kopieren",
  "1664a484ce": "Kopiert ✓",
  "74fdd49abb": "<a role=\"menuitem\" href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Gmail</a>",
- "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>"
+ "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>",
+ "051b0e59d4": "Claude, die KI hinter den Ratschlägen, bekommt deine Nachrichten und die Daten deines Feldes, beschriftet mit Landkreis oder Ort – nicht mit deiner Telefonnummer. Telefonnummern, E‑Mail-Adressen und genaue Koordinaten, die du eintippst, werden entfernt, bevor sie deine Nachrichten liest, und ihre Websuchen nach Agrarwissen enthalten nie deine Daten.",
+ "2764e68daf": "Feldkoordinaten (der Klimadienst der NASA bekommt nur das Gebiet von etwa 50 km) oder der Ortsname bzw. die Postleitzahl, die du eintippst",
+ "a3b1b8293f": "<span class=\"no\">✕</span> Telefonnummer und auch keine Nummern, E‑Mail-Adressen oder Koordinaten, die du eintippst"
 }

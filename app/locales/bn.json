@@ -425,7 +425,6 @@
  "1ba6a7c53a": "<span class=\"no\">✕</span> ফোন নম্বর, নাম, মেসেজ",
  "73029ca759": "Claude (Anthropic) — AI",
  "44b8ce9bf7": "আপনার মেসেজ ও ছবি, আপনার জমির এলাকা ও তথ্য",
- "03e57776cc": "<span class=\"no\">✕</span> ফোন নম্বর",
  "90c5fa29ed": "Google Cloud speech",
  "5ca45114a0": "<span class=\"no\">✕</span> ফোন নম্বর, অবস্থান",
  "49671ad7b2": "Twilio · WhatsApp · SMS",
@@ -460,9 +459,7 @@
  "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
  "c198c23b25": "NASA ও USDA-র উন্মুক্ত তথ্যে তৈরি · © 2026",
  "f1127fb709": "স্যাটেলাইট ও আবহাওয়ার তথ্য পেতে আমরা খেতের স্থানাঙ্ক — বা আপনার লেখা জায়গার নাম — সরকারি সেবাগুলোতে (NASA, USDA, Open‑Meteo) পাঠাই। তারা কখনো আপনার নম্বর বা নাম পায় না।",
- "f1ca62a47d": "পরামর্শের পেছনের AI, Claude, আপনার বার্তা ও খেতের তথ্য পায়, জেলা বা শহরের নাম দিয়ে চিহ্নিত — আপনার ফোন নম্বর দিয়ে নয়। কৃষি তথ্যের জন্য ওয়েবে খুঁজলে সেই খোঁজে কখনো আপনার তথ্য থাকে না।",
  "5c0038f031": "<b>STOP</b> পাঠালে আমরা আর আগে বার্তা পাঠাব না। আপনার খেত ও পাঠানো অবস্থানগুলো মুছতে <b>RESET</b> পাঠান। আমাদের লিখুন, আমরা সব মুছে দেব।",
- "a8a3ef2f87": "খেতের স্থানাঙ্ক, বা আপনার লেখা জায়গার নাম বা পোস্টকোড",
  "0932362829": "<span class=\"no\">✕</span> ফোন নম্বর, নাম, আপনার বাকি বার্তা",
  "3f34fe059f": "ওয়েব খোঁজ (Claude-এর মাধ্যমে)",
  "11877f1cf5": "ফসল ও কৃষি নিয়ে ছোট খোঁজ",
@@ -492,5 +489,8 @@
  "05c3029084": "<span class=\"ic\" aria-hidden=\"true\">⧉</span>ঠিকানা কপি করুন",
  "1664a484ce": "কপি হয়েছে ✓",
  "74fdd49abb": "<a role=\"menuitem\" href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Gmail</a>",
- "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>"
+ "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>",
+ "051b0e59d4": "পরামর্শের পেছনের AI, Claude, আপনার বার্তা ও খেতের তথ্য পায়, জেলা বা শহরের নাম দিয়ে চিহ্নিত — আপনার ফোন নম্বর দিয়ে নয়। আপনার লেখা ফোন নম্বর, ই‑মেল ও সঠিক স্থানাঙ্ক সে বার্তা পড়ার আগেই সরিয়ে ফেলা হয়, আর কৃষি তথ্যের জন্য তার ওয়েব খোঁজে কখনো আপনার তথ্য থাকে না।",
+ "2764e68daf": "খেতের স্থানাঙ্ক (NASA-র জলবায়ু সেবা শুধু প্রায় ৫০ কিমি এলাকা পায়), বা আপনার লেখা জায়গার নাম বা পোস্টকোড",
+ "a3b1b8293f": "<span class=\"no\">✕</span> ফোন নম্বর, কিংবা আপনার লেখা নম্বর, ই‑মেল ও স্থানাঙ্ক"
 }

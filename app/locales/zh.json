@@ -425,7 +425,6 @@
  "1ba6a7c53a": "<span class=\"no\">✕</span> 电话号码、姓名、消息",
  "73029ca759": "Claude（Anthropic）——AI",
  "44b8ce9bf7": "你的消息和照片、田地所在区域和数据",
- "03e57776cc": "<span class=\"no\">✕</span> 电话号码",
  "90c5fa29ed": "Google Cloud 语音服务",
  "5ca45114a0": "<span class=\"no\">✕</span> 电话号码、位置",
  "49671ad7b2": "Twilio · WhatsApp · SMS",
@@ -460,9 +459,7 @@
  "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
  "c198c23b25": "基于 NASA 和 USDA 开放数据构建 · © 2026",
  "f1127fb709": "为了获取卫星和天气数据，我们会把田地的坐标——或您输入的地名——发送给公共服务（NASA、USDA、Open‑Meteo）。它们永远收不到您的号码或姓名。",
- "f1ca62a47d": "提供建议的 AI——Claude——会收到您的消息和田地数据，标注的是县或镇名，而不是您的电话号码。它在网上搜索农业知识时，搜索内容从不包含您的信息。",
  "5c0038f031": "发送 <b>STOP</b>，我们就不再主动给您发消息。发送 <b>RESET</b>，即可删除您的田地和您发送过的位置。给我们写信，我们会删除一切。",
- "a8a3ef2f87": "田地坐标，或您输入的地名或邮编",
  "0932362829": "<span class=\"no\">✕</span> 电话号码、姓名、您的其他消息",
  "3f34fe059f": "网络搜索（通过 Claude）",
  "11877f1cf5": "关于作物和农业的简短搜索",
@@ -492,5 +489,8 @@
  "05c3029084": "<span class=\"ic\" aria-hidden=\"true\">⧉</span>复制地址",
  "1664a484ce": "已复制 ✓",
  "74fdd49abb": "<a role=\"menuitem\" href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Gmail</a>",
- "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>"
+ "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>",
+ "051b0e59d4": "提供建议的 AI——Claude——会收到您的消息和田地数据，标注的是县或镇名，而不是您的电话号码。您输入的电话号码、电子邮件和精确坐标会在它读取消息前被删除，它在网上搜索农业知识时也从不包含您的信息。",
+ "2764e68daf": "田地坐标（NASA 的气候服务只获得约 50 公里的区域），或您输入的地名或邮编",
+ "a3b1b8293f": "<span class=\"no\">✕</span> 电话号码，以及您输入的号码、电子邮件和坐标"
 }

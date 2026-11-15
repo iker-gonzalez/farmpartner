@@ -425,7 +425,6 @@
  "1ba6a7c53a": "<span class=\"no\">✕</span> Nomor telepon, nama, pesan",
  "73029ca759": "Claude (Anthropic) — AI-nya",
  "44b8ce9bf7": "Pesan dan foto Anda, area dan data lahan Anda",
- "03e57776cc": "<span class=\"no\">✕</span> Nomor telepon",
  "90c5fa29ed": "Google Cloud speech",
  "5ca45114a0": "<span class=\"no\">✕</span> Nomor telepon, lokasi",
  "49671ad7b2": "Twilio · WhatsApp · SMS",
@@ -460,9 +459,7 @@
  "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
  "c198c23b25": "DIBANGUN DENGAN DATA TERBUKA NASA &amp; USDA · © 2026",
  "f1127fb709": "Untuk mengambil data satelit dan cuaca, kami mengirim koordinat ladang — atau nama tempat yang Anda ketik — ke layanan publik (NASA, USDA, Open‑Meteo). Mereka tidak pernah menerima nomor atau nama Anda.",
- "f1ca62a47d": "Claude, AI di balik saran ini, menerima pesan Anda dan data ladang Anda, diberi label kabupaten atau kota — bukan nomor telepon Anda. Saat mencari informasi pertanian di web, pencarian itu tidak pernah memuat data Anda.",
  "5c0038f031": "Kirim <b>STOP</b> dan kami tidak akan menghubungi Anda lebih dulu lagi. Kirim <b>RESET</b> untuk menghapus ladang Anda dan lokasi yang Anda kirim. Hubungi kami dan kami hapus semuanya.",
- "a8a3ef2f87": "Koordinat ladang, atau nama tempat atau kode pos yang Anda ketik",
  "0932362829": "<span class=\"no\">✕</span> Nomor telepon, nama, sisa pesan Anda",
  "3f34fe059f": "Pencarian web (lewat Claude)",
  "11877f1cf5": "Pencarian singkat tentang tanaman dan pertanian",
@@ -492,5 +489,8 @@
  "05c3029084": "<span class=\"ic\" aria-hidden=\"true\">⧉</span>Salin alamat",
  "1664a484ce": "Tersalin ✓",
  "74fdd49abb": "<a role=\"menuitem\" href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Gmail</a>",
- "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>"
+ "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>",
+ "051b0e59d4": "Claude, AI di balik saran ini, menerima pesan Anda dan data ladang Anda, diberi label kabupaten atau kota — bukan nomor telepon Anda. Nomor telepon, e‑mail, dan koordinat persis yang Anda ketik dihapus sebelum ia membaca pesan Anda, dan pencarian web-nya tentang pertanian tidak pernah memuat data Anda.",
+ "2764e68daf": "Koordinat ladang (layanan iklim NASA hanya menerima area sekitar 50 km), atau nama tempat atau kode pos yang Anda ketik",
+ "a3b1b8293f": "<span class=\"no\">✕</span> Nomor telepon, maupun nomor, e‑mail, dan koordinat yang Anda ketik"
 }

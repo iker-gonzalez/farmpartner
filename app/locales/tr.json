@@ -425,7 +425,6 @@
  "1ba6a7c53a": "<span class=\"no\">✕</span> Telefon numarası, ad, mesajlar",
  "73029ca759": "Claude (Anthropic) — yapay zekâ",
  "44b8ce9bf7": "Mesajlarınız ve fotoğraflarınız, tarlanızın bölgesi ve verileri",
- "03e57776cc": "<span class=\"no\">✕</span> Telefon numarası",
  "90c5fa29ed": "Google Cloud konuşma tanıma",
  "5ca45114a0": "<span class=\"no\">✕</span> Telefon numarası, konum",
  "49671ad7b2": "Twilio · WhatsApp · SMS",
@@ -460,9 +459,7 @@
  "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
  "c198c23b25": "AÇIK NASA &amp; USDA VERİLERİYLE YAPILDI · © 2026",
  "f1127fb709": "Uydu ve hava durumu verilerini almak için tarlanın koordinatlarını — ya da yazdığınız yer adını — kamu hizmetlerine (NASA, USDA, Open‑Meteo) gönderiyoruz. Numaranızı veya adınızı asla almazlar.",
- "f1ca62a47d": "Tavsiyelerin arkasındaki yapay zekâ Claude, mesajlarınızı ve tarlanızın verilerini telefon numaranızla değil, ilçe veya kasaba adıyla alır. Web'de tarım bilgisi aradığında, arama asla sizin bilgilerinizi içermez.",
  "5c0038f031": "<b>STOP</b> yazın, size bir daha ilk biz yazmayalım. Tarlalarınızı ve gönderdiğiniz konumları silmek için <b>RESET</b> yazın. Bize yazın, her şeyi silelim.",
- "a8a3ef2f87": "Tarla koordinatları ya da yazdığınız yer adı veya posta kodu",
  "0932362829": "<span class=\"no\">✕</span> Telefon numarası, ad, mesajlarınızın geri kalanı",
  "3f34fe059f": "Web araması (Claude üzerinden)",
  "11877f1cf5": "Ürünler ve tarım hakkında kısa aramalar",
@@ -492,5 +489,8 @@
  "05c3029084": "<span class=\"ic\" aria-hidden=\"true\">⧉</span>Adresi kopyala",
  "1664a484ce": "Kopyalandı ✓",
  "74fdd49abb": "<a role=\"menuitem\" href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Gmail</a>",
- "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>"
+ "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>",
+ "051b0e59d4": "Tavsiyelerin arkasındaki yapay zekâ Claude, mesajlarınızı ve tarlanızın verilerini telefon numaranızla değil, ilçe veya kasaba adıyla alır. Yazdığınız telefon numaraları, e‑postalar ve kesin koordinatlar, mesajlarınızı okumadan önce silinir; web'de yaptığı tarım aramaları da asla sizin bilgilerinizi içermez.",
+ "2764e68daf": "Tarla koordinatları (NASA'nın iklim hizmeti yalnızca yaklaşık 50 km'lik alanı alır) ya da yazdığınız yer adı veya posta kodu",
+ "a3b1b8293f": "<span class=\"no\">✕</span> Telefon numarası, ya da yazdığınız numaralar, e‑postalar ve koordinatlar"
 }
