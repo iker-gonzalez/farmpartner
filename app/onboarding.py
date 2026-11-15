@@ -47,13 +47,21 @@ IRRIGATION_PROMPT = buttons("Is this field irrigated?", ("irrigated", "Irrigated
 NEXT_PROMPT = buttons("What next? Tap a button or just type any question.",
                       ("should I water this week?", "Should I water?"), ("is frost coming?", "Frost coming?"),
                       ("report", "My field report"))
+# How to send a pin. On Android, WhatsApp's location screen ignores taps on the map: the pin stays in the middle and
+# the map has to be dragged under it. A pin dropped in Google Maps (press and hold) and shared here works on any phone.
+PIN_HOWTO = ("Tap 📎 → *Location*, then *drag* the map (tapping it does nothing) until the red pin sits on your field "
+             "and tap *Send this location*.\n"
+             "Or in Google Maps: press and hold on your field, tap *Share* and send it here.")
+# The web chat has no draggable map: its 📎 menu sends the browser's GPS position ("My location").
+WEB_PIN_HOWTO = ("Tap 📎 → *My location* if you're standing in the field. Anywhere else: in Google Maps, press and hold "
+                 "on your field, tap *Share* → *Copy link* and paste the link here.")
 WELCOME = ("👋 Hi! I'm *FarmPartner*, your farm advisor powered by NASA satellite data — free, right here in chat.\n\n"
            "In 3 quick steps I'll compare your crop rotation with options that fit your climate, soil and water:\n"
-           "1️⃣ Send your field location — tap 📎 → *Location* and drop the pin on your field (or text your ZIP code)\n"
+           "1️⃣ Send your field location (or text your ZIP code)\n"
            "2️⃣ Confirm your crops\n"
            "3️⃣ Pick your main goal\n\n"
            "After that, ask me anything: watering, frost, heat, what to plant next.\n\n"
-           "📍 *Step 1 of 3:* send your field location now.")
+           "📍 *Step 1 of 3:* send your field location now.\n" + PIN_HOWTO)
 KNOWN_CROPS = ("corn, soybeans, wheat, barley, oats, grain sorghum (milo), rice, cotton, alfalfa, sunflower, canola, "
                "field peas, dry beans, peanuts, potatoes, tomatoes and other vegetables, sugar beets, sugarcane, "
                "proso millet, triticale, and fallow")
@@ -256,9 +264,13 @@ def _first_insight(field: Field) -> list:
     return ["\n".join(lines)]
 
 
-REPIN = ("🤔 That pin looks like {what}, not a farm field. Please drop the pin right on your field: tap 📎 → "
-         "*Location*, move the map until the pin sits on the field, then tap *Send this location*. "
-         "(Or text the field's ZIP code.)")
+REPIN = ("🤔 That pin looks like {what}, not a farm field. Please put the pin right on your field.\n"
+         + PIN_HOWTO + "\n(Or text the field's ZIP code.)")
+
+
+RESTART = "🔄 Starting over.\n\n📍 *Step 1 of 3:* send your field location (or text your ZIP code).\n" + PIN_HOWTO
+NEED_LOCATION = ("I need your field's location to look it up.\n" + PIN_HOWTO + "\n"
+                 "You can also type coordinates (e.g. 38.05, -100.75) or text a U.S. ZIP code.")
 
 
 def _set_location(farmer: Farmer, lat: float, lon: float, place: str | None) -> Reply:
@@ -302,8 +314,7 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
                 db.delete(f)
             fm.state, fm.priorities, fm.constraints = "awaiting_location", [], {}
             db.commit()
-        return Reply(now=["🔄 Starting over.\n\n📍 *Step 1 of 3:* send your field location — tap 📎 → *Location* and "
-                          "drop the pin on your field (or text your ZIP code)."])
+        return Reply(now=[RESTART])
     if low in ("help", "?", "menu", "ayuda", "menú"):
         return Reply(now=[HELP])
     if low in ("stop", "unsubscribe", "stop all"):
@@ -349,8 +360,7 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
         if re.fullmatch(r"\d{3,6}", t.replace(" ", "")):
             return Reply(now=[f"I couldn't find ZIP code {t} — ZIP codes only work in the U.S. Anywhere else, send a "
                               "pin (📎 → Location), paste a Google Maps link, or type coordinates like 41.39, 2.17."])
-        return Reply(now=["I need your field's location to look it up. Tap 📎 → Location and send a pin on the field, "
-                          "paste a Google Maps link, type coordinates (e.g. 38.05, -100.75), or text a U.S. ZIP code."])
+        return Reply(now=[NEED_LOCATION])
 
     if state == "awaiting_crops":
         with session() as db:
@@ -558,14 +568,11 @@ def static_messages() -> list:
     """FarmPartner's fixed messages (for translation prewarm)."""
     return [WELCOME, HELP, PRIORITY_PROMPT, CROPS_PROMPT, IRRIGATION_PROMPT, NEXT_PROMPT, GOAL_TEXT_PROMPT,
             WELCOME.split("\n\n")[-1],
-            "🔄 Starting over.\n\n📍 *Step 1 of 3:* send your field location — tap 📎 → *Location* and drop the pin on "
-            "your field (or text your ZIP code).",
+            RESTART, NEED_LOCATION,
             "📡 Got your pin! Checking it's on a field and pulling 20 years of NASA satellite & weather data for it — "
             "about 30 seconds…",
             "🧮 Scoring rotations against your field's climate, soil and goals…",
             "🌱 I compared your rotation with alternatives that fit your climate:",
-            "I need your field's location to look it up. Tap 📎 → Location and send a pin on the field, paste a Google "
-            "Maps link, type coordinates (e.g. 38.05, -100.75), or text a U.S. ZIP code.",
             "Which crops do you grow on this field? Type them in order, e.g. \"corn, soybeans\". Add \"irrigated\" or "
             "\"dryland\".",
             "No problem — which crops do you grow on this field? Type them in order, e.g. \"corn, soybeans\" or "

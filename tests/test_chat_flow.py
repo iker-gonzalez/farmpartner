@@ -220,3 +220,13 @@ def test_never_cropped_field_moves_on_and_dryland_plans_stay_dryland(offline):
     from tests.conftest import load
     res = compare(load("garden_city_ks"), ["soil_health"], irrigated=False, current=["fallow", "fallow"])
     assert all("corn" not in s["years"] and "soybeans" not in s["years"] for s in res["strategies"][1:])
+
+
+def test_pin_instructions_fit_the_channel(offline):
+    """WhatsApp (Android ignores taps on its map) is told to drag the map; the web chat, which has no map, isn't."""
+    from app import chat, onboarding
+
+    whatsapp = "\n".join(chat.inbound("whatsapp:+15550001111", "whatsapp", "hi").now)
+    assert "*drag* the map" in whatsapp and "Google Maps" in whatsapp
+    web = "\n".join(say(_client(), "pins", text="hi"))
+    assert onboarding.WEB_PIN_HOWTO in web and "drag" not in web

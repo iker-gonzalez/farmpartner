@@ -62,7 +62,7 @@ def test_more_languages_units_and_location_hints(offline):
     say = lambda p, **kw: c.post("/api/chat", json={"phone": p, **kw}).json()["messages"]  # noqa: E731
     say("u1", text="hi")
     assert "ZIP codes only work in the U.S." in say("u1", text="96000")[0]
-    assert "Google Maps link" in say("u1", text="where?")[0]
+    assert "Google Maps" in say("u1", text="where?")[0]
     assert "Step 1 of 3" in say("u1", text="Hi")[0]                      # a greeting re-shows the welcome
     out = say("u1", text="I want the information in °C and mm")
     assert "metric" in out[0] and "Step 1 of 3" in out[1]
