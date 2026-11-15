@@ -408,7 +408,7 @@
  "47345e627e": "Like where FarmPartner is heading? Whether you farm, research, invest or just want to build something useful with open NASA data, we’d love to hear from you.",
  "b301b60406": "<i aria-hidden=\"true\"></i>SIGNAL OPEN · WRITE TO THE TEAM",
  "362a052f2f": "Interested in the project? Drop us a line.",
- "bd87a71f88": "<span class=\"txt\">info@experienciatek.com</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
+ "e877ff631a": "<span class=\"txt\">hello@farmpartner.space</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
  "da5d52a3f8": "SEND US AN EMAIL →",
  "370a93fb3b": "COPY ADDRESS",
  "0eb9813a3a": "01 · FARMERS",
@@ -421,8 +421,8 @@
  "3414de290c": "Scale it with us",
  "6f18b8afaa": "Co-ops, NGOs, companies and investors who want to take FarmPartner to more farms and more countries.",
  "fc5b43e9ba": "■ No forms, no newsletters. Just an e-mail to real people.",
- "e77147d0d6": "Interested in FarmPartner? Write to the team at info@experienciatek.com.",
- "980f5e7d28": "Email info@experienciatek.com",
+ "b3af20d50f": "Interested in FarmPartner? Write to the team at hello@farmpartner.space.",
+ "20a7366432": "Email hello@farmpartner.space",
  "c509a2aae3": "COPIED ✓",
  "67059fc822": "Your data — FarmPartner",
  "2536b15920": "● YOUR DATA · PLAIN WORDS",
@@ -465,7 +465,7 @@
  "b6e77c24ce": "Where it lives",
  "0096b8dd2c": "In a private Postgres database (Supabase) that only the FarmPartner server, which runs on Google Cloud in Europe, can read. Public access to its tables is switched off.",
  "e1081b221f": "Deleting your data",
- "ea57fa5119": "Text <code>RESET</code> to remove your fields and their history. To erase your number and conversation as well, e‑mail <a href=\"mailto:info@experienciatek.com?subject=Delete%20my%20FarmPartner%20data\">info@experienciatek.com</a> from anywhere, with the number you used.",
+ "bb2a16f7cc": "Text <code>RESET</code> to remove your fields and their history. To erase your number and conversation as well, e‑mail <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a> from anywhere, with the number you used.",
  "a717adc281": "■ Last updated November 2026. FarmPartner is a NASA Space Apps Challenge 2026 project and open source: you can check every line of this in the code on <a href=\"https://github.com/iker-gonzalez/farmpartner\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--ink);text-decoration:underline\">GitHub ↗</a>.",
  "0adee36916": "How FarmPartner handles your phone number, your field location and your messages."
 }

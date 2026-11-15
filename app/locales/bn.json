@@ -391,7 +391,6 @@
  "47345e627e": "FarmPartner যেদিকে যাচ্ছে তা ভালো লাগছে? আপনি চাষ করুন, গবেষণা করুন, বিনিয়োগ করুন বা NASA-র উন্মুক্ত তথ্য দিয়ে কাজের কিছু বানাতে চান — আপনার কথা শুনতে আমরা খুব আগ্রহী।",
  "b301b60406": "<i aria-hidden=\"true\"></i>চ্যানেল খোলা · দলকে লিখুন",
  "362a052f2f": "প্রকল্পে আগ্রহী? আমাদের দুই লাইন লিখুন।",
- "bd87a71f88": "<span class=\"txt\">info@experienciatek.com</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
  "da5d52a3f8": "আমাদের ইমেইল পাঠান →",
  "370a93fb3b": "ঠিকানা কপি করুন",
  "0eb9813a3a": "01 · কৃষক",
@@ -404,8 +403,6 @@
  "3414de290c": "আমাদের সঙ্গে বড় করুন",
  "6f18b8afaa": "সমবায়, NGO, কোম্পানি আর বিনিয়োগকারী, যাঁরা FarmPartner-কে আরও খামারে আর আরও দেশে নিয়ে যেতে চান।",
  "fc5b43e9ba": "■ কোনো ফর্ম নেই, নিউজলেটার নেই। শুধু আসল মানুষের কাছে একটি ইমেইল।",
- "e77147d0d6": "FarmPartner-এ আগ্রহী? দলকে লিখুন info@experienciatek.com ঠিকানায়।",
- "980f5e7d28": "ইমেইল করুন info@experienciatek.com",
  "c509a2aae3": "কপি হয়েছে ✓",
  "67059fc822": "আপনার তথ্য — FarmPartner",
  "2536b15920": "● আপনার তথ্য · সহজ কথায়",
@@ -448,7 +445,6 @@
  "b6e77c24ce": "কোথায় থাকে",
  "0096b8dd2c": "একটি ব্যক্তিগত Postgres ডেটাবেসে (Supabase), যা শুধু FarmPartner সার্ভার পড়তে পারে; সার্ভারটি ইউরোপে Google Cloud-এ চলে। এর টেবিলগুলোতে সাধারণের প্রবেশ বন্ধ।",
  "e1081b221f": "আপনার তথ্য মোছা",
- "ea57fa5119": "আপনার জমি আর তার ইতিহাস মুছতে <code>RESET</code> লিখে পাঠান। নম্বর আর কথোপকথনও মুছতে চাইলে, যেকোনো জায়গা থেকে <a href=\"mailto:info@experienciatek.com?subject=Delete%20my%20FarmPartner%20data\">info@experienciatek.com</a>-এ ইমেইল করুন, যে নম্বর ব্যবহার করেছিলেন সেটি জানিয়ে।",
  "a717adc281": "■ সর্বশেষ হালনাগাদ নভেম্বর 2026। FarmPartner একটি NASA Space Apps Challenge 2026 প্রকল্প এবং ওপেন সোর্স: এখানে লেখা প্রতিটি কথা আপনি <a href=\"https://github.com/iker-gonzalez/farmpartner\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--ink);text-decoration:underline\">GitHub ↗</a>-এর কোডে যাচাই করতে পারেন।",
  "0adee36916": "FarmPartner কীভাবে আপনার ফোন নম্বর, জমির অবস্থান আর মেসেজ সামলায়।",
  "8aaa745999": "WHATSAPP<span class=\"long\">-এ খুলুন</span> →",
@@ -467,5 +463,9 @@
  "c556defcfb": "WhatsApp-এ খুলুন",
  "57f5f5efbc": "মেনু",
  "cfba856fd6": "৩০ সেকেন্ডে FarmPartner",
- "74db6a79e4": "FarmPartner-এর ৩০ সেকেন্ডের ভিডিও চালান"
+ "74db6a79e4": "FarmPartner-এর ৩০ সেকেন্ডের ভিডিও চালান",
+ "e877ff631a": "<span class=\"txt\">hello@farmpartner.space</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
+ "b3af20d50f": "FarmPartner-এ আগ্রহী? দলকে লিখুন hello@farmpartner.space ঠিকানায়।",
+ "20a7366432": "ইমেইল করুন hello@farmpartner.space",
+ "bb2a16f7cc": "আপনার জমি আর তার ইতিহাস মুছতে <code>RESET</code> লিখে পাঠান। নম্বর আর কথোপকথনও মুছতে চাইলে, যেকোনো জায়গা থেকে <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a>-এ ইমেইল করুন, যে নম্বর ব্যবহার করেছিলেন সেটি জানিয়ে।"
 }

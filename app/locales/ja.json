@@ -391,7 +391,6 @@
  "47345e627e": "FarmPartnerの目指す方向に共感していただけましたか？農業をしている方も、研究している方も、投資を考えている方も、NASAのオープンデータで役に立つものを作りたい方も、ぜひご連絡ください。",
  "b301b60406": "<i aria-hidden=\"true\"></i>受付中 · チームに連絡する",
  "362a052f2f": "プロジェクトに興味がありますか？お気軽にご連絡ください。",
- "bd87a71f88": "<span class=\"txt\">info@experienciatek.com</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
  "da5d52a3f8": "メールを送る →",
  "370a93fb3b": "アドレスをコピー",
  "0eb9813a3a": "01 · 農家の方",
@@ -404,8 +403,6 @@
  "3414de290c": "一緒に広げましょう",
  "6f18b8afaa": "FarmPartnerをもっと多くの農場、もっと多くの国へ届けたい協同組合、NGO、企業、投資家の皆さん。",
  "fc5b43e9ba": "■ フォームもニュースレターもありません。本物の人間へのメールだけです。",
- "e77147d0d6": "FarmPartnerに興味がありますか？チーム（info@experienciatek.com）までご連絡ください。",
- "980f5e7d28": "info@experienciatek.com にメールする",
  "c509a2aae3": "コピーしました ✓",
  "67059fc822": "あなたのデータ — FarmPartner",
  "2536b15920": "● あなたのデータ · わかりやすく",
@@ -448,7 +445,6 @@
  "b6e77c24ce": "保存場所",
  "0096b8dd2c": "非公開のPostgresデータベース（Supabase）に保存され、読み取れるのは欧州のGoogle Cloud上で動くFarmPartnerのサーバーだけです。テーブルへの公開アクセスは無効にしています。",
  "e1081b221f": "データの削除",
- "ea57fa5119": "<code>RESET</code>と送ると、畑の情報とその履歴を削除します。電話番号と会話も消去したい場合は、使用した電話番号を添えて、どこからでも<a href=\"mailto:info@experienciatek.com?subject=Delete%20my%20FarmPartner%20data\">info@experienciatek.com</a>までメールしてください。",
  "a717adc281": "■ 最終更新：2026年11月。FarmPartnerはNASA Space Apps Challenge 2026のプロジェクトで、オープンソースです。ここに書いたことはすべて、<a href=\"https://github.com/iker-gonzalez/farmpartner\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--ink);text-decoration:underline\">GitHub ↗</a>のコードで確認できます。",
  "0adee36916": "FarmPartnerがあなたの電話番号、畑の位置情報、メッセージをどのように扱うか。",
  "8aaa745999": "WHATSAPP<span class=\"long\">で開く</span> →",
@@ -467,5 +463,9 @@
  "c556defcfb": "WhatsApp で開く",
  "57f5f5efbc": "メニュー",
  "cfba856fd6": "30 秒でわかる FarmPartner",
- "74db6a79e4": "FarmPartner の 30 秒動画を再生"
+ "74db6a79e4": "FarmPartner の 30 秒動画を再生",
+ "e877ff631a": "<span class=\"txt\">hello@farmpartner.space</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
+ "b3af20d50f": "FarmPartnerに興味がありますか？チーム（hello@farmpartner.space）までご連絡ください。",
+ "20a7366432": "hello@farmpartner.space にメールする",
+ "bb2a16f7cc": "<code>RESET</code>と送ると、畑の情報とその履歴を削除します。電話番号と会話も消去したい場合は、使用した電話番号を添えて、どこからでも<a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a>までメールしてください。"
 }

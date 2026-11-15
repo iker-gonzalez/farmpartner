@@ -391,7 +391,6 @@
  "47345e627e": "Suka dengan arah FarmPartner? Entah Anda bertani, meneliti, berinvestasi, atau sekadar ingin membangun sesuatu yang berguna dengan data terbuka NASA, kami senang mendengar dari Anda.",
  "b301b60406": "<i aria-hidden=\"true\"></i>SINYAL TERBUKA · TULIS KE TIM",
  "362a052f2f": "Tertarik dengan proyek ini? Kirimi kami pesan.",
- "bd87a71f88": "<span class=\"txt\">info@experienciatek.com</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
  "da5d52a3f8": "KIRIM EMAIL KE KAMI →",
  "370a93fb3b": "SALIN ALAMAT",
  "0eb9813a3a": "01 · PETANI",
@@ -404,8 +403,6 @@
  "3414de290c": "Kembangkan bersama kami",
  "6f18b8afaa": "Koperasi, LSM, perusahaan, dan investor yang ingin membawa FarmPartner ke lebih banyak lahan dan lebih banyak negara.",
  "fc5b43e9ba": "■ Tanpa formulir, tanpa newsletter. Cukup e-mail ke orang sungguhan.",
- "e77147d0d6": "Tertarik dengan FarmPartner? Tulis ke tim di info@experienciatek.com.",
- "980f5e7d28": "Email ke info@experienciatek.com",
  "c509a2aae3": "TERSALIN ✓",
  "67059fc822": "Data Anda — FarmPartner",
  "2536b15920": "● DATA ANDA · BAHASA SEDERHANA",
@@ -448,7 +445,6 @@
  "b6e77c24ce": "Di mana disimpan",
  "0096b8dd2c": "Di database Postgres privat (Supabase) yang hanya bisa dibaca server FarmPartner, yang berjalan di Google Cloud di Eropa. Akses publik ke tabelnya dimatikan.",
  "e1081b221f": "Menghapus data Anda",
- "ea57fa5119": "Kirim <code>RESET</code> untuk menghapus lahan Anda beserta riwayatnya. Untuk menghapus juga nomor dan percakapan Anda, kirim e‑mail ke <a href=\"mailto:info@experienciatek.com?subject=Delete%20my%20FarmPartner%20data\">info@experienciatek.com</a> dari mana saja, dengan menyebutkan nomor yang Anda pakai.",
  "a717adc281": "■ Terakhir diperbarui November 2026. FarmPartner adalah proyek NASA Space Apps Challenge 2026 dan open source: Anda bisa memeriksa setiap baris dari isi halaman ini di kodenya di <a href=\"https://github.com/iker-gonzalez/farmpartner\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--ink);text-decoration:underline\">GitHub ↗</a>.",
  "0adee36916": "Cara FarmPartner menangani nomor telepon, lokasi lahan, dan pesan Anda.",
  "8aaa745999": "<span class=\"long\">BUKA DI </span>WHATSAPP →",
@@ -467,5 +463,9 @@
  "c556defcfb": "Buka di WhatsApp",
  "57f5f5efbc": "Menu",
  "cfba856fd6": "FarmPartner dalam 30 detik",
- "74db6a79e4": "Putar video FarmPartner 30 detik"
+ "74db6a79e4": "Putar video FarmPartner 30 detik",
+ "e877ff631a": "<span class=\"txt\">hello@farmpartner.space</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
+ "b3af20d50f": "Tertarik dengan FarmPartner? Tulis ke tim di hello@farmpartner.space.",
+ "20a7366432": "Email ke hello@farmpartner.space",
+ "bb2a16f7cc": "Kirim <code>RESET</code> untuk menghapus lahan Anda beserta riwayatnya. Untuk menghapus juga nomor dan percakapan Anda, kirim e‑mail ke <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a> dari mana saja, dengan menyebutkan nomor yang Anda pakai."
 }

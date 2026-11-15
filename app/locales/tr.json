@@ -391,7 +391,6 @@
  "47345e627e": "FarmPartner’ın gittiği yönü beğendiniz mi? İster çiftçi, ister araştırmacı, ister yatırımcı olun ya da açık NASA verileriyle işe yarar bir şey kurmak isteyin, sizden haber almayı çok isteriz.",
  "b301b60406": "<i aria-hidden=\"true\"></i>SİNYAL AÇIK · EKİBE YAZIN",
  "362a052f2f": "Projeyle ilgileniyor musunuz? Bize birkaç satır yazın.",
- "bd87a71f88": "<span class=\"txt\">info@experienciatek.com</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
  "da5d52a3f8": "BİZE E-POSTA GÖNDERİN →",
  "370a93fb3b": "ADRESİ KOPYALA",
  "0eb9813a3a": "01 · ÇİFTÇİLER",
@@ -404,8 +403,6 @@
  "3414de290c": "Bizimle büyütün",
  "6f18b8afaa": "FarmPartner’ı daha fazla çiftliğe ve daha fazla ülkeye taşımak isteyen kooperatifler, STK’lar, şirketler ve yatırımcılar.",
  "fc5b43e9ba": "■ Form yok, bülten yok. Sadece gerçek insanlara bir e-posta.",
- "e77147d0d6": "FarmPartner ile ilgileniyor musunuz? Ekibe info@experienciatek.com adresinden yazın.",
- "980f5e7d28": "info@experienciatek.com adresine e-posta gönderin",
  "c509a2aae3": "KOPYALANDI ✓",
  "67059fc822": "Verileriniz — FarmPartner",
  "2536b15920": "● VERİLERİNİZ · SADE SÖZLERLE",
@@ -448,7 +445,6 @@
  "b6e77c24ce": "Nerede duruyor",
  "0096b8dd2c": "Yalnızca Avrupa’da Google Cloud üzerinde çalışan FarmPartner sunucusunun okuyabildiği özel bir Postgres veritabanında (Supabase). Tablolarına genel erişim kapalıdır.",
  "e1081b221f": "Verilerinizi silmek",
- "ea57fa5119": "Tarlalarınızı ve geçmişlerini silmek için <code>RESET</code> yazın. Numaranızı ve sohbetinizi de silmek için, kullandığınız numarayı belirterek, istediğiniz yerden <a href=\"mailto:info@experienciatek.com?subject=Delete%20my%20FarmPartner%20data\">info@experienciatek.com</a> adresine e‑posta gönderin.",
  "a717adc281": "■ Son güncelleme Kasım 2026. FarmPartner bir NASA Space Apps Challenge 2026 projesidir ve açık kaynaktır: buradaki her satırı <a href=\"https://github.com/iker-gonzalez/farmpartner\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--ink);text-decoration:underline\">GitHub ↗</a> üzerindeki kodda kontrol edebilirsiniz.",
  "0adee36916": "FarmPartner’ın telefon numaranızı, tarla konumunuzu ve mesajlarınızı nasıl işlediği.",
  "8aaa745999": "WHATSAPP<span class=\"long\">’TA AÇ</span> →",
@@ -467,5 +463,9 @@
  "c556defcfb": "WhatsApp'ta aç",
  "57f5f5efbc": "Menü",
  "cfba856fd6": "30 saniyede FarmPartner",
- "74db6a79e4": "30 saniyelik FarmPartner videosunu oynat"
+ "74db6a79e4": "30 saniyelik FarmPartner videosunu oynat",
+ "e877ff631a": "<span class=\"txt\">hello@farmpartner.space</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
+ "b3af20d50f": "FarmPartner ile ilgileniyor musunuz? Ekibe hello@farmpartner.space adresinden yazın.",
+ "20a7366432": "hello@farmpartner.space adresine e-posta gönderin",
+ "bb2a16f7cc": "Tarlalarınızı ve geçmişlerini silmek için <code>RESET</code> yazın. Numaranızı ve sohbetinizi de silmek için, kullandığınız numarayı belirterek, istediğiniz yerden <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a> adresine e‑posta gönderin."
 }

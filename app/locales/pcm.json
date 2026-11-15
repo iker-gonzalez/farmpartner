@@ -391,7 +391,6 @@
  "47345e627e": "You like where FarmPartner dey go? Whether you dey farm, do research, invest or you just wan build something useful with NASA open data, we go like hear from you.",
  "b301b60406": "<i aria-hidden=\"true\"></i>SIGNAL DEY OPEN · WRITE TO THE TEAM",
  "362a052f2f": "The project interest you? Send us message.",
- "bd87a71f88": "<span class=\"txt\">info@experienciatek.com</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
  "da5d52a3f8": "SEND US EMAIL →",
  "370a93fb3b": "COPY THE ADDRESS",
  "0eb9813a3a": "01 · FARMERS",
@@ -404,8 +403,6 @@
  "3414de290c": "Grow am with us",
  "6f18b8afaa": "Co-ops, NGOs, companies and investors wey wan carry FarmPartner go more farms and more countries.",
  "fc5b43e9ba": "■ No forms, no newsletters. Just e-mail to real people.",
- "e77147d0d6": "FarmPartner interest you? Write to the team for info@experienciatek.com.",
- "980f5e7d28": "Email info@experienciatek.com",
  "c509a2aae3": "E DON COPY ✓",
  "67059fc822": "Your data — FarmPartner",
  "2536b15920": "● YOUR DATA · SIMPLE WORDS",
@@ -448,7 +445,6 @@
  "b6e77c24ce": "Where e dey stay",
  "0096b8dd2c": "Inside private Postgres database (Supabase) wey na only the FarmPartner server, wey dey run for Google Cloud for Europe, fit read. Public access to the tables dey switched off.",
  "e1081b221f": "How to delete your data",
- "ea57fa5119": "Send <code>RESET</code> to remove your farms and dia history. To clear your number and conversation too, e‑mail <a href=\"mailto:info@experienciatek.com?subject=Delete%20my%20FarmPartner%20data\">info@experienciatek.com</a> from anywhere, with the number wey you use.",
  "a717adc281": "■ Last update na November 2026. FarmPartner na NASA Space Apps Challenge 2026 project and e be open source: you fit check every line of this for the code for <a href=\"https://github.com/iker-gonzalez/farmpartner\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--ink);text-decoration:underline\">GitHub ↗</a>.",
  "0adee36916": "How FarmPartner dey handle your phone number, your farm location and your messages.",
  "8aaa745999": "<span class=\"long\">OPEN AM FOR </span>WHATSAPP →",
@@ -467,5 +463,9 @@
  "c556defcfb": "Open for WhatsApp",
  "57f5f5efbc": "Menu",
  "cfba856fd6": "FarmPartner for 30 seconds",
- "74db6a79e4": "Play the 30-second FarmPartner video"
+ "74db6a79e4": "Play the 30-second FarmPartner video",
+ "e877ff631a": "<span class=\"txt\">hello@farmpartner.space</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
+ "b3af20d50f": "FarmPartner interest you? Write to the team for hello@farmpartner.space.",
+ "20a7366432": "Email hello@farmpartner.space",
+ "bb2a16f7cc": "Send <code>RESET</code> to remove your farms and dia history. To clear your number and conversation too, e‑mail <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a> from anywhere, with the number wey you use."
 }

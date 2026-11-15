@@ -391,7 +391,6 @@
  "47345e627e": "La direction que prend FarmPartner vous plaît ? Que vous soyez agriculteur, chercheur ou investisseur, ou que vous vouliez simplement construire quelque chose d’utile avec les données ouvertes de la NASA, nous serions ravis d’avoir de vos nouvelles.",
  "b301b60406": "<i aria-hidden=\"true\"></i>SIGNAL OUVERT · ÉCRIVEZ À L’ÉQUIPE",
  "362a052f2f": "Le projet vous intéresse ? Écrivez-nous.",
- "bd87a71f88": "<span class=\"txt\">info@experienciatek.com</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
  "da5d52a3f8": "ENVOYEZ-NOUS UN E-MAIL →",
  "370a93fb3b": "COPIER L’ADRESSE",
  "0eb9813a3a": "01 · AGRICULTEURS",
@@ -404,8 +403,6 @@
  "3414de290c": "Déployez-le avec nous",
  "6f18b8afaa": "Coopératives, ONG, entreprises et investisseurs qui veulent amener FarmPartner dans plus d’exploitations et plus de pays.",
  "fc5b43e9ba": "■ Pas de formulaire, pas de newsletter. Juste un e-mail à de vraies personnes.",
- "e77147d0d6": "FarmPartner vous intéresse ? Écrivez à l’équipe à info@experienciatek.com.",
- "980f5e7d28": "Écrire à info@experienciatek.com",
  "c509a2aae3": "COPIÉ ✓",
  "67059fc822": "Vos données — FarmPartner",
  "2536b15920": "● VOS DONNÉES · EN TERMES SIMPLES",
@@ -448,7 +445,6 @@
  "b6e77c24ce": "Où elles sont stockées",
  "0096b8dd2c": "Dans une base de données Postgres privée (Supabase) que seul le serveur FarmPartner, hébergé sur Google Cloud en Europe, peut lire. L’accès public à ses tables est désactivé.",
  "e1081b221f": "Supprimer vos données",
- "ea57fa5119": "Écrivez <code>RESET</code> pour supprimer vos champs et leur historique. Pour effacer aussi votre numéro et la conversation, écrivez depuis n’importe où à <a href=\"mailto:info@experienciatek.com?subject=Delete%20my%20FarmPartner%20data\">info@experienciatek.com</a>, en indiquant le numéro utilisé.",
  "a717adc281": "■ Dernière mise à jour : novembre 2026. FarmPartner est un projet du NASA Space Apps Challenge 2026 et open source : vous pouvez vérifier chaque ligne de ceci dans le code sur <a href=\"https://github.com/iker-gonzalez/farmpartner\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--ink);text-decoration:underline\">GitHub ↗</a>.",
  "0adee36916": "Comment FarmPartner traite votre numéro de téléphone, la localisation de votre champ et vos messages.",
  "8aaa745999": "<span class=\"long\">OUVRIR DANS </span>WHATSAPP →",
@@ -467,5 +463,9 @@
  "c556defcfb": "Ouvrir dans WhatsApp",
  "57f5f5efbc": "Menu",
  "cfba856fd6": "FarmPartner en 30 secondes",
- "74db6a79e4": "Lire la vidéo FarmPartner de 30 secondes"
+ "74db6a79e4": "Lire la vidéo FarmPartner de 30 secondes",
+ "e877ff631a": "<span class=\"txt\">hello@farmpartner.space</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
+ "b3af20d50f": "FarmPartner vous intéresse ? Écrivez à l’équipe à hello@farmpartner.space.",
+ "20a7366432": "Écrire à hello@farmpartner.space",
+ "bb2a16f7cc": "Écrivez <code>RESET</code> pour supprimer vos champs et leur historique. Pour effacer aussi votre numéro et la conversation, écrivez depuis n’importe où à <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a>, en indiquant le numéro utilisé."
 }

@@ -391,7 +391,6 @@
  "47345e627e": "认同 FarmPartner 的方向吗？无论你是种地、做研究、做投资，还是只想用 NASA 开放数据做点有用的东西，我们都很想听听你的想法。",
  "b301b60406": "<i aria-hidden=\"true\"></i>信号畅通 · 给团队写信",
  "362a052f2f": "对这个项目感兴趣？给我们留个言吧。",
- "bd87a71f88": "<span class=\"txt\">info@experienciatek.com</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
  "da5d52a3f8": "给我们发邮件 →",
  "370a93fb3b": "复制地址",
  "0eb9813a3a": "01 · 农民",
@@ -404,8 +403,6 @@
  "3414de290c": "和我们一起推广",
  "6f18b8afaa": "合作社、非政府组织、企业和投资者，欢迎和我们一起把 FarmPartner 带到更多农场、更多国家。",
  "fc5b43e9ba": "■ 没有表单，没有简报。只是一封发给真人的邮件。",
- "e77147d0d6": "对 FarmPartner 感兴趣？请写信给团队：info@experienciatek.com。",
- "980f5e7d28": "发邮件至 info@experienciatek.com",
  "c509a2aae3": "已复制 ✓",
  "67059fc822": "你的数据 — FarmPartner",
  "2536b15920": "● 你的数据 · 说人话",
@@ -448,7 +445,6 @@
  "b6e77c24ce": "数据存放在哪里",
  "0096b8dd2c": "存放在一个私有的 Postgres 数据库（Supabase）中，只有运行在欧洲 Google Cloud 上的 FarmPartner 服务器才能读取。数据表的公开访问已关闭。",
  "e1081b221f": "删除你的数据",
- "ea57fa5119": "发送 <code>RESET</code> 即可删除你的田地及其历史记录。如果还想删除你的号码和对话，请用你使用的号码，从任何地方发邮件至 <a href=\"mailto:info@experienciatek.com?subject=Delete%20my%20FarmPartner%20data\">info@experienciatek.com</a>。",
  "a717adc281": "■ 最后更新于 2026 年 11 月。FarmPartner 是 NASA Space Apps Challenge 2026 项目，并且开源：你可以在 <a href=\"https://github.com/iker-gonzalez/farmpartner\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--ink);text-decoration:underline\">GitHub ↗</a> 上的代码中核对这里的每一句话。",
  "0adee36916": "FarmPartner 如何处理你的电话号码、田地位置和消息。",
  "8aaa745999": "<span class=\"long\">在 </span>WHATSAPP 中打开 →",
@@ -467,5 +463,9 @@
  "c556defcfb": "在 WhatsApp 中打开",
  "57f5f5efbc": "菜单",
  "cfba856fd6": "30 秒了解 FarmPartner",
- "74db6a79e4": "播放 30 秒的 FarmPartner 视频"
+ "74db6a79e4": "播放 30 秒的 FarmPartner 视频",
+ "e877ff631a": "<span class=\"txt\">hello@farmpartner.space</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
+ "b3af20d50f": "对 FarmPartner 感兴趣？请写信给团队：hello@farmpartner.space。",
+ "20a7366432": "发邮件至 hello@farmpartner.space",
+ "bb2a16f7cc": "发送 <code>RESET</code> 即可删除你的田地及其历史记录。如果还想删除你的号码和对话，请用你使用的号码，从任何地方发邮件至 <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a>。"
 }

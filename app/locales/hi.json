@@ -391,7 +391,6 @@
  "47345e627e": "FarmPartner जिस दिशा में जा रहा है, वह पसंद आया? चाहे आप खेती करते हों, शोध करते हों, निवेश करते हों या बस NASA के खुले डेटा से कुछ काम का बनाना चाहते हों, हमें आपसे सुनकर खुशी होगी।",
  "b301b60406": "<i aria-hidden=\"true\"></i>सिग्नल खुला · टीम को लिखें",
  "362a052f2f": "प्रोजेक्ट में दिलचस्पी है? हमें लिखें।",
- "bd87a71f88": "<span class=\"txt\">info@experienciatek.com</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
  "da5d52a3f8": "हमें ईमेल भेजें →",
  "370a93fb3b": "पता कॉपी करें",
  "0eb9813a3a": "01 · किसान",
@@ -404,8 +403,6 @@
  "3414de290c": "हमारे साथ इसे बढ़ाएँ",
  "6f18b8afaa": "सहकारी समितियाँ, NGO, कंपनियाँ और निवेशक जो FarmPartner को ज़्यादा खेतों और ज़्यादा देशों तक ले जाना चाहते हैं।",
  "fc5b43e9ba": "■ न फॉर्म, न न्यूज़लेटर। बस असली लोगों को एक ईमेल।",
- "e77147d0d6": "FarmPartner में दिलचस्पी है? टीम को info@experienciatek.com पर लिखें।",
- "980f5e7d28": "info@experienciatek.com पर ईमेल करें",
  "c509a2aae3": "कॉपी हो गया ✓",
  "67059fc822": "आपका डेटा — FarmPartner",
  "2536b15920": "● आपका डेटा · सीधी बात",
@@ -448,7 +445,6 @@
  "b6e77c24ce": "यह कहाँ रहता है",
  "0096b8dd2c": "एक निजी Postgres डेटाबेस (Supabase) में, जिसे सिर्फ़ FarmPartner का सर्वर पढ़ सकता है, जो यूरोप में Google Cloud पर चलता है। इसकी टेबलों तक सार्वजनिक पहुँच बंद है।",
  "e1081b221f": "अपना डेटा मिटाना",
- "ea57fa5119": "अपने खेत और उनका इतिहास हटाने के लिए <code>RESET</code> लिखें। अपना नंबर और बातचीत भी मिटाने के लिए, कहीं से भी उसी नंबर के साथ <a href=\"mailto:info@experienciatek.com?subject=Delete%20my%20FarmPartner%20data\">info@experienciatek.com</a> पर ई‑मेल करें जिसका आपने इस्तेमाल किया था।",
  "a717adc281": "■ आखिरी बार नवंबर 2026 में अपडेट किया गया। FarmPartner एक NASA Space Apps Challenge 2026 प्रोजेक्ट है और ओपन सोर्स है: आप इसकी हर बात <a href=\"https://github.com/iker-gonzalez/farmpartner\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--ink);text-decoration:underline\">GitHub ↗</a> पर कोड में जाँच सकते हैं।",
  "0adee36916": "FarmPartner आपके फ़ोन नंबर, आपके खेत की लोकेशन और आपके मैसेज को कैसे संभालता है।",
  "8aaa745999": "WHATSAPP<span class=\"long\"> में खोलें</span> →",
@@ -467,5 +463,9 @@
  "c556defcfb": "WhatsApp में खोलें",
  "57f5f5efbc": "मेन्यू",
  "cfba856fd6": "30 सेकंड में FarmPartner",
- "74db6a79e4": "FarmPartner का 30 सेकंड का वीडियो चलाएँ"
+ "74db6a79e4": "FarmPartner का 30 सेकंड का वीडियो चलाएँ",
+ "e877ff631a": "<span class=\"txt\">hello@farmpartner.space</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
+ "b3af20d50f": "FarmPartner में दिलचस्पी है? टीम को hello@farmpartner.space पर लिखें।",
+ "20a7366432": "hello@farmpartner.space पर ईमेल करें",
+ "bb2a16f7cc": "अपने खेत और उनका इतिहास हटाने के लिए <code>RESET</code> लिखें। अपना नंबर और बातचीत भी मिटाने के लिए, कहीं से भी उसी नंबर के साथ <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a> पर ई‑मेल करें जिसका आपने इस्तेमाल किया था।"
 }

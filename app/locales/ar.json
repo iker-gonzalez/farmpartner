@@ -391,7 +391,6 @@
  "47345e627e": "يعجبك الاتجاه الذي يسير فيه FarmPartner؟ سواء كنت تزرع، أو تبحث، أو تستثمر، أو تريد ببساطة بناء شيء مفيد ببيانات NASA المفتوحة، يسعدنا أن نسمع منك.",
  "b301b60406": "<i aria-hidden=\"true\"></i>القناة مفتوحة · راسل الفريق",
  "362a052f2f": "مهتم بالمشروع؟ راسلنا.",
- "bd87a71f88": "<span class=\"txt\">info@experienciatek.com</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
  "da5d52a3f8": "أرسل لنا بريدًا إلكترونيًا ←",
  "370a93fb3b": "انسخ العنوان",
  "0eb9813a3a": "01 · المزارعون",
@@ -404,8 +403,6 @@
  "3414de290c": "وسّعه معنا",
  "6f18b8afaa": "تعاونيات ومنظمات غير حكومية وشركات ومستثمرون يريدون إيصال FarmPartner إلى مزارع وبلدان أكثر.",
  "fc5b43e9ba": "■ بلا استمارات ولا نشرات بريدية. مجرد بريد إلكتروني إلى أشخاص حقيقيين.",
- "e77147d0d6": "مهتم بـ FarmPartner؟ راسل الفريق على info@experienciatek.com.",
- "980f5e7d28": "راسلنا على info@experienciatek.com",
  "c509a2aae3": "تم النسخ ✓",
  "67059fc822": "بياناتك — FarmPartner",
  "2536b15920": "● بياناتك · بكلمات بسيطة",
@@ -448,7 +445,6 @@
  "b6e77c24ce": "أين تُحفظ",
  "0096b8dd2c": "في قاعدة بيانات Postgres خاصة (Supabase) لا يقرؤها إلا خادم FarmPartner، الذي يعمل على Google Cloud في أوروبا. والوصول العام إلى جداولها معطّل.",
  "e1081b221f": "حذف بياناتك",
- "ea57fa5119": "أرسل <code>RESET</code> لحذف حقولك وسجلّها. ولمحو رقمك ومحادثتك أيضًا، راسلنا على <a href=\"mailto:info@experienciatek.com?subject=Delete%20my%20FarmPartner%20data\">info@experienciatek.com</a> من أي مكان، مع ذكر الرقم الذي استخدمته.",
  "a717adc281": "■ آخر تحديث: نوفمبر 2026. FarmPartner مشروع ضمن NASA Space Apps Challenge 2026 ومفتوح المصدر: يمكنك التحقق من كل سطر هنا في الشيفرة على <a href=\"https://github.com/iker-gonzalez/farmpartner\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--ink);text-decoration:underline\">GitHub ↗</a>.",
  "0adee36916": "كيف يتعامل FarmPartner مع رقم هاتفك وموقع حقلك ورسائلك.",
  "8aaa745999": "<span class=\"long\">افتح في </span>WHATSAPP ←",
@@ -467,5 +463,9 @@
  "c556defcfb": "افتح في واتساب",
  "57f5f5efbc": "القائمة",
  "cfba856fd6": "FarmPartner في 30 ثانية",
- "74db6a79e4": "تشغيل فيديو FarmPartner لمدة 30 ثانية"
+ "74db6a79e4": "تشغيل فيديو FarmPartner لمدة 30 ثانية",
+ "e877ff631a": "<span class=\"txt\">hello@farmpartner.space</span><span class=\"cursor\" aria-hidden=\"true\"></span>",
+ "b3af20d50f": "مهتم بـ FarmPartner؟ راسل الفريق على hello@farmpartner.space.",
+ "20a7366432": "راسلنا على hello@farmpartner.space",
+ "bb2a16f7cc": "أرسل <code>RESET</code> لحذف حقولك وسجلّها. ولمحو رقمك ومحادثتك أيضًا، راسلنا على <a href=\"mailto:hello@farmpartner.space?subject=Delete%20my%20FarmPartner%20data\">hello@farmpartner.space</a> من أي مكان، مع ذكر الرقم الذي استخدمته."
 }
