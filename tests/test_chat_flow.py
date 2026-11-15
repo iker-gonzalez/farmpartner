@@ -242,3 +242,56 @@ def test_landing_plays_our_own_video(offline):
     assert c.get("/static/video/poster.jpg").status_code == 200
     part = c.get("/static/video/farmpartner-30s.mp4", headers={"Range": "bytes=0-99"})   # Safari needs byte ranges
     assert part.status_code == 206 and len(part.content) == 100
+
+
+def test_privacy_reset_forgets_locations_purge_and_delete(offline):
+    """What the privacy page promises: RESET erases sent locations, 12 months of silence deletes everything,
+    a deletion request erases the number and conversation."""
+    import datetime as dt
+    import logging
+
+    from fastapi.testclient import TestClient
+
+    from app import service
+    from app.db import Farmer, Field, Message, session
+    from app.main import app
+    c = TestClient(app)
+    say = lambda p, t, **k: c.post("/api/chat", json={"phone": p, "text": t, "wait": True, **k})  # noqa: E731
+    say("priv1", "hi"); say("priv1", "", lat=38.05, lon=-100.75); say("priv1", "43.416425, -2.914102 my field")
+    say("priv1", "reset")
+    with session() as db:
+        fm = db.query(Farmer).filter_by(phone="web:priv1").one()
+        ins = db.query(Message).filter_by(farmer_id=fm.id, direction="in").all()
+        assert not fm.fields and all(m.lat is None for m in ins)
+        assert "[location removed]" in [m.body for m in ins] and not any("43.416" in (m.body or "") for m in ins)
+        assert any(m.body == "hi" for m in ins)                     # the rest of the conversation stays
+    # 12 months without a message → deleted; recent and sample farmers stay
+    say("old1", "hi"); say("old1", "67846"); say("new1", "hi")
+    with session() as db:
+        old = db.query(Farmer).filter_by(phone="web:old1").one()
+        old.last_inbound_at = dt.datetime.now() - dt.timedelta(days=400)
+        db.add(Farmer(phone="sample:x", channel="web", priorities=[], constraints={},
+                      created_at=dt.datetime.now() - dt.timedelta(days=900)))
+        db.commit()
+        assert service.purge_inactive(db) >= 1
+        phones = {f.phone for f in db.query(Farmer).all()}
+        assert "web:old1" not in phones and "web:new1" in phones and "sample:x" in phones
+        assert not db.query(Message).filter(~Message.farmer_id.in_([f.id for f in db.query(Farmer)])).count()
+        assert not db.query(Field).filter(~Field.farmer_id.in_([f.id for f in db.query(Farmer)])).count()
+    # HTTP client logs (query strings with typed place names) stay out of the server logs
+    assert logging.getLogger("httpx").level >= logging.WARNING
+    assert logging.getLogger("twilio.http_client").level >= logging.WARNING
+
+
+def test_pages_use_self_hosted_fonts(offline):
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+    c = TestClient(app)
+    import pathlib
+    assert "fonts.googleapis" not in (pathlib.Path(__file__).parents[1] / "app/templates/report.html").read_text()
+    for path in ("/", "/what-and-how", "/data-and-science", "/team", "/limits", "/contact", "/privacy"):
+        r = c.get(path)
+        assert r.status_code == 200 and "fonts.googleapis" not in r.text and "fonts.gstatic" not in r.text, path
+    css = c.get("/static/fonts/fonts.css")
+    assert css.status_code == 200 and "fonts.gstatic" not in css.text and "/static/fonts/" in css.text

@@ -7,9 +7,7 @@
 <meta name="description" content="How FarmPartner handles your phone number, your field location and your messages.">
 <meta property="og:title" content="Your data — FarmPartner">
 <meta property="og:image" content="/static/landing/hero.jpg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&family=Silkscreen&family=Space+Grotesk:wght@600&display=swap" rel="stylesheet">
+<link href="/static/fonts/fonts.css" rel="stylesheet">
 <link rel="icon" href="/static/brand/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/static/brand/favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="/static/brand/apple-touch-icon.png">
@@ -95,12 +93,12 @@
       <li>
         <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
         <h3>Locations travel without names</h3>
-        <p>To fetch satellite and weather data we send only the field’s coordinates to public services (NASA, USDA, Open‑Meteo). They never receive your number, your name or anything else that identifies you.</p>
+        <p>To fetch satellite and weather data we send the field’s coordinates — or the place name you type — to public services (NASA, USDA, Open‑Meteo). They never receive your number or your name.</p>
       </li>
       <li>
         <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M4 4h16v12H8l-4 4z"/><path d="M9 9h6M9 12h3"/></svg></span>
         <h3>The AI never sees who you are</h3>
-        <p>Claude, the AI behind the advice, gets your messages and your field’s data, labelled with the county or town — not your phone number.</p>
+        <p>Claude, the AI behind the advice, gets your messages and your field’s data, labelled with the county or town — not your phone number. When it searches the web for farming facts, the search never includes your details.</p>
       </li>
       <li>
         <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><rect x="4" y="10" width="16" height="11"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>
@@ -115,7 +113,7 @@
       <li>
         <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14"/></svg></span>
         <h3>Leave whenever you want</h3>
-        <p>Text <b>STOP</b> and we won’t message you first again. Text <b>RESET</b> to erase your fields. Write to us and we’ll delete everything.</p>
+        <p>Text <b>STOP</b> and we won’t message you first again. Text <b>RESET</b> to erase your fields and the locations you sent. Write to us and we’ll delete everything.</p>
       </li>
     </ul>
 
@@ -124,10 +122,13 @@
       <p class="sub">Every outside service FarmPartner talks to, and what it receives.</p>
       <div class="table" role="table">
         <div class="row head" role="row"><div role="columnheader">SERVICE</div><div role="columnheader">RECEIVES</div><div role="columnheader">DOES NOT RECEIVE</div></div>
-        <div class="row" role="row"><div role="cell">NASA, USDA, Open‑Meteo, geocoders</div><div role="cell">Field coordinates or ZIP code</div><div role="cell"><span class="no">✕</span> Phone number, name, messages</div></div>
+        <div class="row" role="row"><div role="cell">NASA, USDA, Open‑Meteo, geocoders</div><div role="cell">Field coordinates, or the place name or ZIP code you type</div><div role="cell"><span class="no">✕</span> Phone number, name, the rest of your messages</div></div>
         <div class="row" role="row"><div role="cell">Claude (Anthropic) — the AI</div><div role="cell">Your messages and photos, your field’s area and data</div><div role="cell"><span class="no">✕</span> Phone number</div></div>
-        <div class="row" role="row"><div role="cell">Google Cloud speech</div><div role="cell">Voice notes, to turn them into text and back</div><div role="cell"><span class="no">✕</span> Phone number, location</div></div>
-        <div class="row" role="row"><div role="cell">Twilio · WhatsApp · SMS</div><div role="cell">Your number and our replies — they carry the messages</div><div role="cell"><span class="no">✕</span> Your field data beyond the replies themselves</div></div>
+        <div class="row" role="row"><div role="cell">Web search (through Claude)</div><div role="cell">Short searches about crops and farming</div><div role="cell"><span class="no">✕</span> Phone number, name, location</div></div>
+        <div class="row" role="row"><div role="cell">Google Cloud speech</div><div role="cell">Your voice notes, to write them down, and our replies, to read them aloud</div><div role="cell"><span class="no">✕</span> Phone number, location</div></div>
+        <div class="row" role="row"><div role="cell">Twilio · WhatsApp · SMS</div><div role="cell">Your number and every message, photo and voice note — they carry them</div><div role="cell"><span class="no">✕</span> Your field data beyond the replies themselves</div></div>
+        <div class="row" role="row"><div role="cell">Maps (OpenStreetMap, Esri, unpkg)</div><div role="cell">Your IP address and the map area on screen, when you open a field report or the web demo</div><div role="cell"><span class="no">✕</span> Phone number, name, messages</div></div>
+        <div class="row" role="row"><div role="cell">Google Cloud (our server)</div><div role="cell">Technical logs with your IP address when you use the website, kept about 30 days</div><div role="cell"><span class="no">✕</span> Phone number, what you write</div></div>
       </div>
     </section>
 
@@ -135,19 +136,39 @@
       <h2 id="details-title">The fine print, still in plain words</h2>
       <div>
         <h3>What we keep</h3>
-        <p>Your phone number, language, your field’s location and crops, your goals, the conversation, and anything you report (rain, pests, yields). We keep them together so the bot remembers your field next time you write.</p>
+        <p>Your phone number, language, your field’s location and crops, your goals, the conversation (voice notes as their written text), and anything you report (rain, pests, yields). We keep them together so the bot remembers your field next time you write.</p>
       </div>
       <div>
         <h3>What we don’t keep</h3>
-        <p>Raw satellite images. We store only the summaries computed for your field (rainfall, soil, vegetation trends), not the original NASA files.</p>
+        <p>Raw satellite images: we store only the summaries computed for your field (rainfall, soil, vegetation trends). Nor the photos and voice recordings you send: we read them and keep only the text.</p>
+      </div>
+      <div>
+        <h3>How long we keep it</h3>
+        <p>As long as you keep writing. After 12 months without a message from you, we delete your number, your fields and the conversation automatically. Spoken replies are stored as audio for 30 days, so WhatsApp can deliver them, then deleted.</p>
       </div>
       <div>
         <h3>Where it lives</h3>
-        <p>In a private Postgres database (Supabase) that only the FarmPartner server, which runs on Google Cloud in Europe, can read. Public access to its tables is switched off.</p>
+        <p>In a private Postgres database (Supabase, in Ireland) that only the FarmPartner server, which runs on Google Cloud in Belgium, can read. Public access to its tables is switched off.</p>
       </div>
       <div>
         <h3>Deleting your data</h3>
-        <p>Text <code>RESET</code> to remove your fields and their history. To erase your number and conversation as well, e‑mail <a href="mailto:{{ email }}?subject=Delete%20my%20FarmPartner%20data">{{ email }}</a> from anywhere, with the number you used.</p>
+        <p>Text <code>RESET</code> to remove your fields, their history and the locations you sent. To erase your number and conversation as well, e‑mail <a href="mailto:{{ email }}?subject=Delete%20my%20FarmPartner%20data">{{ email }}</a> from anywhere, with the number you used.</p>
+      </div>
+      <div>
+        <h3>Who is responsible</h3>
+        <p>The FarmPartner team, which built it for the NASA Space Apps Challenge 2026 in Bilbao, Spain. Write to <a href="mailto:{{ email }}">{{ email }}</a> about anything on this page.</p>
+      </div>
+      <div>
+        <h3>Why we use your data</h3>
+        <p>Only to answer you and, if you want them, to send you weather alerts for your field. You ask for this by writing to FarmPartner, and you can stop at any time.</p>
+      </div>
+      <div>
+        <h3>Your rights</h3>
+        <p>You can ask to see, correct, download or delete your data, or object to how we use it. Write to us and we reply within a month. You can also complain to the Spanish Data Protection Agency (<a href="https://www.aepd.es" target="_blank" rel="noopener">aepd.es</a>).</p>
+      </div>
+      <div>
+        <h3>Outside Europe</h3>
+        <p>Twilio, Anthropic and Google are U.S. companies, so what they receive (listed above) leaves the EU. They handle it under their data processing terms for European users, which include the EU’s standard contractual clauses.</p>
       </div>
     </section>
 

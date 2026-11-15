@@ -166,7 +166,7 @@ def crops_any_language(text: str) -> tuple[list[str], list[str]]:
                     'vineyard, fruit), else null"}. Only list real crops; ignore any word that is not a crop name '
                     '(greetings, insults, apologies).', text[:300], max_tokens=250)
         import logging
-        logging.getLogger(__name__).info("crop mapping %r -> %s", text[:60], raw[:300])
+        logging.getLogger(__name__).info("crop mapping (%d chars) -> %s", len(text), raw[:300])  # never log what farmers wrote
         d = json.loads(re.search(r"\{.*\}", raw, re.S).group(0))
         tree = d.get("tree_crop")
         unknown = [str(u)[:40] for u in d.get("unknown", [])][:3]
@@ -181,7 +181,7 @@ def crops_any_language(text: str) -> tuple[list[str], list[str]]:
         return crops_out, unknown
     except Exception:
         import logging
-        logging.getLogger(__name__).warning("crop mapping failed for %r", text[:60], exc_info=True)
+        logging.getLogger(__name__).warning("crop mapping failed (%d chars)", len(text), exc_info=True)
         return [], []
 
 
@@ -312,6 +312,7 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
             fm = db.get(Farmer, farmer.id)
             for f in list(fm.fields):
                 db.delete(f)
+            forget_locations(db, fm)
             fm.state, fm.priorities, fm.constraints = "awaiting_location", [], {}
             db.commit()
         return Reply(now=[RESTART])
@@ -554,6 +555,26 @@ def _enrich_ndvi(field_id: int):
         if fld:
             service.enrich_ndvi(db, fld)
     service.wait_for_satellite(field_id)  # SMAP + ECOSTRESS via AppEEARS (async, minutes)
+
+
+def forget_locations(db, farmer: Farmer) -> None:
+    """RESET also erases every location the farmer sent from the conversation log: pins, pasted coordinates, map links."""
+    from app.data.maplinks import location_from_text
+    for m in db.query(Message).filter(Message.farmer_id == farmer.id, Message.direction == "in"):
+        body = m.body or ""
+        if m.lat is not None or re.search(r"https?://|\d\.\d+\s*[,;]|\d\s*°", body) and _is_location(body, location_from_text):
+            m.lat = m.lon = None
+            m.body = "[location removed]"
+
+
+def _is_location(body: str, finder) -> bool:
+    from app.data.maplinks import MAP_HOSTS
+    if any(h in body for h in MAP_HOSTS if "." in h):  # a pasted map link: no need to resolve it to know
+        return True
+    try:
+        return finder(body) is not None
+    except Exception:
+        return False
 
 
 def record(farmer_id: int, direction: str, body: str, lat=None, lon=None, media_url=None):

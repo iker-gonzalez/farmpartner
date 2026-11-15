@@ -11,6 +11,17 @@ resource "google_storage_bucket" "cache" {
   force_destroy               = true # a cache: everything in it can be re-downloaded
   labels                      = local.labels
 
+  # Spoken replies (voice/) only need to live until WhatsApp has fetched them; the privacy page promises 30 days.
+  lifecycle_rule {
+    condition {
+      age            = 30
+      matches_prefix = ["voice/"]
+    }
+    action {
+      type = "Delete"
+    }
+  }
+
   # Short-lived entries (forecasts, NASA POWER windows) live under ttl/ and are cleaned up automatically.
   lifecycle_rule {
     condition {

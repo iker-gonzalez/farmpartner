@@ -19,6 +19,13 @@ from app.engine.scoring import PRIORITY_LABELS
 from app.engine.features import crop_name, rotation_label
 
 logging.basicConfig(level=logging.INFO)
+import mimetypes  # noqa: E402
+
+mimetypes.add_type("font/woff2", ".woff2")  # self-hosted fonts (app/static/fonts)
+# HTTP client request logs carry query strings (place names a farmer typed, coordinates) and Twilio request details:
+# keep them out of the server logs.
+for _noisy in ("httpx", "httpx2", "twilio.http_client"):
+    logging.getLogger(_noisy).setLevel(logging.WARNING)
 log = logging.getLogger("farmpartner")
 app = FastAPI(title="FarmPartner")
 templates = Jinja2Templates(directory=str(config.ROOT / "app" / "templates"))
@@ -572,8 +579,10 @@ def daily_job(request: Request, token: str = Form("")):
         alerts = _send_alerts(db)
         refreshed = _refresh_stale_fields(db)
         satellite = _collect_satellite(db)
-    log.info("daily job: %s alerts, %s fields refreshed, %s satellite results collected", alerts, refreshed, satellite)
-    return {"alerts": alerts, "refreshed": refreshed, "satellite_collected": satellite}
+        purged = service.purge_inactive(db)
+    log.info("daily job: %s alerts, %s fields refreshed, %s satellite results collected, %s inactive farmers deleted",
+             alerts, refreshed, satellite, purged)
+    return {"alerts": alerts, "refreshed": refreshed, "satellite_collected": satellite, "purged": purged}
 
 
 @app.post("/admin/alerts/run")

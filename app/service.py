@@ -2,6 +2,7 @@
 import datetime as dt
 import logging
 
+import sqlalchemy as sa
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -300,3 +301,25 @@ def wait_for_satellite(field_id: int, timeout_s: int = 3600, every_s: int = 60) 
                     return
             except Exception:
                 logging.getLogger(__name__).exception("AppEEARS collect failed")
+
+
+RETENTION_DAYS = 365  # the privacy page promises this: no message for 12 months → everything about the farmer is deleted
+
+
+def delete_farmer(db: Session, farmer: Farmer) -> None:
+    """Erase a farmer completely: number, fields (with their history, reports and alerts) and the conversation."""
+    for f in farmer.fields:
+        db.query(Alert).filter(Alert.field_id == f.id).delete()
+    db.delete(farmer)  # cascades to fields, observations, recommendations, crop history and messages
+    db.commit()
+
+
+def purge_inactive(db: Session, days: int = RETENTION_DAYS) -> int:
+    """Delete farmers who haven't written for `days` (or never did since joining that long ago). Returns how many."""
+    cutoff = now() - dt.timedelta(days=days)
+    old = db.query(Farmer).filter(~Farmer.phone.startswith("sample:"),
+                                  sa.func.coalesce(Farmer.last_inbound_at, Farmer.created_at) < cutoff).all()
+    for fm in old:
+        delete_farmer(db, fm)
+    return len(old)
+

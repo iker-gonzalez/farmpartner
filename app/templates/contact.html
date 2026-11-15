@@ -7,9 +7,7 @@
 <meta name="description" content="Interested in FarmPartner? Write to the team at {{ email }}.">
 <meta property="og:title" content="Contact — FarmPartner">
 <meta property="og:image" content="/static/landing/hero.jpg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&family=Silkscreen&family=Space+Grotesk:wght@600&display=swap" rel="stylesheet">
+<link href="/static/fonts/fonts.css" rel="stylesheet">
 <link rel="icon" href="/static/brand/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/static/brand/favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="/static/brand/apple-touch-icon.png">
@@ -73,12 +71,17 @@
   .actions .btn { padding: 15px 20px; }
   .actions .ghost { cursor: pointer; transition: border-color .2s, color .2s; }
   .actions .ghost.ok { border-color: var(--lime); color: var(--lime); }
-  .alt { margin-top: 18px; font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); transition: color .2s; }
-  .alt a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
-  .alt a:hover { color: var(--lime); }
-  .alt .miss { display: none; color: var(--lime); }
-  .alt.flash .miss { display: inline; }
-  .alt.flash { color: var(--ink); }
+  /* "Send us an email" opens a chooser: mailto: alone does nothing for people without a mail app (webmail users). */
+  .send { position: relative; display: inline-flex; }
+  .send > .btn { border: 0; cursor: pointer; font: inherit; font-family: var(--mono); font-size: 13px; font-weight: 600; }
+  .send > .btn[aria-expanded=true] { filter: brightness(1.08); }
+  .pick { position: absolute; z-index: 5; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); min-width: 240px; margin: 0; padding: 6px 0;
+    list-style: none; background: #111113; border: 1px solid var(--line-2); box-shadow: 6px 6px 0 #000; text-align: left; }
+  .pick a, .pick button { display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 16px; border: 0; background: none;
+    font-family: var(--mono); font-size: 13px; color: var(--ink); cursor: pointer; text-align: left; }
+  .pick a:hover, .pick a:focus-visible, .pick button:hover, .pick button:focus-visible { background: #a8f3261a; color: var(--lime); outline: none; }
+  .pick .ic { width: 18px; text-align: center; font-size: 15px; }
+  .pick small { margin-left: auto; font-size: 11px; color: var(--ink-3); }
 
   /* ---------- Who should write: three cards that rise in one after another ---------- */
   .who { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 48px; padding: 0; list-style: none;
@@ -141,10 +144,17 @@
       <a class="mail" id="mail" href="mailto:{{ email }}?subject=FarmPartner" aria-label="Email {{ email }}"><span class="txt">{{ email }}</span><span class="cursor" aria-hidden="true"></span></a>
 
       <div class="actions">
-        <a class="btn" href="mailto:{{ email }}?subject=FarmPartner">SEND US AN EMAIL →</a>
+        <div class="send">
+          <button class="btn" type="button" id="send" aria-haspopup="true" aria-expanded="false" aria-controls="pick">SEND US AN EMAIL →</button>
+          <ul class="pick" id="pick" role="menu" hidden>
+            <li role="none"><a role="menuitem" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to={{ email }}&amp;su=FarmPartner" target="_blank" rel="noopener"><span class="ic" aria-hidden="true">✉</span>Gmail</a></li>
+            <li role="none"><a role="menuitem" href="https://outlook.live.com/mail/0/deeplink/compose?to={{ email }}&amp;subject=FarmPartner" target="_blank" rel="noopener"><span class="ic" aria-hidden="true">✉</span>Outlook</a></li>
+            <li role="none"><a role="menuitem" href="mailto:{{ email }}?subject=FarmPartner"><span class="ic" aria-hidden="true">↗</span>Mail app</a></li>
+            <li role="none"><button role="menuitem" type="button" data-copy="{{ email }}" data-i18n-copied="Copied ✓"><span class="ic" aria-hidden="true">⧉</span>Copy address</button></li>
+          </ul>
+        </div>
         <button class="ghost" type="button" id="copy" data-email="{{ email }}" data-i18n-copied="COPIED ✓">COPY ADDRESS</button>
       </div>
-      <p class="alt" id="alt"><span class="miss">No mail app opened?</span> Write from <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to={{ email }}&amp;su=FarmPartner" target="_blank" rel="noopener">Gmail</a> · <a href="https://outlook.live.com/mail/0/deeplink/compose?to={{ email }}&amp;subject=FarmPartner" target="_blank" rel="noopener">Outlook</a></p>
     </section>
 
     <ul class="who">
@@ -172,16 +182,35 @@
       })();
     })();
 
-    // mailto: links do nothing when the browser has no mail app set up (common with webmail). If the page
-    // keeps focus after the click, no app opened: point to the Gmail / Outlook compose links instead.
-    document.querySelectorAll('main a[href^="mailto:"]').forEach(function (a) {
-      a.addEventListener("click", function () {
-        var left = false, mark = function () { left = true; };
-        window.addEventListener("blur", mark, {once: true});
-        document.addEventListener("visibilitychange", mark, {once: true});
-        setTimeout(function () { if (!left && document.hasFocus()) document.getElementById("alt").classList.add("flash"); }, 900);
+    // "Send us an email": a small menu (Gmail, Outlook, mail app, copy) instead of a bare mailto: link.
+    (function () {
+      var btn = document.getElementById("send"), pick = document.getElementById("pick");
+      var items = function () { return pick.querySelectorAll("a, button"); };
+      var set = function (open, focus) {
+        pick.hidden = !open; btn.setAttribute("aria-expanded", String(open));
+        if (open && focus) items()[0].focus();
+      };
+      btn.addEventListener("click", function (e) { set(pick.hidden, e.detail === 0); });
+      pick.addEventListener("click", function (e) { if (e.target.closest("a")) set(false); });
+      pick.addEventListener("keydown", function (e) {
+        var list = Array.prototype.slice.call(items()), i = list.indexOf(document.activeElement);
+        if (e.key === "ArrowDown") { e.preventDefault(); list[(i + 1) % list.length].focus(); }
+        if (e.key === "ArrowUp") { e.preventDefault(); list[(i - 1 + list.length) % list.length].focus(); }
       });
-    });
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !pick.hidden) { set(false); btn.focus(); } });
+      document.addEventListener("pointerdown", function (e) { if (!pick.hidden && !e.target.closest(".send")) set(false); });
+      // The big address opens the same menu.
+      document.getElementById("mail").addEventListener("click", function (e) { e.preventDefault(); set(true, true); btn.scrollIntoView({block: "nearest"}); });
+      // Copy from the menu.
+      pick.querySelector("[data-copy]").addEventListener("click", function () {
+        var b = this, label = b.innerHTML;
+        if (!navigator.clipboard) return;
+        navigator.clipboard.writeText(b.dataset.copy).then(function () {
+          b.lastChild.textContent = b.dataset.i18nCopied;
+          setTimeout(function () { b.innerHTML = label; set(false); }, 1200);
+        });
+      });
+    })();
 
     // Copy the address to the clipboard.
     document.getElementById("copy").addEventListener("click", function () {
