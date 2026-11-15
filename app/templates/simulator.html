@@ -101,6 +101,31 @@
   .sheet li:hover { background:#f5f6f6 } .sheet li div { flex:1 } .sheet li small { display:block; color:var(--sub); font-size:13px }
   .sheet li .r { width:20px; height:20px; border:2px solid #8696a0; border-radius:50%; flex:none }
   .sheet .go { margin:6px 16px 14px; padding:12px; border:0; border-radius:24px; background:var(--green); color:#fff; font-family:inherit; font-size:15px; font-weight:600; cursor:pointer }
+  /* pin-on-map picker (like WhatsApp's "send location"): drag the satellite map under a fixed pin */
+  .picker { position:absolute; inset:0; z-index:10; background:#fff; display:flex; flex-direction:column }
+  .picker .phdr { background:var(--teal); color:#fff; display:flex; align-items:center; gap:8px; padding:10px 8px;
+                  padding-top:max(10px, env(safe-area-inset-top)) }
+  .picker .phdr b { font-size:17px; font-weight:500 }
+  .psearch { position:relative; padding:8px 10px; border-bottom:1px solid #e9edef }
+  .psearch input { width:100%; padding:10px 14px; border:0; border-radius:20px; background:#f0f2f5; font:inherit; outline:none }
+  .psearch ul { position:absolute; left:10px; right:10px; top:calc(100% - 2px); z-index:1001; list-style:none; margin:0; padding:4px 0;
+                background:#fff; border-radius:10px; box-shadow:0 6px 20px #0003; max-height:240px; overflow-y:auto }
+  .psearch li { padding:10px 14px; cursor:pointer } .psearch li:hover { background:#f5f6f6 }
+  .psearch li small { display:block; color:var(--sub); font-size:12.5px }
+  .pmap { position:relative; flex:1; min-height:0; background:#1d2a20 }
+  #pkMap { position:absolute; inset:0 }
+  .pmap .crosshair { position:absolute; left:50%; top:50%; width:34px; height:44px; transform:translate(-50%, -100%); z-index:1000;
+                     pointer-events:none; filter:drop-shadow(0 3px 3px #0007); transition:transform .15s }
+  .pmap.moving .crosshair { transform:translate(-50%, calc(-100% - 8px)) }
+  .pmap .dot { position:absolute; left:50%; top:50%; width:6px; height:6px; margin:-3px 0 0 -3px; border-radius:50%; background:#fff;
+               box-shadow:0 0 0 1px #0008; z-index:1000; pointer-events:none }
+  .pmap .locate { position:absolute; right:12px; bottom:12px; z-index:1000; width:44px; height:44px; border-radius:50%; border:0;
+                  background:#fff; box-shadow:0 2px 8px #0004; font-size:20px; cursor:pointer }
+  .pfoot { padding:12px 16px; padding-bottom:max(12px, env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:6px }
+  .pfoot p { margin:0; color:var(--sub); font-size:13.5px }
+  .pfoot small { font-family:ui-monospace,Menlo,monospace; font-size:12.5px; color:var(--ink) }
+  .pfoot .go { margin:4px 0 0; padding:13px; border:0; border-radius:24px; background:var(--green); color:#fff; font:inherit; font-weight:600; cursor:pointer }
+  .pfoot .go:disabled { background:#b5c9c3; cursor:default }
   [hidden] { display:none !important }
 </style>
 </head>
@@ -121,12 +146,28 @@
   </div>
   <div id="log"></div>
   <div class="attach" id="attach" hidden>
+    <button id="pickMap"><span style="background:#1d9bf0">🗺️</span>Pin on map</button>
     <button data-pin="38.05,-100.75,Garden City, KS"><span style="background:#1fa855">📍</span>Garden City</button>
     <button data-pin="40.65,-98.30,Hastings, NE"><span style="background:#1fa855">📍</span>Hastings</button>
     <button data-pin="33.68,-102.25,Lubbock, TX"><span style="background:#1fa855">📍</span>Lubbock</button>
     <button id="myLoc"><span style="background:#02a698">🧭</span>My location</button>
     <button id="pickPhoto"><span style="background:#bf59cf">🖼️</span>Gallery</button>
     <button id="takePhoto"><span style="background:#ff2e74">📷</span>Camera</button>
+  </div>
+  <div class="picker" id="picker" hidden>
+    <div class="phdr"><button class="icon" id="pkClose" aria-label="Close">←</button><b>Pin your field</b></div>
+    <form class="psearch" id="pkSearch" autocomplete="off"><input id="pkQ" type="search" placeholder="Search a town, county or place" aria-label="Search a place"><ul id="pkRes" hidden></ul></form>
+    <div class="pmap" id="pkWrap">
+      <div id="pkMap"></div>
+      <svg class="crosshair" viewBox="0 0 34 44" aria-hidden="true"><path d="M17 43C17 43 32 26.5 32 16.5A15 15 0 0 0 2 16.5C2 26.5 17 43 17 43Z" fill="#ea4335" stroke="#a52714" stroke-width="1.5"/><circle cx="17" cy="16" r="5.5" fill="#a52714"/></svg>
+      <span class="dot"></span>
+      <button class="locate" id="pkLocate" type="button" aria-label="Go to my location">🧭</button>
+    </div>
+    <div class="pfoot">
+      <p>Drag the map until the pin sits on your field. Zoom in close.</p>
+      <small id="pkCoords"></small>
+      <button class="go" id="pkSend" type="button">Send this location</button>
+    </div>
   </div>
   <div class="bar">
     <div class="field" id="field">
@@ -358,6 +399,57 @@
   $('myLoc').onclick = () => { attach.hidden = true; navigator.geolocation.getCurrentPosition(
     p => pin(+p.coords.latitude.toFixed(5), +p.coords.longitude.toFixed(5), 'My location'),
     () => chip('📍 Allow location access, or pick one of the sample farms.', true)); };
+  // ---------- pin on map: satellite view, the pin stays in the centre while the map moves ----------
+  let pk = null;
+  const loadLeaflet = () => window.L ? Promise.resolve() : new Promise((ok, fail) => {
+    const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    const js = document.createElement('script'); js.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'; js.onload = ok; js.onerror = fail;
+    document.head.append(css, js);
+  });
+  const PK_ZOOM = 13;  // close enough to tell one field from the next
+  function pkUpdate() {
+    const c = pk.getCenter(), z = pk.getZoom(), ok = z >= PK_ZOOM;
+    $('pkCoords').textContent = `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
+    $('pkSend').disabled = !ok; $('pkSend').textContent = ok ? 'Send this location' : 'Zoom in to your field';
+  }
+  $('pickMap').onclick = async () => {
+    attach.hidden = true; $('picker').hidden = false;
+    try { await loadLeaflet(); } catch { $('picker').hidden = true; chip('🗺️ The map could not load. Send a sample farm or type a place name.', true); return; }
+    if (!pk) {
+      pk = L.map('pkMap', {zoomControl: false, attributionControl: true, worldCopyJump: true}).setView([30, -10], 2);
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                  {maxZoom: 19, attribution: 'Esri, Maxar, Earthstar'}).addTo(pk);
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+                  {maxZoom: 19}).addTo(pk);
+      L.control.zoom({position: 'topright'}).addTo(pk);
+      pk.on('movestart', () => $('pkWrap').classList.add('moving'));
+      pk.on('moveend', () => { $('pkWrap').classList.remove('moving'); pkUpdate(); });
+    }
+    setTimeout(() => { pk.invalidateSize(); pkUpdate(); }, 0);
+  };
+  $('pkClose').onclick = () => { $('picker').hidden = true; $('pkRes').hidden = true; };
+  $('pkLocate').onclick = () => navigator.geolocation.getCurrentPosition(
+    p => pk.setView([p.coords.latitude, p.coords.longitude], 15),
+    () => chip('🧭 Allow location access, or search a place.', true));
+  $('pkSend').onclick = () => {
+    const c = pk.getCenter(); $('picker').hidden = true;
+    pin(+c.lat.toFixed(5), +c.lng.toFixed(5), 'Dropped pin');
+  };
+  $('pkSearch').onsubmit = async e => {
+    e.preventDefault(); const q = $('pkQ').value.trim(), ul = $('pkRes'); if (!q) return;
+    ul.innerHTML = '<li><small>Searching…</small></li>'; ul.hidden = false;
+    try {
+      const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?count=6&language=${encodeURIComponent((navigator.language || 'en').slice(0, 2))}&name=${encodeURIComponent(q)}`);
+      const res = (await r.json()).results || [];
+      ul.innerHTML = res.length ? '' : '<li><small>No place found — try a nearby town.</small></li>';
+      res.forEach(p => {
+        const li = document.createElement('li');
+        li.innerHTML = `${esc(p.name)}<small>${esc([p.admin2, p.admin1, p.country].filter(Boolean).join(', '))}</small>`;
+        li.onclick = () => { ul.hidden = true; $('pkQ').blur(); pk.setView([p.latitude, p.longitude], 14); };
+        ul.appendChild(li);
+      });
+    } catch { ul.innerHTML = '<li><small>Search is unavailable — drag and zoom the map instead.</small></li>'; }
+  };
   $('pickPhoto').onclick = () => { attach.hidden = true; $('gallery').click(); };
   $('takePhoto').onclick = () => { attach.hidden = true; $('camera').click(); };
   menu.onclick = e => {
