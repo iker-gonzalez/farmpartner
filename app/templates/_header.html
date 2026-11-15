@@ -1,4 +1,5 @@
-{# Site header shared by the public pages (landing.html includes it too). Styles: /static/site.css and landing.html. #}
+{# Site header shared by the public pages (landing.html includes it too). Styles: /static/site.css and landing.html;
+   the mobile menu (hamburger, shown below 1100px where the text links are hidden) is self-contained below. #}
 <header>
   <a class="logo" href="/" aria-label="FarmPartner home">
     <img class="orbi" src="/static/brand/orbi.svg" alt="" width="58" height="29">
@@ -9,9 +10,48 @@
     <a href="/data-and-science"{% if active == "data" %} class="on" aria-current="page"{% endif %}>DATA &amp; SCIENCE</a>
     <a href="/team"{% if active == "team" %} class="on" aria-current="page"{% endif %}>TEAM</a>
     <a href="{{ repo }}">GITHUB</a>
-    <a class="btn" href="{{ whatsapp }}" target="_blank" rel="noopener">
+    <a class="btn" href="{{ whatsapp }}" target="_blank" rel="noopener" aria-label="Open in WhatsApp">
       <svg viewBox="0 0 14.6453 14.6344" width="16" height="16" aria-hidden="true"><path transform="matrix(1 -0.000029 0.000029 1 -1.6875 -1.687)" fill="#0a0a0b" d="{{ whatsapp_path }}"/></svg>
-      <span class="long">OPEN IN </span>WHATSAPP →
+      <span class="txt"><span class="long">OPEN IN </span>WHATSAPP →</span>
     </a>
+    <button class="burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="mnav">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
+  <div class="mnav" id="mnav" hidden>
+    <a href="/what-and-how"{% if active == "what-how" %} class="on" aria-current="page"{% endif %}>WHAT &amp; HOW</a>
+    <a href="/data-and-science"{% if active == "data" %} class="on" aria-current="page"{% endif %}>DATA &amp; SCIENCE</a>
+    <a href="/team"{% if active == "team" %} class="on" aria-current="page"{% endif %}>TEAM</a>
+    <a href="{{ repo }}">GITHUB</a>
+    <a class="btn" href="{{ whatsapp }}" target="_blank" rel="noopener">OPEN IN WHATSAPP →</a>
+  </div>
 </header>
+<style>
+  .burger { display: none; width: 40px; height: 36px; padding: 0 9px; margin-right: -9px; background: none; border: 0;
+    cursor: pointer; flex-direction: column; justify-content: center; gap: 5px; }
+  .burger span { display: block; height: 2px; background: var(--ink); transition: transform .2s, opacity .2s; }
+  .burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+  .burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .mnav { position: absolute; top: 100%; left: 0; right: 0; display: flex; flex-direction: column;
+    background: #0a0a0bf7; border-bottom: 1px solid var(--line); backdrop-filter: blur(6px); }
+  .mnav[hidden] { display: none; }
+  .mnav a { padding: 18px 20px; font-family: var(--mono); font-size: 14px; color: var(--ink-2); border-top: 1px solid var(--line); }
+  .mnav a:hover, .mnav a.on { color: var(--ink); }
+  .mnav a.on { box-shadow: inset 3px 0 0 var(--lime); }
+  .mnav a.btn { justify-content: center; margin: 4px 20px 20px; padding: 14px; border: 0; color: var(--bg); font-size: 13px; }
+  .mnav a.btn:hover { color: var(--bg); }
+  @media (max-width: 1100px) { .burger { display: flex; } nav { gap: 16px; } }
+  @media (max-width: 420px) { nav .btn .txt { display: none; } nav .btn { padding: 9px; } }
+  @media (min-width: 1101px) { .mnav { display: none !important; } }
+</style>
+<script>
+  (() => {
+    const btn = document.querySelector("header .burger"), menu = document.getElementById("mnav");
+    const set = (open) => { btn.setAttribute("aria-expanded", open); menu.hidden = !open; };
+    btn.addEventListener("click", (e) => { e.stopPropagation(); set(menu.hidden); });
+    menu.addEventListener("click", (e) => { if (e.target.closest("a")) set(false); });
+    document.addEventListener("click", (e) => { if (!menu.hidden && !e.target.closest("header")) set(false); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !menu.hidden) { set(false); btn.focus(); } });
+  })();
+</script>

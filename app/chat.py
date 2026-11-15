@@ -202,7 +202,11 @@ def photo(phone: str, channel: str, image: dict | None, caption: str, media_url:
         def from_photo():
             name = agent.identify_crop(image)
             if not name:
-                msgs = ["📷 I couldn't tell the crop from the photo — please type it (e.g. \"wheat, corn\")."]
+                with session() as db:
+                    from app.db import Farmer
+                    fld = service.main_field(db.get(Farmer, farmer.id))
+                    example = onboarding.crop_example(fld.features if fld else None)
+                msgs = [f"📷 I couldn't tell the crop from the photo — please type it (e.g. \"{example}\")."]
             else:
                 r = onboarding.handle(farmer, name, None, None)
                 msgs = [f"📷 That looks like *{name}*."] + ((r.now + (r.later() if r.later else [])) if r else [])
@@ -221,9 +225,25 @@ def photo(phone: str, channel: str, image: dict | None, caption: str, media_url:
     return _out(farmer.id, Turn(now=i18n.translate(["📷 Got it — taking a look…"], farmer.language), later=later))
 
 
+def _is_web(farmer_id: int) -> bool:
+    from app.db import Farmer
+    with session() as db:
+        fm = db.get(Farmer, farmer_id)
+        return bool(fm and fm.phone.startswith(("web:", "cli:")))
+
+
+def _web_howto(msgs: list) -> list:
+    return [m.replace(onboarding.PIN_HOWTO, onboarding.WEB_PIN_HOWTO) if isinstance(m, str) else m for m in msgs]
+
+
 def _out(farmer_id: int, turn: Turn, lang: str = "en", unit: str = "imperial") -> Turn:
     """Wrap the turn so every outbound message is logged (the agent reads this history). FarmPartner's scripted
     messages are converted to metric (deterministically) and translated into the farmer's language."""
+    if _is_web(farmer_id):  # the web chat can't drag a map like WhatsApp: swap in its own pin instructions
+        turn = Turn(now=_web_howto(turn.now), later=turn.later)
+        if turn.later:
+            inner_web = turn.later
+            turn = Turn(now=turn.now, later=lambda: _web_howto(inner_web()))
     if lang != "en" or unit == "metric":
         def localize(msgs):
             return i18n.translate(units.convert(msgs) if unit == "metric" else msgs, lang)
