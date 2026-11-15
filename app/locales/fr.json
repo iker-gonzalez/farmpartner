@@ -493,5 +493,6 @@
  "2764e68daf": "Coordonnées du champ (le service climatique de la NASA ne reçoit que la zone d’environ 50 km), ou le nom du lieu ou le code postal que vous tapez",
  "a3b1b8293f": "<span class=\"no\">✕</span> Numéro de téléphone, ni les numéros, e‑mails et coordonnées que vous tapez",
  "87ff1b3384": "Pseudonymisé quand il sort de chez nous",
- "15e04cfd9e": "Ce que nous envoyons à des services externes est privé de votre numéro de téléphone et des numéros, e‑mails ou coordonnées que vous tapez."
+ "15e04cfd9e": "Ce que nous envoyons à des services externes est privé de votre numéro de téléphone et des numéros, e‑mails ou coordonnées que vous tapez.",
+ "54c9964d72": "<span class=\"nl\">Gratuit · Aucune appli à installer · Open source (MIT)<span class=\"sep\"> · </span></span><span class=\"nl\"><a href=\"/sample\">Voir un exemple de rapport →</a></span>"
 }
