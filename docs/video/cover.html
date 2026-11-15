@@ -1,0 +1,21 @@
+<!doctype html>
+<!-- Cover (poster) for the video on the landing page. Render: node cover.mjs → app/static/video/poster.jpg -->
+<html lang="en"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; box-sizing:border-box } html, body { width:1920px; height:1080px; overflow:hidden; background:#0a0a0b; color:#f4f4f5 }
+  .art { position:absolute; inset:0; background:url(../../app/static/landing/hero.jpg) center/cover; image-rendering:pixelated }
+  .shade { position:absolute; inset:0; background:linear-gradient(180deg,#0a0a0b99 0%,#0a0a0b26 38%,#0a0a0bf2 100%) }
+  .top { position:absolute; left:90px; top:76px; display:flex; align-items:center; gap:22px }
+  .top img { width:110px } .top b { font:700 64px "Space Grotesk"; letter-spacing:-2.5px }
+  .tag { position:absolute; right:90px; top:92px; font:700 28px "IBM Plex Mono"; color:#0a0a0b; background:#a8f326; padding:12px 20px; letter-spacing:2px }
+  .copy { position:absolute; left:90px; right:90px; bottom:84px }
+  .copy p { font:700 30px "IBM Plex Mono"; color:#a8f326; letter-spacing:3px }
+  .copy h1 { font:700 124px/1.02 "Space Grotesk"; letter-spacing:-4px; margin-top:20px }
+  .copy h1 i { font-style:normal; color:#a8f326 }
+</style></head><body>
+  <div class="art"></div><div class="shade"></div>
+  <div class="top"><img src="../../app/static/brand/orbi.svg" alt=""><b>FarmPartner</b></div>
+  <div class="tag">0:30</div>
+  <div class="copy"><p>NASA DATA · AI · IN THE CHAT YOU ALREADY USE</p><h1>Your field, <i>read from space.</i></h1></div>
+</body></html>
