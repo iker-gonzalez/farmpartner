@@ -19,7 +19,7 @@
   .toc { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 28px; margin: 48px auto 0; max-width: 900px;
     padding: 0; list-style: none; font-family: var(--mono); font-size: 12.5px; }
   .toc a { color: var(--ink-3); }
-  .toc a span { color: var(--lime); margin-right: 6px; }
+  .toc a span { color: var(--lime); margin-inline-end: 6px; }
   .toc a:hover { color: var(--ink); }
 
   /* ---------- Sections ---------- */
@@ -62,6 +62,21 @@
   .statement { font-size: 30px; font-weight: 500; line-height: 1.3; letter-spacing: -.5px; max-width: 800px; }
   .statement em { font-style: normal; color: var(--lime); }
 
+  /* ---------- 00 The challenge: problem vs. what we solve ---------- */
+  .hl { font-style: normal; color: var(--ink); }
+  .vs { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 40px; background: var(--line); border: 1px solid var(--line); }
+  .side { padding: 28px 26px 12px; background: var(--bg); }
+  .side.solution { background: #0d0f0a; }
+  .side-h { font-family: var(--mono); font-size: 12px; letter-spacing: .6px; color: var(--ink-3); }
+  .solution .side-h { color: var(--lime); }
+  .side ul { margin: 14px 0 0; padding: 0; list-style: none; }
+  .side li { display: grid; grid-template-columns: 26px 1fr; column-gap: 6px; padding: 16px 0; border-top: 1px solid var(--line); }
+  .side li::before { grid-row: span 2; font-family: var(--mono); font-size: 14px; line-height: 1.45; }
+  .problem li::before { content: "✕"; color: var(--ink-3); }
+  .solution li::before { content: "✓"; color: var(--lime); }
+  .side h3 { font-size: 18px; font-weight: 500; letter-spacing: -.2px; line-height: 1.35; }
+  .side li p { margin-top: 6px; font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+
   /* ---------- Sample report ---------- */
   .sample-cta { margin: 32px auto 0; font-family: var(--mono); font-size: 13px; }
   .sample-cta a { color: var(--lime); text-decoration: underline; text-underline-offset: 4px; }
@@ -102,6 +117,8 @@
     .sec h2 { font-size: 28px; letter-spacing: -.5px; }
     .sec h2 + p { font-size: 15.5px; }
     .cards.c3, .cards.c2 { grid-template-columns: 1fr; }
+    .vs { grid-template-columns: 1fr; }
+    .side { padding: 22px 18px 8px; }
     .card { padding: 22px 18px; }
     .steps li { grid-template-columns: 1fr; gap: 6px; }
     .steps .n { font-size: 20px; }
@@ -114,6 +131,8 @@
     .phone { width: min(300px, 100%); height: 520px; margin: 0 auto; box-shadow: 5px 5px 0 #000; }
     .sample-actions .btn { width: 100%; justify-content: center; }
   }
+  /* Key ideas in the intro, in the brand lime (no underline, so they don't read as links). */
+  .lead strong { font-weight: 600; color: var(--lime); }
 </style>
 </head>
 <body>
@@ -122,9 +141,10 @@
   <section class="intro">
     <p class="kicker">● WHAT &amp; HOW</p>
     <h1>Satellite data, AI and farmers’ know-how, working for your field.</h1>
-    <p class="lead">FarmPartner is an AI engine that helps farmers adapt to climate change and make better decisions about their land. It cross-references NASA Earth observation data, information about each farm and the practical knowledge of experienced farmers, and delivers personalized recommendations through a chatbot on the messaging apps farmers already use.</p>
+    <p class="lead">FarmPartner is an <strong>AI engine</strong> that helps farmers adapt to climate change and make better decisions about their land, starting with <strong>crop rotation</strong>. It cross-references NASA Earth observation data, information about each farm and the practical knowledge of experienced farmers, and delivers personalized recommendations through a chatbot on the <strong>messaging apps</strong> farmers already use. It is built for <strong>generational renewal</strong>, passing that know-how on to the next generation of farmers; for <strong>digital inclusion</strong>, since anyone can use it by voice or by text; and with <strong>no language barriers</strong>, in {{ langs.text }} languages.</p>
     <p class="sample-cta"><a href="#sample-report">■ SEE WHAT A FARMER GETS: A REAL FIELD REPORT ↓</a></p>
     <ul class="toc">
+      <li><a href="#challenge"><span>00</span>THE CHALLENGE</a></li>
       <li><a href="#what"><span>01</span>WHAT IT DOES</a></li>
       <li><a href="#how"><span>02</span>HOW IT WORKS</a></li>
       <li><a href="#sample-report"><span>03</span>SAMPLE REPORT</a></li>
@@ -137,6 +157,37 @@
   </section>
 
   <main class="wrap">
+    <section class="sec" id="challenge">
+      <p class="label"><b>00</b>THE CHALLENGE</p>
+      <div class="body">
+        <h2>The climate has already changed. Decisions in the field haven’t yet.</h2>
+        <p>FarmPartner was born from the <em class="hl">Field Shift: Adapting Farms with NASA Data</em> challenge of the NASA Space Apps Challenge 2026: helping farmers adapt their land to climate change with NASA’s open data.</p>
+        <div class="vs">
+          <div class="side problem">
+            <p class="side-h">THE PROBLEM</p>
+            <ul>
+              <li><h3>Intensive farming wears out the land</h3><p>Planting the same crop year after year exhausts the soil: it loses nutrients and organic matter, pests and erosion increase, and every season yields less. Crop rotation is essential to let the land recover, but choosing the right rotation means knowing each field’s climate, soil and water.</p></li>
+              <li><h3>The climate is changing faster than experience</h3><p>Rain, frost and heat waves no longer follow the usual calendar. What worked for decades is no longer reliable.</p></li>
+              <li><h3>The data exists, but it doesn’t reach the field</h3><p>NASA has been observing every plot on the planet for more than 20 years. But that data comes in technical formats, in English, and is made for scientists.</p></li>
+              <li><h3>Knowledge is being lost</h3><p>Many experienced farmers retire with no one to take over, and what they know is never written down.</p></li>
+              <li><h3>Technology leaves many behind</h3><p>Farming tools are often complex apps, in a single language, that require reading charts or being comfortable with technology.</p></li>
+            </ul>
+          </div>
+          <div class="side solution">
+            <p class="side-h">WHAT WE SOLVE</p>
+            <ul>
+              <li><h3>Turning data into decisions</h3><p>We have built an AI engine that reads NASA data for each field and turns it into a concrete crop rotation that brings the soil back to life, with its benefits and its risks.</p></li>
+              <li><h3>Bringing science to the chat</h3><p>Anyone can talk to the AI engine from the messaging apps they already use, with nothing to install. It works on WhatsApp today, and soon on Messenger, iMessage, Instagram, Line and SMS.</p></li>
+              <li><h3>Generational renewal</h3><p>The knowledge of experienced farmers feeds the recommendations and reaches the next generation.</p></li>
+              <li><h3>Digital inclusion</h3><p>Just type or send a voice note. No need to read charts or be comfortable with technology.</p></li>
+              <li><h3>No language barriers</h3><p>Every farmer talks to FarmPartner in their own language: {{ langs.text }} languages.</p></li>
+              <li><h3>Support all season long</h3><p>We send frost, heat and drought alerts when conditions change.</p></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="sec" id="what">
       <p class="label"><b>01</b>WHAT IT DOES</p>
       <div class="body">

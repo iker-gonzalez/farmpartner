@@ -5,6 +5,7 @@ import re
 from app import config
 
 REPO_URL = "https://github.com/iker-gonzalez/farmpartner"
+CONTACT_EMAIL = "info@experienciatek.com"
 SAMPLE_PHONE = "sample:garden-city"  # reserved: /api/chat always prefixes "web:", so visitors can't touch it
 SAMPLE_FIELD = {"lat": 38.05, "lon": -100.75, "irrigated": False, "priorities": ["soil_health"]}
 
