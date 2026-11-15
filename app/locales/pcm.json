@@ -492,5 +492,7 @@
  "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>",
  "051b0e59d4": "Claude, the AI wey dey give the advice, dey get your messages and your farm data, wey dem label with the county or town — no be your phone number. Phone numbers, e‑mails and exact coordinates wey you type, we dey remove dem before e read your messages, and the web search wey e dey do for farm matter no dey ever carry your details.",
  "2764e68daf": "Farm coordinates (NASA climate service dey get only the ~50 km area), or the place name or ZIP code wey you type",
- "a3b1b8293f": "<span class=\"no\">✕</span> Phone number, or the numbers, e‑mails and coordinates wey you type"
+ "a3b1b8293f": "<span class=\"no\">✕</span> Phone number, or the numbers, e‑mails and coordinates wey you type",
+ "87ff1b3384": "E don pseudonymise once e comot from us",
+ "15e04cfd9e": "Wetin we dey send go outside services no dey carry your phone number or any numbers, e‑mails or coordinates wey you type."
 }

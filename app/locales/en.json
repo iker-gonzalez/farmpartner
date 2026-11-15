@@ -477,6 +477,8 @@
  "1c86f69cf5": "Your phone number, language, your field’s location and crops, your goals, the conversation (voice notes as their written text), and anything you report (rain, pests, yields). We keep them together so the bot remembers your field next time you write.",
  "e7ff08b263": "What we don’t keep",
  "98f68b27ad": "Raw satellite images: we store only the summaries computed for your field (rainfall, soil, vegetation trends). Nor the photos and voice recordings you send: we read them and keep only the text.",
+ "87ff1b3384": "Pseudonymised when it leaves us",
+ "15e04cfd9e": "What we send to outside services is stripped of your phone number and of any numbers, e‑mails or coordinates you type.",
  "5a01609c8a": "How long we keep it",
  "fd886b5492": "As long as you keep writing. After 12 months without a message from you, we delete your number, your fields and the conversation automatically. Spoken replies are stored as audio for 30 days, so WhatsApp can deliver them, then deleted.",
  "b6e77c24ce": "Where it lives",

@@ -492,5 +492,7 @@
  "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>",
  "051b0e59d4": "提供建议的 AI——Claude——会收到您的消息和田地数据，标注的是县或镇名，而不是您的电话号码。您输入的电话号码、电子邮件和精确坐标会在它读取消息前被删除，它在网上搜索农业知识时也从不包含您的信息。",
  "2764e68daf": "田地坐标（NASA 的气候服务只获得约 50 公里的区域），或您输入的地名或邮编",
- "a3b1b8293f": "<span class=\"no\">✕</span> 电话号码，以及您输入的号码、电子邮件和坐标"
+ "a3b1b8293f": "<span class=\"no\">✕</span> 电话号码，以及您输入的号码、电子邮件和坐标",
+ "87ff1b3384": "离开我们时已假名化",
+ "15e04cfd9e": "我们发送给外部服务的内容已去除您的电话号码，以及您输入的任何号码、电子邮件或坐标。"
 }

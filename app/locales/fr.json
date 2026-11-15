@@ -492,5 +492,7 @@
  "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>",
  "051b0e59d4": "Claude, l’IA derrière les conseils, reçoit vos messages et les données de votre champ, étiquetés avec le comté ou la commune — pas votre numéro de téléphone. Les numéros de téléphone, e‑mails et coordonnées exactes que vous tapez sont retirés avant qu’elle lise vos messages, et ses recherches web sur l’agriculture ne contiennent jamais vos données.",
  "2764e68daf": "Coordonnées du champ (le service climatique de la NASA ne reçoit que la zone d’environ 50 km), ou le nom du lieu ou le code postal que vous tapez",
- "a3b1b8293f": "<span class=\"no\">✕</span> Numéro de téléphone, ni les numéros, e‑mails et coordonnées que vous tapez"
+ "a3b1b8293f": "<span class=\"no\">✕</span> Numéro de téléphone, ni les numéros, e‑mails et coordonnées que vous tapez",
+ "87ff1b3384": "Pseudonymisé quand il sort de chez nous",
+ "15e04cfd9e": "Ce que nous envoyons à des services externes est privé de votre numéro de téléphone et des numéros, e‑mails ou coordonnées que vous tapez."
 }

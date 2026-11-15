@@ -492,5 +492,7 @@
  "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>",
  "051b0e59d4": "アドバイスを担う AI の Claude は、あなたのメッセージと畑のデータを受け取りますが、付いているのは郡や町の名前で、電話番号ではありません。入力された電話番号、メールアドレス、正確な座標はメッセージを読む前に取り除かれ、農業の情報をウェブで検索するときもあなたの情報は含まれません。",
  "2764e68daf": "畑の座標（NASA の気候サービスが受け取るのは約 50 km の範囲のみ）、または入力された地名や郵便番号",
- "a3b1b8293f": "<span class=\"no\">✕</span> 電話番号、入力された番号・メールアドレス・座標"
+ "a3b1b8293f": "<span class=\"no\">✕</span> 電話番号、入力された番号・メールアドレス・座標",
+ "87ff1b3384": "外部に出るときは仮名化",
+ "15e04cfd9e": "外部サービスに送る情報からは、電話番号と、入力された番号・メールアドレス・座標を取り除いています。"
 }

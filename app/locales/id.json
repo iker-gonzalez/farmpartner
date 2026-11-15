@@ -492,5 +492,7 @@
  "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>",
  "051b0e59d4": "Claude, AI di balik saran ini, menerima pesan Anda dan data ladang Anda, diberi label kabupaten atau kota — bukan nomor telepon Anda. Nomor telepon, e‑mail, dan koordinat persis yang Anda ketik dihapus sebelum ia membaca pesan Anda, dan pencarian web-nya tentang pertanian tidak pernah memuat data Anda.",
  "2764e68daf": "Koordinat ladang (layanan iklim NASA hanya menerima area sekitar 50 km), atau nama tempat atau kode pos yang Anda ketik",
- "a3b1b8293f": "<span class=\"no\">✕</span> Nomor telepon, maupun nomor, e‑mail, dan koordinat yang Anda ketik"
+ "a3b1b8293f": "<span class=\"no\">✕</span> Nomor telepon, maupun nomor, e‑mail, dan koordinat yang Anda ketik",
+ "87ff1b3384": "Dipseudonimkan saat keluar dari kami",
+ "15e04cfd9e": "Apa yang kami kirim ke layanan luar sudah dibersihkan dari nomor telepon Anda serta nomor, e‑mail, atau koordinat yang Anda ketik."
 }

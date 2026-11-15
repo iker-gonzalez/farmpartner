@@ -492,5 +492,7 @@
  "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>",
  "051b0e59d4": "Tavsiyelerin arkasındaki yapay zekâ Claude, mesajlarınızı ve tarlanızın verilerini telefon numaranızla değil, ilçe veya kasaba adıyla alır. Yazdığınız telefon numaraları, e‑postalar ve kesin koordinatlar, mesajlarınızı okumadan önce silinir; web'de yaptığı tarım aramaları da asla sizin bilgilerinizi içermez.",
  "2764e68daf": "Tarla koordinatları (NASA'nın iklim hizmeti yalnızca yaklaşık 50 km'lik alanı alır) ya da yazdığınız yer adı veya posta kodu",
- "a3b1b8293f": "<span class=\"no\">✕</span> Telefon numarası, ya da yazdığınız numaralar, e‑postalar ve koordinatlar"
+ "a3b1b8293f": "<span class=\"no\">✕</span> Telefon numarası, ya da yazdığınız numaralar, e‑postalar ve koordinatlar",
+ "87ff1b3384": "Bizden çıkarken takma adlandırılır",
+ "15e04cfd9e": "Dış hizmetlere gönderdiğimiz veriler, telefon numaranızdan ve yazdığınız numaralardan, e‑postalardan veya koordinatlardan arındırılır."
 }

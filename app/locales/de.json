@@ -492,5 +492,7 @@
  "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>",
  "051b0e59d4": "Claude, die KI hinter den Ratschlägen, bekommt deine Nachrichten und die Daten deines Feldes, beschriftet mit Landkreis oder Ort – nicht mit deiner Telefonnummer. Telefonnummern, E‑Mail-Adressen und genaue Koordinaten, die du eintippst, werden entfernt, bevor sie deine Nachrichten liest, und ihre Websuchen nach Agrarwissen enthalten nie deine Daten.",
  "2764e68daf": "Feldkoordinaten (der Klimadienst der NASA bekommt nur das Gebiet von etwa 50 km) oder der Ortsname bzw. die Postleitzahl, die du eintippst",
- "a3b1b8293f": "<span class=\"no\">✕</span> Telefonnummer und auch keine Nummern, E‑Mail-Adressen oder Koordinaten, die du eintippst"
+ "a3b1b8293f": "<span class=\"no\">✕</span> Telefonnummer und auch keine Nummern, E‑Mail-Adressen oder Koordinaten, die du eintippst",
+ "87ff1b3384": "Pseudonymisiert, sobald es uns verlässt",
+ "15e04cfd9e": "Was wir an externe Dienste senden, enthält weder deine Telefonnummer noch Nummern, E‑Mail-Adressen oder Koordinaten, die du eintippst."
 }
