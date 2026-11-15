@@ -459,7 +459,6 @@
  "20a7366432": "Email hello@farmpartner.space",
  "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
  "c198c23b25": "WE BUILD AM ON OPEN NASA &amp; USDA DATA · © 2026",
- "d40d479bd7": "<span class=\"miss\">Mail app no open?</span> Write from <a href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\">Gmail</a> · <a href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\">Outlook</a>",
  "f1127fb709": "To get satellite and weather data, we dey send the farm coordinates — or the place name wey you type — go public services (NASA, USDA, Open‑Meteo). Dem no dey ever collect your number or your name.",
  "f1ca62a47d": "Claude, the AI wey dey give the advice, dey get your messages and your farm data, wey dem label with the county or town — no be your phone number. When e dey search internet for farm matter, the search no dey ever carry your details.",
  "5c0038f031": "Send <b>STOP</b> and we no go message you first again. Send <b>RESET</b> to clear your farms and the locations wey you send. Write us and we go delete everything.",
@@ -488,5 +487,10 @@
  "e71102d544": "Your rights",
  "b0c7e1fa92": "You fit ask to see, correct, download or delete your data, or object to how we dey use am. Write us and we go reply inside one month. You fit also complain to the Spanish Data Protection Agency (<a href=\"https://www.aepd.es\" target=\"_blank\" rel=\"noopener\">aepd.es</a>).",
  "7e60a7bf3b": "Outside Europe",
- "cf6a2dcc77": "Twilio, Anthropic and Google na U.S. companies, so wetin dem receive (wey we list for top) dey comot from the EU. Dem dey handle am under their data processing terms for European users, wey include the EU standard contractual clauses."
+ "cf6a2dcc77": "Twilio, Anthropic and Google na U.S. companies, so wetin dem receive (wey we list for top) dey comot from the EU. Dem dey handle am under their data processing terms for European users, wey include the EU standard contractual clauses.",
+ "0962b7758d": "<a role=\"menuitem\" href=\"mailto:hello@farmpartner.space?subject=FarmPartner\"><span class=\"ic\" aria-hidden=\"true\">↗</span>Mail app</a>",
+ "05c3029084": "<span class=\"ic\" aria-hidden=\"true\">⧉</span>Copy di address",
+ "1664a484ce": "E don copy ✓",
+ "74fdd49abb": "<a role=\"menuitem\" href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Gmail</a>",
+ "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>"
 }

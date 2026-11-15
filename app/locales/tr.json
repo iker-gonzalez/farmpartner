@@ -459,7 +459,6 @@
  "20a7366432": "hello@farmpartner.space adresine e-posta gönderin",
  "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
  "c198c23b25": "AÇIK NASA &amp; USDA VERİLERİYLE YAPILDI · © 2026",
- "d40d479bd7": "<span class=\"miss\">E-posta uygulaması açılmadı mı?</span> Şuradan yazın: <a href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\">Gmail</a> · <a href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\">Outlook</a>",
  "f1127fb709": "Uydu ve hava durumu verilerini almak için tarlanın koordinatlarını — ya da yazdığınız yer adını — kamu hizmetlerine (NASA, USDA, Open‑Meteo) gönderiyoruz. Numaranızı veya adınızı asla almazlar.",
  "f1ca62a47d": "Tavsiyelerin arkasındaki yapay zekâ Claude, mesajlarınızı ve tarlanızın verilerini telefon numaranızla değil, ilçe veya kasaba adıyla alır. Web'de tarım bilgisi aradığında, arama asla sizin bilgilerinizi içermez.",
  "5c0038f031": "<b>STOP</b> yazın, size bir daha ilk biz yazmayalım. Tarlalarınızı ve gönderdiğiniz konumları silmek için <b>RESET</b> yazın. Bize yazın, her şeyi silelim.",
@@ -488,5 +487,10 @@
  "e71102d544": "Haklarınız",
  "b0c7e1fa92": "Verilerinizi görmeyi, düzeltmeyi, indirmeyi veya silmeyi isteyebilir ya da nasıl kullandığımıza itiraz edebilirsiniz. Bize yazın, bir ay içinde yanıt verelim. İspanya Veri Koruma Ajansı'na (<a href=\"https://www.aepd.es\" target=\"_blank\" rel=\"noopener\">aepd.es</a>) şikâyette de bulunabilirsiniz.",
  "7e60a7bf3b": "Avrupa dışı",
- "cf6a2dcc77": "Twilio, Anthropic ve Google ABD şirketleridir; bu yüzden aldıkları veriler (yukarıda listelenen) AB'den çıkar. Bu verileri, AB standart sözleşme maddelerini içeren Avrupalı kullanıcılara yönelik veri işleme koşullarına göre işlerler."
+ "cf6a2dcc77": "Twilio, Anthropic ve Google ABD şirketleridir; bu yüzden aldıkları veriler (yukarıda listelenen) AB'den çıkar. Bu verileri, AB standart sözleşme maddelerini içeren Avrupalı kullanıcılara yönelik veri işleme koşullarına göre işlerler.",
+ "0962b7758d": "<a role=\"menuitem\" href=\"mailto:hello@farmpartner.space?subject=FarmPartner\"><span class=\"ic\" aria-hidden=\"true\">↗</span>E-posta uygulaması</a>",
+ "05c3029084": "<span class=\"ic\" aria-hidden=\"true\">⧉</span>Adresi kopyala",
+ "1664a484ce": "Kopyalandı ✓",
+ "74fdd49abb": "<a role=\"menuitem\" href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Gmail</a>",
+ "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>"
 }

@@ -459,7 +459,6 @@
  "20a7366432": "Написать на hello@farmpartner.space",
  "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
  "c198c23b25": "НА ОТКРЫТЫХ ДАННЫХ NASA И USDA · © 2026",
- "d40d479bd7": "<span class=\"miss\">Почтовое приложение не открылось?</span> Напишите из <a href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\">Gmail</a> · <a href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\">Outlook</a>",
  "f1127fb709": "Чтобы получить спутниковые и погодные данные, мы отправляем координаты поля — или название места, которое вы ввели, — в общедоступные сервисы (NASA, USDA, Open‑Meteo). Они никогда не получают ваш номер или имя.",
  "f1ca62a47d": "Claude, ИИ, который даёт советы, получает ваши сообщения и данные поля с пометкой округа или населённого пункта — но не ваш номер телефона. Когда он ищет в интернете сведения о сельском хозяйстве, в поиск никогда не попадают ваши данные.",
  "5c0038f031": "Отправьте <b>STOP</b>, и мы больше не будем писать вам первыми. Отправьте <b>RESET</b>, чтобы стереть ваши поля и присланные местоположения. Напишите нам — и мы удалим всё.",
@@ -488,5 +487,10 @@
  "e71102d544": "Ваши права",
  "b0c7e1fa92": "Вы можете попросить показать, исправить, выгрузить или удалить ваши данные либо возразить против их использования. Напишите нам — мы ответим в течение месяца. Также можно подать жалобу в Испанское агентство по защите данных (<a href=\"https://www.aepd.es\" target=\"_blank\" rel=\"noopener\">aepd.es</a>).",
  "7e60a7bf3b": "За пределами Европы",
- "cf6a2dcc77": "Twilio, Anthropic и Google — американские компании, поэтому то, что они получают (см. выше), покидает ЕС. Они обрабатывают эти данные по своим условиям обработки данных для европейских пользователей, включающим стандартные договорные положения ЕС."
+ "cf6a2dcc77": "Twilio, Anthropic и Google — американские компании, поэтому то, что они получают (см. выше), покидает ЕС. Они обрабатывают эти данные по своим условиям обработки данных для европейских пользователей, включающим стандартные договорные положения ЕС.",
+ "0962b7758d": "<a role=\"menuitem\" href=\"mailto:hello@farmpartner.space?subject=FarmPartner\"><span class=\"ic\" aria-hidden=\"true\">↗</span>Почтовое приложение</a>",
+ "05c3029084": "<span class=\"ic\" aria-hidden=\"true\">⧉</span>Скопировать адрес",
+ "1664a484ce": "Скопировано ✓",
+ "74fdd49abb": "<a role=\"menuitem\" href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Gmail</a>",
+ "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>"
 }

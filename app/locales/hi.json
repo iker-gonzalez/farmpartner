@@ -459,7 +459,6 @@
  "20a7366432": "hello@farmpartner.space पर ईमेल करें",
  "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
  "c198c23b25": "NASA &amp; USDA के खुले डेटा पर बना · © 2026",
- "d40d479bd7": "<span class=\"miss\">कोई मेल ऐप नहीं खुला?</span> यहाँ से लिखें: <a href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\">Gmail</a> · <a href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\">Outlook</a>",
  "f1127fb709": "सैटेलाइट और मौसम डेटा पाने के लिए हम खेत के निर्देशांक — या आपके लिखे जगह के नाम — सार्वजनिक सेवाओं (NASA, USDA, Open‑Meteo) को भेजते हैं। उन्हें कभी आपका नंबर या नाम नहीं मिलता।",
  "f1ca62a47d": "सलाह देने वाला AI, Claude, आपके संदेश और खेत का डेटा पाता है, जिन पर ज़िले या कस्बे का नाम होता है — आपका फ़ोन नंबर नहीं। जब यह खेती की जानकारी के लिए वेब पर खोजता है, तो खोज में आपकी जानकारी कभी नहीं होती।",
  "5c0038f031": "<b>STOP</b> भेजें और हम आपको पहले संदेश नहीं भेजेंगे। अपने खेत और भेजी गई लोकेशन मिटाने के लिए <b>RESET</b> भेजें। हमें लिखें और हम सब कुछ मिटा देंगे।",
@@ -488,5 +487,10 @@
  "e71102d544": "आपके अधिकार",
  "b0c7e1fa92": "आप अपना डेटा देखने, सुधारने, डाउनलोड करने या मिटाने को कह सकते हैं, या उसके इस्तेमाल पर आपत्ति कर सकते हैं। हमें लिखें, हम एक महीने के भीतर जवाब देंगे। आप स्पेन की डेटा संरक्षण एजेंसी (<a href=\"https://www.aepd.es\" target=\"_blank\" rel=\"noopener\">aepd.es</a>) से शिकायत भी कर सकते हैं।",
  "7e60a7bf3b": "यूरोप के बाहर",
- "cf6a2dcc77": "Twilio, Anthropic और Google अमेरिकी कंपनियाँ हैं, इसलिए उन्हें जो मिलता है (ऊपर दिया गया) वह EU से बाहर जाता है। वे इसे यूरोपीय उपयोगकर्ताओं के लिए अपनी डेटा प्रोसेसिंग शर्तों के तहत संभालती हैं, जिनमें EU की मानक संविदात्मक धाराएँ शामिल हैं।"
+ "cf6a2dcc77": "Twilio, Anthropic और Google अमेरिकी कंपनियाँ हैं, इसलिए उन्हें जो मिलता है (ऊपर दिया गया) वह EU से बाहर जाता है। वे इसे यूरोपीय उपयोगकर्ताओं के लिए अपनी डेटा प्रोसेसिंग शर्तों के तहत संभालती हैं, जिनमें EU की मानक संविदात्मक धाराएँ शामिल हैं।",
+ "0962b7758d": "<a role=\"menuitem\" href=\"mailto:hello@farmpartner.space?subject=FarmPartner\"><span class=\"ic\" aria-hidden=\"true\">↗</span>मेल ऐप</a>",
+ "05c3029084": "<span class=\"ic\" aria-hidden=\"true\">⧉</span>पता कॉपी करें",
+ "1664a484ce": "कॉपी हो गया ✓",
+ "74fdd49abb": "<a role=\"menuitem\" href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Gmail</a>",
+ "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>"
 }

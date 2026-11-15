@@ -459,7 +459,6 @@
  "20a7366432": "发邮件至 hello@farmpartner.space",
  "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
  "c198c23b25": "基于 NASA 和 USDA 开放数据构建 · © 2026",
- "d40d479bd7": "<span class=\"miss\">没有打开邮件应用？</span> 通过以下方式发信： <a href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\">Gmail</a> · <a href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\">Outlook</a>",
  "f1127fb709": "为了获取卫星和天气数据，我们会把田地的坐标——或您输入的地名——发送给公共服务（NASA、USDA、Open‑Meteo）。它们永远收不到您的号码或姓名。",
  "f1ca62a47d": "提供建议的 AI——Claude——会收到您的消息和田地数据，标注的是县或镇名，而不是您的电话号码。它在网上搜索农业知识时，搜索内容从不包含您的信息。",
  "5c0038f031": "发送 <b>STOP</b>，我们就不再主动给您发消息。发送 <b>RESET</b>，即可删除您的田地和您发送过的位置。给我们写信，我们会删除一切。",
@@ -488,5 +487,10 @@
  "e71102d544": "您的权利",
  "b0c7e1fa92": "您可以要求查看、更正、下载或删除您的数据，或反对我们的使用方式。给我们写信，我们会在一个月内答复。您也可以向西班牙数据保护局（<a href=\"https://www.aepd.es\" target=\"_blank\" rel=\"noopener\">aepd.es</a>）投诉。",
  "7e60a7bf3b": "欧洲以外",
- "cf6a2dcc77": "Twilio、Anthropic 和 Google 是美国公司，因此它们收到的内容（见上文）会离开欧盟。它们依据面向欧洲用户的数据处理条款处理这些数据，其中包括欧盟标准合同条款。"
+ "cf6a2dcc77": "Twilio、Anthropic 和 Google 是美国公司，因此它们收到的内容（见上文）会离开欧盟。它们依据面向欧洲用户的数据处理条款处理这些数据，其中包括欧盟标准合同条款。",
+ "0962b7758d": "<a role=\"menuitem\" href=\"mailto:hello@farmpartner.space?subject=FarmPartner\"><span class=\"ic\" aria-hidden=\"true\">↗</span>邮件应用</a>",
+ "05c3029084": "<span class=\"ic\" aria-hidden=\"true\">⧉</span>复制地址",
+ "1664a484ce": "已复制 ✓",
+ "74fdd49abb": "<a role=\"menuitem\" href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Gmail</a>",
+ "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>"
 }

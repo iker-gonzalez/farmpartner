@@ -75,7 +75,7 @@
   .send { position: relative; display: inline-flex; }
   .send > .btn { border: 0; cursor: pointer; font: inherit; font-family: var(--mono); font-size: 13px; font-weight: 600; }
   .send > .btn[aria-expanded=true] { filter: brightness(1.08); }
-  .pick { position: absolute; z-index: 5; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); min-width: 240px; margin: 0; padding: 6px 0;
+  .pick { width: 260px; max-width: 100%; margin: 14px auto 0; padding: 6px 0;
     list-style: none; background: #111113; border: 1px solid var(--line-2); box-shadow: 6px 6px 0 #000; text-align: left; }
   .pick a, .pick button { display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 16px; border: 0; background: none;
     font-family: var(--mono); font-size: 13px; color: var(--ink); cursor: pointer; text-align: left; }
@@ -146,15 +146,15 @@
       <div class="actions">
         <div class="send">
           <button class="btn" type="button" id="send" aria-haspopup="true" aria-expanded="false" aria-controls="pick">SEND US AN EMAIL →</button>
-          <ul class="pick" id="pick" role="menu" hidden>
-            <li role="none"><a role="menuitem" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to={{ email }}&amp;su=FarmPartner" target="_blank" rel="noopener"><span class="ic" aria-hidden="true">✉</span>Gmail</a></li>
-            <li role="none"><a role="menuitem" href="https://outlook.live.com/mail/0/deeplink/compose?to={{ email }}&amp;subject=FarmPartner" target="_blank" rel="noopener"><span class="ic" aria-hidden="true">✉</span>Outlook</a></li>
-            <li role="none"><a role="menuitem" href="mailto:{{ email }}?subject=FarmPartner"><span class="ic" aria-hidden="true">↗</span>Mail app</a></li>
-            <li role="none"><button role="menuitem" type="button" data-copy="{{ email }}" data-i18n-copied="Copied ✓"><span class="ic" aria-hidden="true">⧉</span>Copy address</button></li>
-          </ul>
         </div>
         <button class="ghost" type="button" id="copy" data-email="{{ email }}" data-i18n-copied="COPIED ✓">COPY ADDRESS</button>
       </div>
+      <ul class="pick" id="pick" role="menu" hidden>
+        <li role="none"><a role="menuitem" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to={{ email }}&amp;su=FarmPartner" target="_blank" rel="noopener"><span class="ic" aria-hidden="true">✉</span>Gmail</a></li>
+        <li role="none"><a role="menuitem" href="https://outlook.live.com/mail/0/deeplink/compose?to={{ email }}&amp;subject=FarmPartner" target="_blank" rel="noopener"><span class="ic" aria-hidden="true">✉</span>Outlook</a></li>
+        <li role="none"><a role="menuitem" href="mailto:{{ email }}?subject=FarmPartner"><span class="ic" aria-hidden="true">↗</span>Mail app</a></li>
+        <li role="none"><button role="menuitem" type="button" data-copy="{{ email }}" data-i18n-copied="Copied ✓"><span class="ic" aria-hidden="true">⧉</span>Copy address</button></li>
+      </ul>
     </section>
 
     <ul class="who">
@@ -198,7 +198,7 @@
         if (e.key === "ArrowUp") { e.preventDefault(); list[(i - 1 + list.length) % list.length].focus(); }
       });
       document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !pick.hidden) { set(false); btn.focus(); } });
-      document.addEventListener("pointerdown", function (e) { if (!pick.hidden && !e.target.closest(".send")) set(false); });
+      document.addEventListener("pointerdown", function (e) { if (!pick.hidden && !e.target.closest(".send, .pick")) set(false); });
       // The big address opens the same menu.
       document.getElementById("mail").addEventListener("click", function (e) { e.preventDefault(); set(true, true); btn.scrollIntoView({block: "nearest"}); });
       // Copy from the menu.

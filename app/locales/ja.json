@@ -459,7 +459,6 @@
  "20a7366432": "hello@farmpartner.space にメールする",
  "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
  "c198c23b25": "NASA &amp; USDAのオープンデータで構築 · © 2026",
- "d40d479bd7": "<span class=\"miss\">メールアプリが開きませんでしたか？</span> こちらから送信： <a href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\">Gmail</a> · <a href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\">Outlook</a>",
  "f1127fb709": "衛星データや気象データを取得するため、畑の座標——または入力された地名——を公開サービス（NASA、USDA、Open‑Meteo）に送ります。番号や名前が送られることはありません。",
  "f1ca62a47d": "アドバイスを担う AI の Claude は、あなたのメッセージと畑のデータを受け取りますが、付いているのは郡や町の名前で、電話番号ではありません。農業の情報をウェブで検索するときも、あなたの情報は検索に含まれません。",
  "5c0038f031": "<b>STOP</b>と送れば、こちらから先にメッセージを送ることはなくなります。<b>RESET</b>と送れば、畑の情報と送った位置情報を消去します。ご連絡いただければ、すべて削除します。",
@@ -488,5 +487,10 @@
  "e71102d544": "あなたの権利",
  "b0c7e1fa92": "データの閲覧、訂正、ダウンロード、削除を求めたり、利用に異議を申し立てたりできます。ご連絡いただければ 1 か月以内にお返事します。スペイン個人データ保護庁（<a href=\"https://www.aepd.es\" target=\"_blank\" rel=\"noopener\">aepd.es</a>）に苦情を申し立てることもできます。",
  "7e60a7bf3b": "ヨーロッパ外への移転",
- "cf6a2dcc77": "Twilio、Anthropic、Google は米国企業のため、これらが受け取る情報（上記）は EU の外に出ます。各社は欧州ユーザー向けのデータ処理条件に基づいて扱っており、その条件には EU の標準契約条項が含まれています。"
+ "cf6a2dcc77": "Twilio、Anthropic、Google は米国企業のため、これらが受け取る情報（上記）は EU の外に出ます。各社は欧州ユーザー向けのデータ処理条件に基づいて扱っており、その条件には EU の標準契約条項が含まれています。",
+ "0962b7758d": "<a role=\"menuitem\" href=\"mailto:hello@farmpartner.space?subject=FarmPartner\"><span class=\"ic\" aria-hidden=\"true\">↗</span>メールアプリ</a>",
+ "05c3029084": "<span class=\"ic\" aria-hidden=\"true\">⧉</span>アドレスをコピー",
+ "1664a484ce": "コピーしました ✓",
+ "74fdd49abb": "<a role=\"menuitem\" href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Gmail</a>",
+ "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>"
 }

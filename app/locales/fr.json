@@ -459,7 +459,6 @@
  "20a7366432": "Écrire à hello@farmpartner.space",
  "a3677c4168": "FARMPARTNER · NASA SPACE APPS CHALLENGE 2026 · MIT",
  "c198c23b25": "CONSTRUIT SUR LES DONNÉES OUVERTES DE LA NASA &amp; DE L’USDA · © 2026",
- "d40d479bd7": "<span class=\"miss\">Aucune application de messagerie ne s’est ouverte ?</span> Écrivez depuis <a href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\">Gmail</a> · <a href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\">Outlook</a>",
  "f1127fb709": "Pour obtenir les données satellite et météo, nous envoyons les coordonnées du champ — ou le nom du lieu que vous tapez — à des services publics (NASA, USDA, Open‑Meteo). Ils ne reçoivent jamais votre numéro ni votre nom.",
  "f1ca62a47d": "Claude, l’IA derrière les conseils, reçoit vos messages et les données de votre champ, étiquetés avec le comté ou la commune — pas votre numéro de téléphone. Quand elle cherche des informations agricoles sur le web, la recherche ne contient jamais vos données.",
  "5c0038f031": "Envoyez <b>STOP</b> et nous ne vous écrirons plus en premier. Envoyez <b>RESET</b> pour effacer vos champs et les positions que vous avez envoyées. Écrivez-nous et nous supprimerons tout.",
@@ -488,5 +487,10 @@
  "e71102d544": "Vos droits",
  "b0c7e1fa92": "Vous pouvez demander à voir, corriger, télécharger ou supprimer vos données, ou vous opposer à leur utilisation. Écrivez-nous et nous répondons sous un mois. Vous pouvez aussi porter plainte auprès de l’Agence espagnole de protection des données (<a href=\"https://www.aepd.es\" target=\"_blank\" rel=\"noopener\">aepd.es</a>).",
  "7e60a7bf3b": "Hors d’Europe",
- "cf6a2dcc77": "Twilio, Anthropic et Google sont des entreprises américaines : ce qu’elles reçoivent (détaillé plus haut) quitte donc l’UE. Elles le traitent selon leurs conditions de traitement des données pour les utilisateurs européens, qui incluent les clauses contractuelles types de l’UE."
+ "cf6a2dcc77": "Twilio, Anthropic et Google sont des entreprises américaines : ce qu’elles reçoivent (détaillé plus haut) quitte donc l’UE. Elles le traitent selon leurs conditions de traitement des données pour les utilisateurs européens, qui incluent les clauses contractuelles types de l’UE.",
+ "0962b7758d": "<a role=\"menuitem\" href=\"mailto:hello@farmpartner.space?subject=FarmPartner\"><span class=\"ic\" aria-hidden=\"true\">↗</span>Application mail</a>",
+ "05c3029084": "<span class=\"ic\" aria-hidden=\"true\">⧉</span>Copier l’adresse",
+ "1664a484ce": "Copié ✓",
+ "74fdd49abb": "<a role=\"menuitem\" href=\"https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=hello@farmpartner.space&amp;su=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Gmail</a>",
+ "9227fb381d": "<a role=\"menuitem\" href=\"https://outlook.live.com/mail/0/deeplink/compose?to=hello@farmpartner.space&amp;subject=FarmPartner\" target=\"_blank\" rel=\"noopener\"><span class=\"ic\" aria-hidden=\"true\">✉</span>Outlook</a>"
 }
