@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact — FarmPartner</title>
+<meta name="description" content="Interested in FarmPartner? Write to the team at {{ email }}.">
+<meta property="og:title" content="Contact — FarmPartner">
+<meta property="og:image" content="/static/landing/hero.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&family=Silkscreen&family=Space+Grotesk:wght@600&display=swap" rel="stylesheet">
+<link rel="icon" href="/static/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/static/brand/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="/static/brand/apple-touch-icon.png">
+<link rel="stylesheet" href="/static/site.css">
+<style>
+  /* Page-specific styles; shared tokens, header, intro and CTA live in /static/site.css. */
+
+  /* ---------- Signal card: the e-mail, "transmitted" like a satellite downlink ---------- */
+  .signal { position: relative; isolation: isolate; overflow: hidden; padding: 72px 48px 56px; text-align: center;
+    border: 1px solid var(--line); background: #0d0d0f; }
+  /* Halftone field that slowly drifts, echoing the pixel-art illustrations. */
+  .signal::before { content: ""; position: absolute; inset: -14px; z-index: -2;
+    background: radial-gradient(#ffffff1f 1px, transparent 1.2px) 0 0 / 7px 7px;
+    -webkit-mask-image: radial-gradient(ellipse 60% 80% at 50% 50%, transparent 20%, #000 100%);
+            mask-image: radial-gradient(ellipse 60% 80% at 50% 50%, transparent 20%, #000 100%);
+    animation: drift 18s linear infinite; }
+  /* Scan line sweeping top to bottom. */
+  .signal::after { content: ""; position: absolute; inset: 0 0 auto 0; height: 120px; z-index: -1; pointer-events: none;
+    background: linear-gradient(180deg, #a8f32600 0%, #a8f32614 85%, #a8f32659 100%);
+    border-bottom: 1px solid #a8f32680; animation: scan 5.5s cubic-bezier(.45, 0, .55, 1) infinite; }
+  @keyframes drift { to { transform: translate(14px, 14px); } }
+  @keyframes scan { 0% { transform: translateY(-130px); } 100% { transform: translateY(560px); } }
+
+  /* Corner brackets, like a viewfinder locked on the target. */
+  .corner { position: absolute; width: 18px; height: 18px; border: 0 solid var(--lime); }
+  .corner.tl { top: 14px; left: 14px; border-top-width: 2px; border-left-width: 2px; }
+  .corner.tr { top: 14px; right: 14px; border-top-width: 2px; border-right-width: 2px; }
+  .corner.bl { bottom: 14px; left: 14px; border-bottom-width: 2px; border-left-width: 2px; }
+  .corner.br { bottom: 14px; right: 14px; border-bottom-width: 2px; border-right-width: 2px; }
+
+  /* Orbit: a satellite circling the envelope. */
+  .orbit { position: relative; width: 132px; height: 132px; margin: 0 auto 34px; }
+  .orbit .ring { position: absolute; inset: 0; border: 1px dashed var(--line-2); border-radius: 50%; animation: spin 14s linear infinite; }
+  .orbit .ring.inner { inset: 22px; border-style: solid; border-color: var(--line); animation-duration: 22s; animation-direction: reverse; }
+  .orbit .sat { position: absolute; inset: 0; animation: spin 6s linear infinite; }
+  .orbit .sat::before { content: ""; position: absolute; top: -5px; left: 50%; width: 10px; height: 10px; margin-left: -5px;
+    background: var(--lime); box-shadow: 0 0 0 4px #a8f32626, 0 0 18px #a8f326; }
+  .orbit .core { position: absolute; inset: 40px; display: grid; place-items: center; background: var(--lime); color: var(--bg);
+    animation: pulse 2.8s ease-in-out infinite; }
+  .orbit .core svg { width: 28px; height: 28px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 #a8f32666; } 50% { box-shadow: 0 0 0 14px #a8f32600; } }
+
+  .status { display: inline-flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); letter-spacing: .4px; }
+  .status i { width: 8px; height: 8px; background: var(--lime); animation: blink 1.4s steps(2, start) infinite; }
+  @keyframes blink { to { visibility: hidden; } }
+
+  .signal h2 { max-width: 640px; margin: 18px auto 0; font-size: 30px; font-weight: 500; line-height: 1.25; letter-spacing: -.5px; }
+
+  /* The e-mail itself, typed out like an incoming transmission. */
+  .mail { display: inline-flex; align-items: center; max-width: 100%; margin-top: 34px; padding: 6px 4px;
+    font-family: "Space Grotesk", var(--sans); font-size: 52px; font-weight: 600; letter-spacing: -1.2px; color: var(--ink);
+    overflow-wrap: anywhere; background: linear-gradient(var(--lime), var(--lime)) 0 100% / 0 3px no-repeat;
+    transition: background-size .45s ease, color .25s; }
+  .mail:hover, .mail:focus-visible { color: var(--lime); background-size: 100% 3px; outline: none; }
+  .mail .cursor { display: inline-block; width: .5em; height: .9em; margin-left: 6px; background: var(--lime);
+    animation: blink 1s steps(2, start) infinite; }
+  .mail.done .cursor { animation-duration: 1.2s; }
+
+  .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 34px; }
+  .actions .btn { padding: 15px 20px; }
+  .actions .ghost { cursor: pointer; transition: border-color .2s, color .2s; }
+  .actions .ghost.ok { border-color: var(--lime); color: var(--lime); }
+
+  /* ---------- Who should write: three cards that rise in one after another ---------- */
+  .who { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 48px; padding: 0; list-style: none;
+    background: var(--line); border: 1px solid var(--line); }
+  .who li { display: flex; flex-direction: column; gap: 12px; padding: 28px 26px 30px; background: var(--bg);
+    transition: background .3s; opacity: 0; transform: translateY(18px); animation: rise .7s ease forwards; }
+  .who li:nth-child(2) { animation-delay: .15s; }
+  .who li:nth-child(3) { animation-delay: .3s; }
+  .who li:hover { background: #111113; }
+  .who .tag { font-family: var(--mono); font-size: 12px; color: var(--lime); letter-spacing: .4px; }
+  .who h3 { font-size: 22px; font-weight: 500; letter-spacing: -.4px; }
+  .who p { font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+
+  .note { margin-top: 24px; font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); text-align: center; }
+
+  @media (max-width: 800px) {
+    .signal { padding: 52px 18px 40px; }
+    .orbit { width: 104px; height: 104px; margin-bottom: 26px; }
+    .orbit .ring.inner { inset: 18px; }
+    .orbit .core { inset: 32px; }
+    .orbit .core svg { width: 22px; height: 22px; }
+    .signal h2 { font-size: 22px; }
+    .mail { font-size: 26px; letter-spacing: -.5px; }
+    .actions { flex-direction: column; }
+    .actions .btn, .actions .ghost { justify-content: center; }
+    .who { grid-template-columns: 1fr; margin-top: 32px; }
+    .who li { padding: 22px 18px 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .who li { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+  {% include "_header.html" %}
+
+  <section class="intro">
+    <p class="kicker">● CONTACT · OPEN CHANNEL</p>
+    <h1>Let’s grow this together.</h1>
+    <p class="lead">Like where FarmPartner is heading? Whether you farm, research, invest or just want to build something useful with open NASA data, we’d love to hear from you.</p>
+  </section>
+
+  <main class="wrap">
+    <section class="signal" aria-labelledby="signal-title">
+      <span class="corner tl" aria-hidden="true"></span><span class="corner tr" aria-hidden="true"></span>
+      <span class="corner bl" aria-hidden="true"></span><span class="corner br" aria-hidden="true"></span>
+
+      <div class="orbit" aria-hidden="true">
+        <span class="ring"></span><span class="ring inner"></span><span class="sat"></span>
+        <span class="core">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><rect x="3" y="5" width="18" height="14"/><path d="m3 6 9 7 9-7"/></svg>
+        </span>
+      </div>
+
+      <p class="status"><i aria-hidden="true"></i>SIGNAL OPEN · WRITE TO THE TEAM</p>
+      <h2 id="signal-title">Interested in the project? Drop us a line.</h2>
+
+      <a class="mail" id="mail" href="mailto:{{ email }}?subject=FarmPartner" aria-label="Email {{ email }}"><span class="txt">{{ email }}</span><span class="cursor" aria-hidden="true"></span></a>
+
+      <div class="actions">
+        <a class="btn" href="mailto:{{ email }}?subject=FarmPartner">SEND US AN EMAIL →</a>
+        <button class="ghost" type="button" id="copy" data-email="{{ email }}" data-i18n-copied="COPIED ✓">COPY ADDRESS</button>
+      </div>
+    </section>
+
+    <ul class="who">
+      <li><span class="tag">01 · FARMERS</span><h3>Test it on your land</h3><p>Tell us what works, what doesn’t and what you wish it could see. Your field is our best ground truth.</p></li>
+      <li><span class="tag">02 · RESEARCHERS</span><h3>Bring your data</h3><p>Agronomy, remote sensing, extension services: help us sharpen the science behind every recommendation.</p></li>
+      <li><span class="tag">03 · PARTNERS</span><h3>Scale it with us</h3><p>Co-ops, NGOs, companies and investors who want to take FarmPartner to more farms and more countries.</p></li>
+    </ul>
+
+    <p class="note">■ No forms, no newsletters. Just an e-mail to real people.</p>
+  </main>
+
+  {% include "_cta_footer.html" %}
+
+  <script>
+    // Type the address out like an incoming transmission. The full address is in the HTML, so it works without JS.
+    (function () {
+      var txt = document.querySelector("#mail .txt"), mail = document.getElementById("mail");
+      var full = txt.textContent, i = 0;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { mail.classList.add("done"); return; }
+      txt.textContent = "";
+      (function type() {
+        txt.textContent = full.slice(0, ++i);
+        if (i < full.length) setTimeout(type, 45 + Math.random() * 55);
+        else mail.classList.add("done");
+      })();
+    })();
+
+    // Copy the address to the clipboard.
+    document.getElementById("copy").addEventListener("click", function () {
+      var b = this, email = b.dataset.email, label = b.textContent;
+      var done = function () { b.textContent = b.dataset.i18nCopied; b.classList.add("ok");
+        setTimeout(function () { b.textContent = label; b.classList.remove("ok"); }, 2000); };
+      if (navigator.clipboard) navigator.clipboard.writeText(email).then(done, function () {});
+    });
+  </script>
+</body>
+</html>

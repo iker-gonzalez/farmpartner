@@ -11,7 +11,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from sqlalchemy import select
 
-from app import chat, config, i18n, landing, media, messaging, ratelimit, report_view, service, sources, team, voice
+from app import chat, config, i18n, landing, site_i18n, media, messaging, ratelimit, report_view, service, sources, team, voice
 from app.prompts import as_text, is_prompt
 from app.db import Farmer, Field, init_db, session
 from app.engine.explain import DISCLAIMER, SCORE_LABELS, evidence, gaps, inch, short_name
@@ -23,6 +23,25 @@ log = logging.getLogger("farmpartner")
 app = FastAPI(title="FarmPartner")
 templates = Jinja2Templates(directory=str(config.ROOT / "app" / "templates"))
 app.mount("/static", StaticFiles(directory=str(config.ROOT / "app" / "static")), name="static")
+
+
+@app.middleware("http")
+async def _site_language(request: Request, call_next):
+    """Public pages: serve them in the visitor's language (?lang= or the fp_lang cookie; English by default)."""
+    if request.method != "GET" or request.url.path not in site_i18n.PAGES:
+        return await call_next(request)
+    lang = site_i18n.pick(request)
+    request.state.lang = lang
+    resp = await call_next(request)
+    if resp.status_code == 200 and resp.headers.get("content-type", "").startswith("text/html"):
+        body = b"".join([chunk async for chunk in resp.body_iterator]).decode()
+        headers = {k: v for k, v in resp.headers.items() if k.lower() != "content-length"}
+        resp = HTMLResponse(site_i18n.localize(body, lang), status_code=200, headers=headers)
+        resp.headers["Vary"] = "Cookie"
+    if request.query_params.get("lang") in site_i18n.LANGS:
+        resp.set_cookie(site_i18n.COOKIE, lang, max_age=365 * 24 * 3600, samesite="lax")
+    return resp
+
 init_db()
 
 
@@ -343,7 +362,7 @@ def _site_ctx() -> dict:
     """Values shared by the public pages (landing and What & How)."""
     return {"repo": landing.REPO_URL, "whatsapp": landing.whatsapp_url(), "wa": landing.whatsapp_copy(),
             "sprout_path": landing.SPROUT_PATH, "whatsapp_path": landing.WHATSAPP_PATH,
-            "video_id": landing.VIDEO_ID, "langs": _lang_counts()}
+            "video_id": landing.VIDEO_ID, "langs": _lang_counts(), "site_langs": site_i18n.LANGS}
 
 
 def _lang_counts() -> dict:
@@ -381,6 +400,16 @@ def data_short():
 @app.get("/team", response_class=HTMLResponse)
 def team_page(request: Request):
     return templates.TemplateResponse(request, "team.html", {**_site_ctx(), "active": "team", "team": team.members()})
+
+
+@app.get("/contact", response_class=HTMLResponse)
+def contact_page(request: Request):
+    return templates.TemplateResponse(request, "contact.html", {**_site_ctx(), "active": "contact", "email": landing.CONTACT_EMAIL})
+
+
+@app.get("/privacy", response_class=HTMLResponse)
+def privacy_page(request: Request):
+    return templates.TemplateResponse(request, "privacy.html", {**_site_ctx(), "active": "privacy", "email": landing.CONTACT_EMAIL})
 
 
 @app.get("/chat", response_class=HTMLResponse)

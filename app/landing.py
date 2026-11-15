@@ -5,6 +5,7 @@ import re
 from app import config
 
 REPO_URL = "https://github.com/iker-gonzalez/farmpartner"
+CONTACT_EMAIL = "info@experienciatek.com"
 # Explainer video on the landing page. Placeholder until our own video is ready: swap the YouTube ID here.
 VIDEO_ID = "5l-_0LwnpSo"
 SAMPLE_PHONE = "sample:garden-city"  # reserved: /api/chat always prefixes "web:", so visitors can't touch it
