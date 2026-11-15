@@ -256,3 +256,17 @@ def test_coordinates_with_words_and_reply_read_in_its_own_language():
     assert location_from_text("we got 1.5, 2.0 inches of rain") is None
     assert _spoken_lang("قارنتُ دورتك الزراعية مع بدائل تناسب مناخ حقلك", "es") == "ar"
     assert _spoken_lang("ok", "es") == "es"
+
+
+def test_questions_are_not_places_and_ha_is_not_hectares(offline, monkeypatch):
+    """From a live chat: "Quién soy?" was geocoded to Quien Sabe (Chiapas); "se me ha olvidado" switched to metric."""
+    from app import onboarding, units
+    assert units.asked("Me dices mi número de teléfono que se me ha olvidado") is None
+    assert units.asked("en hectáreas por favor") == "metric"
+    called = []
+    monkeypatch.setattr(onboarding, "place_to_point", lambda t, *a: called.append(t) or (16.0, -92.0, "Quien Sabe, MX"))
+    c = _client()
+    say = lambda t: c.post("/api/chat", json={"phone": "q1", "text": t, "wait": True}).json()["messages"]  # noqa: E731
+    say("hi")
+    out = say("Quién soy?")
+    assert called == [] and not any("NASA" in m and "Quien Sabe" in m for m in out)

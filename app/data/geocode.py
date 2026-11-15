@@ -39,7 +39,8 @@ STOPWORDS = {"i", "im", "live", "living", "my", "our", "we", "farm", "field", "i
              "mon", "je", "suis", "habite", "près", "pres", "minha", "meu", "fazenda", "moro", "ich", "wohne", "bei",
              "hello", "hi", "hey", "hola", "buenas", "kaixo", "ola", "bonjour", "ciao", "hallo", "thanks", "thank",
              "you", "gracias", "ok", "okay", "yes", "no", "si", "sí", "bai", "ez", "please", "porfa", "vale", "good",
-             "morning", "afternoon", "dias", "días", "tardes", "what", "how", "que", "qué", "como", "cómo"}
+             "morning", "afternoon", "dias", "días", "tardes", "what", "how", "que", "qué", "como", "cómo",
+             "who", "where", "which", "why", "quien", "quién", "donde", "dónde", "cual", "cuál", "sabe", "se", "sé"}
 
 
 def _plain(x: str) -> str:

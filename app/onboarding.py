@@ -351,7 +351,7 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
             return _set_location(farmer, z[0], z[1], z[2])
         if low.strip("!.¡ ") in GREETINGS:
             return Reply(now=[WELCOME])
-        if re.search(r"[^\W\d_]{3}", t):
+        if re.search(r"[^\W\d_]{3}", t) and not re.search(r"[?¿؟？]", t):  # a question is never a place name
             try:
                 pl = place_to_point(t, farmer.language)
             except Exception:

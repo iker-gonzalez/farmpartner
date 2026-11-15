@@ -4,7 +4,7 @@ import re
 
 _NUM = r"([-+]?\d+(?:\.\d+)?)"
 METRIC_ASK = re.compile(r"(°\s?c\b|celsius|centígrad|metric|métric|\bmm\b|mil[ií]metros|litros|liters|litres|"
-                        r"\bl/yr\b|hect[aá]reas?|\bha\b)", re.I)
+                        r"\bl/yr\b|hect[aá]reas?)", re.I)  # not bare "ha": "se me ha olvidado" is not hectares
 IMPERIAL_ASK = re.compile(r"(°\s?f\b|fahrenheit|imperial|inches|pulgadas|acres)", re.I)
 
 
