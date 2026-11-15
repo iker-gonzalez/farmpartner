@@ -332,6 +332,8 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
         return Reply(now=[WELCOME])
 
     state = farmer.state
+    if state in RESUMABLE and low.strip("!.¡ ") in GREETINGS:
+        return Reply(now=[WELCOME_BACK] + _resume_step(farmer))  # a greeting is not an answer to the pending question
     if state == "new":
         with session() as db:
             db.get(Farmer, farmer.id).state = "awaiting_location"
@@ -520,6 +522,21 @@ def _compare(farmer: Farmer, priorities: list[str], note: str | None = None, ack
                  later=later)
 
 
+RESUMABLE = ("awaiting_crops", "awaiting_irrigation", "awaiting_priority", "awaiting_more_goals", "awaiting_goal_text")
+WELCOME_BACK = "👋 Welcome back! Let's pick up where we left off."
+
+
+def _resume_step(farmer: Farmer) -> list:
+    """The question we were waiting on, asked again in full (with its buttons) when the farmer comes back."""
+    if farmer.state == "awaiting_crops":
+        with session() as db:
+            fld = service.main_field(db.get(Farmer, farmer.id))
+            rot = ((fld.features or {}).get("rotation") or {}) if fld else {}
+            if fld and rot.get("is_cropland") and fld.current_rotation:
+                return [f"Satellite crop maps suggest *{rotation_label(fld.current_rotation)}* on your field.", CROPS_PROMPT]
+    return current_step(farmer)
+
+
 def current_step(farmer: Farmer) -> list:
     """Repeat what we're waiting for (used after a language switch)."""
     return {"new": [WELCOME], "awaiting_location": [WELCOME.split("\n\n")[-1]],
@@ -590,7 +607,7 @@ def static_messages() -> list:
     """FarmPartner's fixed messages (for translation prewarm)."""
     return [WELCOME, HELP, PRIORITY_PROMPT, CROPS_PROMPT, IRRIGATION_PROMPT, NEXT_PROMPT, GOAL_TEXT_PROMPT,
             WELCOME.split("\n\n")[-1],
-            RESTART, NEED_LOCATION,
+            RESTART, NEED_LOCATION, WELCOME_BACK,
             "📡 Got your pin! Checking it's on a field and pulling 20 years of NASA satellite & weather data for it — "
             "about 30 seconds…",
             "🧮 Scoring rotations against your field's climate, soil and goals…",

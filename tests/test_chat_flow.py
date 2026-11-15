@@ -295,3 +295,14 @@ def test_pages_use_self_hosted_fonts(offline):
         assert r.status_code == 200 and "fonts.googleapis" not in r.text and "fonts.gstatic" not in r.text, path
     css = c.get("/static/fonts/fonts.css")
     assert css.status_code == 200 and "fonts.gstatic" not in css.text and "/static/fonts/" in css.text
+
+
+def test_greeting_mid_setup_resumes_the_pending_step(offline):
+    c = _client()
+    say(c, "back", text="hi")
+    say(c, "back", lat=38.05, lon=-100.75)
+    msgs = say(c, "back", text="hi")  # a greeting is not an answer to "is that your rotation?"
+    assert "Welcome back" in msgs[0] and "Winter wheat → Grain sorghum → Fallow" in msgs[1] and "Step 2 of 3" in msgs[-1]
+    assert "Save water" in "\n".join(say(c, "back", text="yes it's dryland"))
+    msgs = say(c, "back", text="hello!")
+    assert "Welcome back" in msgs[0] and "Step 3 of 3" in msgs[-1]

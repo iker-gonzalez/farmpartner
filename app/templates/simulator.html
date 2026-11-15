@@ -196,11 +196,20 @@
   let phone = localStorage.fpPhone || (localStorage.fpPhone = newId());
   let lastSide = null, waiting = 0, lastReport = null;
 
+  // ---------- history: the conversation is kept in this browser, so coming back shows it again ----------
+  let hist = (() => { try { const h = JSON.parse(localStorage.fpLog || 'null'); return h && h.phone === phone ? h.items : []; } catch (e) { return []; } })();
+  let replaying = false, stamp = null;
+  function remember(item) {
+    if (replaying) return;
+    hist.push({...item, ts: Date.now()}); if (hist.length > 150) hist = hist.slice(-150);
+    try { localStorage.fpLog = JSON.stringify({phone, items: hist}); } catch (e) { /* storage full or blocked: no history */ }
+  }
+
   // ---------- rendering ----------
   const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const fmt = s => esc(s).replace(/\*([^*\n]+)\*/g, '<b>$1</b>').replace(/(^|\s)_([^_\n]+)_(?=\s|$)/g, '$1<i>$2</i>')
     .replace(/(^|\s)~(\S[^~\n]*?\S)~(?=\s|$|[.,!?])/g, '$1<s>$2</s>').replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
-  const now = () => new Date().toLocaleTimeString(LOCALE, {hour: 'numeric', minute: '2-digit'});
+  const now = () => new Date(stamp || Date.now()).toLocaleTimeString(LOCALE, {hour: 'numeric', minute: '2-digit'});
   const scroll = () => requestAnimationFrame(() => log.scrollTop = log.scrollHeight);
   function bubble(side, html, cls = '') {
     const d = document.createElement('div');
@@ -261,12 +270,13 @@
   }
 
   function render(j) {
+    if ((j.messages || []).length || (j.audio || []).length) remember({k: 'in', m: j.messages, a: j.actions, au: j.audio});
     (j.messages || []).forEach((m, i) => {
       const a = (j.actions || [])[i];
       if (a) choices(a);
       else text('in', m, /^🎙️ /.test(m) && /[“"]/.test(m) ? 'heard' : '');
     });
-    (j.audio || []).forEach(src => voiceNote('in', src, true));
+    (j.audio || []).forEach(src => voiceNote('in', src, !replaying));
   }
 
   // ---------- typing indicator ----------
@@ -285,6 +295,7 @@
   // ---------- talking to the backend ----------
   async function call(url, body) {
     phone = localStorage.fpPhone || phone;
+    log.querySelectorAll('.qr:not(.used)').forEach(b => b.classList.add('used'));  // an answered question's buttons go quiet
     typing(true);
     try {
       const r = await fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'},
@@ -304,12 +315,15 @@
       if (!j.pending) return;
     }
   }
-  function send(body, label) { if (label) text('out', label); return call('/api/chat', body); }
+  function send(body, label) { if (label) { text('out', label); remember({k: 'out', s: label}); } return call('/api/chat', body); }
   function pin(lat, lon, name) {
+    pinBubble(lat, lon, name); remember({k: 'pin', lat, lon, name});
+    return call('/api/chat', {lat, lon, text: ''});
+  }
+  function pinBubble(lat, lon, name) {
     const z = 12, n = 2 ** z, x = Math.floor((lon + 180) / 360 * n);
     const y = Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * n);
     bubble('out', `<div class="map" style="background-image:url(https://tile.openstreetmap.org/${z}/${x}/${y}.png)"></div><div class="cap">${esc(name)}</div>`, 'media');
-    return call('/api/chat', {lat, lon, text: ''});
   }
 
   // ---------- composer: text ⇄ mic ----------
@@ -349,7 +363,7 @@
     $('field').hidden = false; $('rec').hidden = true; syncFab();
     if (!sendIt || Date.now() - r.t0 < 700) return;
     const wav = toWav(r.chunks, rate, 16000);
-    voiceNote('out', URL.createObjectURL(wav), false);
+    voiceNote('out', URL.createObjectURL(wav), false); remember({k: 'note', s: '🎙️ Voice note'});
     wav.arrayBuffer().then(buf => call('/api/media', {kind: 'audio', data: b64(buf), content_type: 'audio/wav'}));
   }
   $('recCancel').onclick = () => rec && stopRec(false);
@@ -382,6 +396,7 @@
     const url = c.toDataURL('image/jpeg', 0.85), caption = t.value.trim();
     t.value = ''; syncFab();
     bubble('out', `<img class="ph" src="${url}" alt="">${caption ? `<div class="cap">${fmt(caption)}</div>` : ''}`, 'media');
+    remember({k: 'note', s: '📷 Photo' + (caption ? ' — ' + caption : '')});
     call('/api/media', {kind: 'image', data: url.split(',')[1], content_type: 'image/jpeg', caption});
   }
   $('gallery').onchange = e => { sendPhoto(e.target.files[0]); e.target.value = ''; };
@@ -462,10 +477,38 @@
   };
 
   // ---------- start ----------
-  chip('TODAY');
-  chip('🔒 Demo in your browser — same FarmPartner as on WhatsApp. Type, send a 🎙️ voice note or a 📷 crop photo, '
-       + 'and share a 📍 location with the 📎 button. Say "hi" to start.', true);
   const zip = new URLSearchParams(location.search).get('zip');
+  if (zip) hist = [];
+  const dayOf = ts => new Date(ts).toDateString();
+  if (hist.length) {  // coming back: show the earlier conversation, then pick up anything the bot sent meanwhile
+    let day = null; replaying = true;
+    hist.forEach(it => {
+      if (dayOf(it.ts) !== day) {
+        day = dayOf(it.ts);
+        chip(day === dayOf(Date.now()) ? 'TODAY' : new Date(it.ts).toLocaleDateString(LOCALE, {day: 'numeric', month: 'long', year: 'numeric'}).toUpperCase());
+      }
+      log.querySelectorAll('.qr:not(.used)').forEach(b => b.classList.add('used'));  // only the last question stays tappable
+      stamp = it.ts;
+      if (it.k === 'out') text('out', it.s);
+      else if (it.k === 'note') bubble('out', `<i>${esc(it.s)}</i>`);
+      else if (it.k === 'pin') pinBubble(it.lat, it.lon, it.name);
+      else if (it.k === 'in') render({messages: it.m, actions: it.a, audio: it.au});
+    });
+    stamp = null; replaying = false; lastSide = null;
+    if (day !== dayOf(Date.now())) chip('TODAY');
+    chip('↩ Continuing your earlier chat. To start fresh: ⋮ → New farmer.', true);
+    (async () => {
+      try {
+        const j = await (await fetch('/api/poll?phone=' + encodeURIComponent(phone))).json();
+        render(j);
+        if (j.pending) { typing(true); try { await poll(); } finally { typing(false); } }
+      } catch (e) { /* offline: the saved chat is still shown */ }
+    })();
+  } else {
+    chip('TODAY');
+    chip('🔒 Demo in your browser — same FarmPartner as on WhatsApp. Type, send a 🎙️ voice note or a 📷 crop photo, '
+         + 'and share a 📍 location with the 📎 button. Say "hi" to start.', true);
+  }
   if (zip) {
     localStorage.fpPhone = phone = newId();
     history.replaceState(null, '', '/chat');
