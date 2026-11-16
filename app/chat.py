@@ -166,7 +166,7 @@ def _set_voice(farmer, on: bool) -> None:
         farmer.constraints = fm.constraints
 
 
-def apply_locale(phone: str, channel: str, lang: str | None, unit: str | None) -> None:
+def apply_locale(phone: str, channel: str, lang: str | None, unit: str | None, country: str | None = None) -> None:
     """First visit from a browser: start in the browser's language and units. Once only, never over a choice."""
     from app.db import Farmer
     with session() as db:
@@ -178,6 +178,8 @@ def apply_locale(phone: str, channel: str, lang: str | None, unit: str | None) -
             fm.language = lang
         if unit in ("metric", "imperial") and "units" not in c:
             c["units"] = unit
+        if country:
+            c["country"] = country.lower()  # where a typed postal code is looked up first
         c["locale_set"] = True
         fm.constraints = c
         db.commit()

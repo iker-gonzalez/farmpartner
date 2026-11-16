@@ -21,16 +21,48 @@ def phone_country(phone: str | None) -> str:
     return "us"
 
 
-def zip_to_point(text: str, country: str = "us") -> tuple[float, float, str] | None:
-    m = re.search(r"\b(\d{5})\b" if country == "us" else r"\b(\d{4,5})\b", text or "")
-    if not m:
+# Farmer's language → countries whose postal codes to try (Zippopotam covers these), most likely first.
+LANG_COUNTRIES = {"en": ["us"], "es": ["es", "mx", "ar"], "eu": ["es"], "ca": ["es"], "gl": ["es"], "fr": ["fr", "be", "ch"],
+                  "de": ["de", "at", "ch"], "it": ["it"], "tr": ["tr"], "hi": ["in"], "bn": ["in", "bd"], "ru": ["ru"],
+                  "nl": ["nl", "be"], "pl": ["pl"], "pt": ["br", "pt"], "ja": ["jp"]}
+# Digits-only postal code lengths per country (the rest use 5, or 4 or 5).
+CODE_LEN = {"us": (5,), "es": (5,), "mx": (5,), "fr": (5,), "de": (5,), "it": (5,), "tr": (5,), "in": (6,), "ru": (6,),
+            "ar": (4,), "be": (4,), "ch": (4,), "at": (4,), "bd": (4,), "au": (4,), "nz": (4,), "za": (4,), "dk": (4,),
+            "no": (4,), "hu": (4,), "nl": (4,), "ph": (4,)}
+
+
+POSTAL_WORDS = re.compile(r"\b(zip( ?code)?|post(al)? ?code|postcode|c[oó]digo postal|cp|c\.p\.|code postal|plz|postleitzahl|"
+                          r"cap|posta kodu?|my|mi|is|es|el|the|est|ist)\b", re.I)
+
+
+def postcode_countries(phone: str | None, lang: str | None = None, country: str | None = None) -> list[str]:
+    """Where a typed postal code may be, most likely first: the phone's country (WhatsApp/SMS), the browser's
+    region (web chat), the countries of the farmer's language, then the U.S."""
+    out = [phone_country(phone)] if "+" in (phone or "") else []
+    out += [(country or "").lower()] if country else []
+    out += LANG_COUNTRIES.get(lang or "", [])
+    return list(dict.fromkeys(c for c in out + ["us"] if re.fullmatch(r"[a-z]{2}", c)))
+
+
+def zip_to_point(text: str, country: str | list[str] = "us") -> tuple[float, float, str] | None:
+    """A postal code in the message → (lat, lon, label). Tries each country in turn; the first that knows it wins."""
+    text = text or ""
+    # "01409", "vivo en 01409", "my zip is 67846" — but not "tengo 15000 olivos": a number among other words is not a code.
+    rest = FILLER.sub(" ", POSTAL_WORDS.sub(" ", re.sub(r"\d+", " ", text)))
+    if re.search(r"[^\W_]", rest) and not POSTAL_WORDS.search(text):
         return None
-    try:
-        d = get_json(f"https://api.zippopotam.us/{country}/{m.group(1)}", ttl_s=0)
-    except Exception:
-        return None
-    p = d["places"][0]
-    return float(p["latitude"]), float(p["longitude"]), f"{p['place name']}, {p['state abbreviation'] or p['state']}"
+    for cc in [country] if isinstance(country, str) else country:
+        m = next((m for n in CODE_LEN.get(cc, (5, 4)) for m in [re.search(rf"(?<!\d)(\d{{{n}}})(?!\d)", text or "")] if m), None)
+        if not m:
+            continue
+        try:
+            d = get_json(f"https://api.zippopotam.us/{cc}/{m.group(1)}", ttl_s=0)
+            p = d["places"][0]
+        except Exception:
+            continue
+        label = f"{p['place name']}, {p['state abbreviation'] or p['state']}"
+        return float(p["latitude"]), float(p["longitude"]), label if cc == "us" else f"{label}, {cc.upper()}"
+    return None
 
 
 STOPWORDS = {"i", "im", "live", "living", "my", "our", "we", "farm", "field", "is", "am", "are", "the", "a", "at",

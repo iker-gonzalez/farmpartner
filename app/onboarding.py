@@ -11,7 +11,7 @@ from typing import Callable
 from app import service
 from app.privacy import scrub
 from app.data import landcheck
-from app.data.geocode import county_name, phone_country, place_to_point, zip_to_point
+from app.data.geocode import county_name, place_to_point, postcode_countries, zip_to_point
 from app.db import Farmer, Field, Message, now, session
 from app.engine import explain as ex
 from app.engine.features import crop_name, rotation_label
@@ -174,6 +174,10 @@ def _approximate(farmer: Farmer, pl) -> "Reply":
     return r
 
 
+def _postcode_countries(farmer: Farmer) -> list[str]:
+    return postcode_countries(farmer.phone, farmer.language, (farmer.constraints or {}).get("country"))
+
+
 def _place_point(farmer: Farmer, text: str):
     name = place_in_text(text)
     if not name:
@@ -314,7 +318,7 @@ REPIN = ("🤔 That pin looks like {what}, not a farm field. Please put the pin 
 
 RESTART = "🔄 Starting over.\n\n📍 *Step 1 of 3:* send your field location (or text your ZIP code).\n" + PIN_HOWTO
 NEED_LOCATION = ("I need your field's location to look it up.\n" + PIN_HOWTO + "\n"
-                 "You can also type coordinates (e.g. 38.05, -100.75) or text a U.S. ZIP code.")
+                 "You can also type coordinates (e.g. 38.05, -100.75) or text your postal code.")
 
 
 def _set_location(farmer: Farmer, lat: float, lon: float, place: str | None) -> Reply:
@@ -381,7 +385,7 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
         with session() as db:
             db.get(Farmer, farmer.id).state = "awaiting_location"
             db.commit()
-        if lat is not None or zip_to_point(t, phone_country(farmer.phone)):
+        if lat is not None or zip_to_point(t, _postcode_countries(farmer)):
             farmer.state = "awaiting_location"
             return handle(farmer, text, lat, lon)
         if len(t.split()) >= 3 and low.strip("!.¡ ") not in GREETINGS:  # "my garden is in Alesanco": don't make them repeat it
@@ -396,7 +400,7 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
     if state == "awaiting_location":
         if lat is not None and lon is not None:
             return _set_location(farmer, lat, lon, None)
-        z = zip_to_point(t, phone_country(farmer.phone))
+        z = zip_to_point(t, _postcode_countries(farmer))
         if z:
             return _set_location(farmer, z[0], z[1], z[2])
         if low.strip("!.¡ ") in GREETINGS:
@@ -405,7 +409,7 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
         if pl:
             return _approximate(farmer, pl)
         if re.fullmatch(r"\d{3,6}", t.replace(" ", "")):
-            return Reply(now=[f"I couldn't find ZIP code {t} — ZIP codes only work in the U.S. Anywhere else, send a "
+            return Reply(now=[f"I couldn't find the postal code {t}. Type the name of your town instead, send a "
                               "pin (📎 → Location), paste a Google Maps link, or type coordinates like 41.39, 2.17."])
         if len(t.split()) >= 3 and re.search(r"[^\W\d_]{3}", t):
             return Reply(to_agent=True)  # a remark or request, not a location: Claude answers, then we ask again

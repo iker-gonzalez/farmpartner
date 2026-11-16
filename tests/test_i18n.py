@@ -61,7 +61,7 @@ def test_more_languages_units_and_location_hints(offline):
     c = TestClient(app)
     say = lambda p, **kw: c.post("/api/chat", json={"phone": p, **kw}).json()["messages"]  # noqa: E731
     say("u1", text="hi")
-    assert "ZIP codes only work in the U.S." in say("u1", text="96000")[0]
+    assert "couldn't find the postal code 96000" in say("u1", text="96000")[0]
     assert "Google Maps" in say("u1", text="where?")[0]
     assert "Step 1 of 3" in say("u1", text="Hi")[0]                      # a greeting re-shows the welcome
     out = say("u1", text="I want the information in °C and mm")
@@ -249,3 +249,25 @@ def test_per_year_unit_is_localised():
     assert _per_year("Lluvia: ~437 mm/yr frente a ~1156 mm/yr. Días >35°C: 19/yr", "es") == \
         "Lluvia: ~437 mm/año frente a ~1156 mm/año. Días >35°C: 19/año"
     assert _per_year("Rain: ~21.5 in/yr", "en") == "Rain: ~21.5 in/yr"
+
+
+def test_postcodes_outside_the_us(monkeypatch):
+    """A Spanish browser visitor typed "01409" and was told postal codes only work in the U.S."""
+    from app.data import geocode
+    known = {"es/01409": ("San Roman", "PV", 42.87, -2.3), "us/67846": ("Garden City", "KS", 37.97, -100.87)}
+
+    def fake(url, *a, **k):
+        name, st, lat, lon = known[url.split("zippopotam.us/")[1]]  # KeyError = unknown code, like the real 404
+        return {"places": [{"place name": name, "state abbreviation": st, "state": st, "latitude": str(lat), "longitude": str(lon)}]}
+    monkeypatch.setattr(geocode, "get_json", fake)
+    assert geocode.postcode_countries("web:abc", "es") == ["es", "mx", "ar", "us"]
+    assert geocode.postcode_countries("web:abc", "en", "ES")[0] == "es"          # browser region first
+    assert geocode.postcode_countries("whatsapp:+34666000000", "en")[0] == "es"  # phone country first
+    web_es = geocode.postcode_countries("web:abc", "es")
+    assert geocode.zip_to_point("01409", web_es)[2] == "San Roman, PV, ES"
+    assert geocode.zip_to_point("vivo en 01409", web_es)[:2] == (42.87, -2.3)
+    assert geocode.zip_to_point("mi código postal es 01409", web_es)
+    assert geocode.zip_to_point("67846", web_es)[2] == "Garden City, KS"         # falls through to the U.S.
+    assert geocode.zip_to_point("my zip is 67846") and geocode.zip_to_point("I'm in 67846")
+    assert geocode.zip_to_point("tengo 01409 olivos", web_es) is None            # a number among words is not a code
+    assert geocode.zip_to_point("99999", web_es) is None
