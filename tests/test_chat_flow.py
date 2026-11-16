@@ -359,3 +359,21 @@ def test_fixes_from_the_audience_stress_test(offline, monkeypatch):
     _web_locale("web:st4", "es")
     with session() as db:
         assert db.query(Farmer).filter_by(phone="web:st4").one().constraints["units"] == "metric"
+
+
+def test_long_messages_split_between_lines_never_inside_a_link(hastings):
+    """WhatsApp showed 'https://fa' / 'rmpartner.space/r/…': the comparison was cut at exactly 1,500 characters."""
+    from app.engine.explain import chat_summary, explain
+    from app.engine.scoring import compare
+    from app.messaging import MAX_SMS, split_message
+    link = "https://farmpartner.space/r/cvzfp7SuBxR7"
+    body = chat_summary(explain(compare(hastings, ["forage"], irrigated=True), hastings), link)
+    for filler in range(0, 1400, 7):                       # slide the link across the 1,500-character boundary
+        text = "x" * 3 + " word" * (filler // 5) + "\n" + body
+        parts = split_message(text)
+        assert all(len(p) <= MAX_SMS for p in parts) and sum(link in p for p in parts) == text.count(link)
+        assert "".join(parts).replace("\n", "").replace(" ", "") == text.replace("\n", "").replace(" ", "")
+    assert split_message("short") == ["short"]
+    long_bold = "intro line\n" + "a" * 900 + "\n*Option 2: something*\n" + "b" * 900
+    assert split_message(long_bold)[1].startswith("*Option 2")
+    assert [len(p) for p in split_message("z" * 3200)] == [1500, 1500, 200]

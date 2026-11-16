@@ -23,6 +23,26 @@ _content_sids: dict[str, str] = {}
 _approval = {"status": None, "checked": 0.0}
 
 
+def split_message(body: str, limit: int = MAX_SMS) -> list[str]:
+    """Split a long message for Twilio without ever cutting a word or a link in half: break before a section
+    heading (a line starting with *bold*) when one is in reach, else at a line break, else at a space."""
+    parts, rest = [], body
+    while len(rest) > limit:
+        window = rest[:limit + 1]
+        cut = window.rfind("\n*")
+        if cut < limit // 2:
+            cut = window.rfind("\n")
+        if cut < limit // 4:
+            cut = window.rfind(" ")
+        if cut <= 0:
+            cut = limit          # one unbroken run longer than the limit: nothing better to do
+        parts.append(rest[:cut].rstrip())
+        rest = rest[cut:].lstrip("\n ") if cut < limit or rest[cut:cut + 1] in "\n " else rest[cut:]
+    if rest.strip():
+        parts.append(rest)
+    return parts
+
+
 def _client():
     from twilio.rest import Client
 
@@ -75,8 +95,8 @@ def send(to: str, message) -> None:
         except Exception:
             log.warning("interactive message failed; falling back to text", exc_info=True)
     body = as_text(message)
-    for i in range(0, len(body), MAX_SMS):
-        client.messages.create(from_=sender, to=to, body=body[i:i + MAX_SMS])
+    for part in split_message(body):
+        client.messages.create(from_=sender, to=to, body=part)
 
 
 def welcome_status() -> str:

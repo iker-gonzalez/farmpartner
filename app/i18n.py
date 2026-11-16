@@ -216,6 +216,16 @@ def _translate_batch(texts: list[str], lang: str) -> list[str]:
     return out
 
 
+PER_YEAR = {"es": "año", "pt": "ano", "fr": "an", "de": "Jahr", "it": "anno", "eu": "urte", "ca": "any", "gl": "ano",
+            "nl": "jaar", "tr": "yıl", "pl": "rok", "id": "tahun", "ro": "an", "sv": "år"}
+
+
+def _per_year(text: str, lang: str) -> str:
+    """Units keep their English "/yr" through translation now and then ("~437 mm/yr" in a Spanish message)."""
+    word = PER_YEAR.get(lang)
+    return re.sub(r"(?<=\w)/yr\b", "/" + word, text) if word else text
+
+
 def translate(msgs: list, lang: str) -> list:
     if lang in (None, "en") or lang not in LANGS or not msgs or not config.llm_enabled():
         return msgs
@@ -236,7 +246,7 @@ def translate(msgs: list, lang: str) -> list:
             log.exception("translation failed; sending English")
             return msgs
     with _lock:
-        tr = {s: _cache[(lang, s)] for s in wanted if (lang, s) in _cache}
+        tr = {s: _per_year(_cache[(lang, s)], lang) for s in wanted if (lang, s) in _cache}
     return [_rebuild(m, tr) for m in msgs]
 
 

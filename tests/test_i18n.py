@@ -242,3 +242,10 @@ def test_any_language_switch_via_claude(offline, monkeypatch):
     assert "Turkish" in out[0]
     with session() as db:
         assert db.query(Farmer).filter_by(phone="web:tr1").one().language == "tr"
+
+
+def test_per_year_unit_is_localised():
+    from app.i18n import _per_year
+    assert _per_year("Lluvia: ~437 mm/yr frente a ~1156 mm/yr. Días >35°C: 19/yr", "es") == \
+        "Lluvia: ~437 mm/año frente a ~1156 mm/año. Días >35°C: 19/año"
+    assert _per_year("Rain: ~21.5 in/yr", "en") == "Rain: ~21.5 in/yr"
