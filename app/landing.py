@@ -29,3 +29,18 @@ def whatsapp_copy() -> dict:
                 "alt": "QR code: open WhatsApp and join FarmPartner"}
     return {"cta": "TEXT “HI” ON WHATSAPP →", "chip": "Text “hi” on WhatsApp",
             "alt": "QR code: open WhatsApp and text “hi” to FarmPartner"}
+
+
+def _video_version() -> str:
+    """Changes whenever the landing video file changes, so browsers fetch the new one instead of a cached copy."""
+    import hashlib
+    from pathlib import Path
+    f = Path(__file__).parent / "static" / "video" / "farmpartner-30s.mp4"
+    try:
+        return hashlib.sha1(f.read_bytes()).hexdigest()[:10]
+    except OSError:
+        return "0"
+
+
+VIDEO_VERSION = _video_version()
+

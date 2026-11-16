@@ -239,6 +239,8 @@ def test_landing_plays_our_own_video(offline):
     c = TestClient(app)
     home = c.get("/").text
     assert '/static/video/farmpartner-30s.mp4' in home and "youtube" not in home.lower()
+    from app import landing
+    assert f'farmpartner-30s.mp4?v={landing.VIDEO_VERSION}"' in home and len(landing.VIDEO_VERSION) == 10   # no stale cached video
     assert c.get("/static/video/poster.jpg").status_code == 200
     part = c.get("/static/video/farmpartner-30s.mp4", headers={"Range": "bytes=0-99"})   # Safari needs byte ranges
     assert part.status_code == 206 and len(part.content) == 100
