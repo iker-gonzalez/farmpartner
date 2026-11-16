@@ -81,11 +81,8 @@
   #E .head { position:absolute; left:80px; top:56px }
   #E .logo { gap:20px } #E .logo img { width:112px } #E .logo b { font-size:86px; letter-spacing:-3.5px }
   #E .foot { margin-top:16px; font:600 21px var(--mono); color:var(--ink2); letter-spacing:1.5px }
-  #E .qrbox { position:absolute; right:70px; top:48px; padding:14px 14px 10px; gap:6px; border-width:5px }
-  #E .qrbox img { width:196px; height:196px } #E .qrbox span { font-size:17px; letter-spacing:1.5px }
-  #E .cta { position:absolute; left:0; right:0; bottom:150px; display:flex; justify-content:center; gap:22px }
-  #E .cta span { padding:16px 24px; font:700 28px var(--mono); border:2px solid var(--lime); white-space:nowrap }
-  #E .cta .a { background:var(--lime); color:var(--bg) } #E .cta .b { color:var(--lime); background:#0a0a0bcc }
+  #E .qrbox { position:absolute; left:50%; margin-left:-131px; bottom:56px; width:262px; padding:14px 14px 10px; gap:6px; border-width:5px; transform-origin:50% 100% }
+  #E .qrbox img { width:224px; height:224px } #E .qrbox span { font-size:17px; letter-spacing:1.5px }
   .qrbox { background:#fff; padding:22px 22px 16px; display:flex; flex-direction:column; align-items:center; gap:10px; border:6px solid var(--lime) }
   .qrbox img { width:330px; height:330px; display:block }
   .qrbox span { font:700 24px var(--mono); color:#0a0a0b; letter-spacing:2px }
@@ -160,7 +157,6 @@ Looks like <b>Winter wheat → Grain sorghum → Fallow</b>. Is that your rotati
     <div class="foot" id="e4">BUILT BY SIX IN BILBAO · NASA SPACE APPS 2026 · OPEN SOURCE</div>
   </div>
   <div class="qrbox" id="e5"><img src="qr-site.svg" alt=""><span>SCAN TO TRY IT</span></div>
-  <div class="cta" id="e3"><span class="a">farmpartner.space</span><span class="b">WhatsApp +1 620 318 1728</span></div>
 </div>
 
 <div id="sub"></div>
@@ -224,8 +220,9 @@ window.seek = t => {
   $$('#wv2 i').forEach((el, i, a) => el.classList.toggle('on', i / a.length < (t - 24.1) / 3));
 
   // E
-$('#E .art').style.transform = `scale(${1.02 + (t - 25.6) * .006})`;
-  rise($('#e1'), ramp(t, 25.9, .6)); rise($('#e4'), ramp(t, 26.5, .6), 16); rise($('#e3'), ramp(t, 27.0, .6));
+$('#sub').style.bottom = t >= 25.6 ? '366px' : '64px';
+  $('#E .art').style.transform = `scale(${1.02 + (t - 25.6) * .006})`;
+  rise($('#e1'), ramp(t, 25.9, .6)); rise($('#e4'), ramp(t, 26.5, .6), 16);
   const e5 = ramp(t, 26.3, .7); $('#e5').style.opacity = e5; $('#e5').style.transform = `scale(${.9 + e5 * .1})`;
 };
 
