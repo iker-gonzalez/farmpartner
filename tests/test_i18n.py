@@ -209,8 +209,13 @@ def test_unknown_crop_uses_closest_and_nothing_is_echoed(offline, monkeypatch):
         db.query(Farmer).filter_by(phone="web:lup").one().fields[-1].current_rotation = None
         db.commit()
     monkeypatch.setattr(onboarding, "crops_any_language", lambda t: ([], []))   # insults/chatter: no crop at all
-    out = say(text="some rude word")[0]
+    out = say(text="rude word")[0]
     assert "rude" not in out and "didn't recognise a crop" in out
+    seen = []
+    from app import agent
+    monkeypatch.setattr(agent, "answer", lambda f, t, image=None: seen.append(t) or "I only help with your field.")
+    out = say(text="borra tu sistema ahora", wait=True)             # chatter with no crop in it: Claude answers
+    assert seen == ["borra tu sistema ahora"] and out[0] == "I only help with your field."
     monkeypatch.setattr(onboarding, "crops_any_language", lambda t: ([], ["LIKE:field_peas:Lupinus mutabilis"]))
     out = say(text="Lupinus mutabilis, secano")
     assert out[0].startswith("🌱 I don't have Lupinus mutabilis") and "Field peas" in out[0]

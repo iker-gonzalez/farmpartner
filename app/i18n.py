@@ -101,14 +101,31 @@ SWITCH = [("es", r"\b(español|espanol|castellano|spanish)\b"), ("pt", r"\b(port
           ("ca", r"\b(català|catala|catalan|catalán)\b"), ("gl", r"\b(galego|galician|gallego)\b"), ("en", r"\b(english|inglés|ingles)\b")]
 
 
+_NOT_A_LANGUAGE = (r"(?!\s+(region|country|countryside|area|zone|coast|province|provinces|land|border|city|town|"
+                   r"farm|field|weather|food|market|pa[ií]s|comunidad|regi[oó]n|zona|costa))")
+_ASKS = (r"\b(in|en|em|auf|por|speak|talk|write|answer|reply|respond|say it|habl\w*|escrib\w*|contest\w*|respond\w*|"
+         r"dime|dilo|parl\w*|sprich|fal\w*)\s+(?:\w+\s+){0,2}")
+
+
+def named_language(text: str) -> str | None:
+    """The language a message names as a language: "en español", "in English please", "speak basque".
+    Not "I live in the Basque Country" or "Spanish olives": there the word is about a place or a thing."""
+    t = text or ""
+    short = len(t.split()) <= 5
+    for code, pat in SWITCH:
+        if re.search(pat + _NOT_A_LANGUAGE, t, re.I) and (short or re.search(_ASKS + pat + _NOT_A_LANGUAGE, t, re.I)):
+            return code
+    return None
+
+
 def detect(text: str) -> str | None:
     """A language code, or None when the message is too short or ambiguous to tell (e.g. "corn", "2")."""
     t = (text or "").strip()
     if not t:
         return None
-    for code, pat in SWITCH:
-        if re.search(pat, t, re.I):
-            return code
+    named = named_language(t)
+    if named:
+        return named
     for code, pat in SCRIPTS:
         if re.search(pat, t):
             return code
@@ -130,10 +147,7 @@ def explicit_language(text: str) -> str | None:
     t = text or ""
     if len(t.split()) > 8:
         return None
-    for code, pat in SWITCH:
-        if re.search(pat, t, re.I):
-            return code
-    return None
+    return named_language(t)
 
 
 def is_switch(text: str) -> bool:

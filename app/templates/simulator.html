@@ -330,7 +330,8 @@
   const syncFab = () => { const has = t.value.trim().length > 0; fab.innerHTML = has ? SEND : MIC; fab.setAttribute('aria-label', has ? 'Send' : 'Record voice note'); };
   t.addEventListener('input', () => { t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 110) + 'px'; syncFab(); });
   t.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendText(); } });
-  function sendText() { const v = t.value.trim(); if (!v) return; t.value = ''; t.style.height = 'auto'; syncFab(); send({text: v}, v); }
+  function sendText() { const v = t.value.trim(); if (!v) return;
+    if (v.length > 1000) { chip('✂️ That message is too long — please keep it under 1,000 characters.', true); return; } t.value = ''; t.style.height = 'auto'; syncFab(); send({text: v}, v); }
   fab.onclick = () => { if (rec) stopRec(true); else if (t.value.trim()) sendText(); else startRec(); };
   syncFab();
 

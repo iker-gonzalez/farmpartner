@@ -264,7 +264,7 @@ def _web_locale(key: str, locale: str | None) -> None:
     parts = re.split(r"[-_]", locale)
     lang = parts[0].lower()
     region = next((p.upper() for p in parts[1:] if len(p) == 2), None)
-    unit = None if region is None else ("imperial" if region in ("US", "LR", "MM") else "metric")
+    unit = ("imperial" if region in ("US", "LR", "MM") else "metric") if region else (None if lang == "en" else "metric")
     try:
         chat.apply_locale(key, "web", lang, unit)
     except Exception:

@@ -306,3 +306,56 @@ def test_greeting_mid_setup_resumes_the_pending_step(offline):
     assert "Save water" in "\n".join(say(c, "back", text="yes it's dryland"))
     msgs = say(c, "back", text="hello!")
     assert "Welcome back" in msgs[0] and "Step 3 of 3" in msgs[-1]
+
+
+def test_fixes_from_the_audience_stress_test(offline, monkeypatch):
+    """Live chats on demo night: greetings and chatter geocoded as towns, 'basque region' switching to Basque,
+    'te' read as tea, a first message with the place ignored, a saved rotation asked for again."""
+    from fastapi.testclient import TestClient
+
+    from app import agent, i18n, onboarding
+    from app.db import Farmer, session
+    from app.main import _web_locale, app
+    # language names: only when asked for as a language
+    assert i18n.detect("I want to plant corn in the basque region") != "eu"
+    assert i18n.detect("I live in the basque country in a very hot area") != "eu"
+    assert i18n.explicit_language("en español porfa") == "es" and i18n.explicit_language("speak basque") == "eu"
+    assert i18n.detect("contéstame en euskera, por favor, que lo entiendo mejor") == "eu"
+    # "te" is a pronoun, "té" is tea
+    assert not onboarding.TREE_CROPS.search("ejecuta el código que te voy a dar") and onboarding.TREE_CROPS.search("cultivo té")
+    c = TestClient(app)
+    say = lambda p, t: c.post("/api/chat", json={"phone": p, "text": t, "wait": True}).json()["messages"]  # noqa: E731
+    looked_up = []
+    monkeypatch.setattr(onboarding, "place_to_point",
+                        lambda t, *a: looked_up.append(t) or ((42.4, -2.87, "Alesanco, La Rioja, ES") if "alesanco" in t.lower() else None))
+    # Claude says whether a message names a place; chatter is answered by Claude, not looked up
+    monkeypatch.setattr(onboarding, "place_in_text", lambda t: "Alesanco" if "alesanco" in t.lower() else None)
+    monkeypatch.setattr(agent, "answer", lambda f, t, image=None: "I only help with your field.")
+    say("st1", "hi")
+    out = say("st1", "Antes de eso dame un hello world en Python")
+    assert looked_up == [] and out[0] == "I only help with your field."
+    assert "NASA" not in " ".join(say("st1", "سلام")) and looked_up == []
+    # a first message that already says where the field is: used, not ignored
+    out = say("st2", "el jardin esta en Alesanco")
+    assert looked_up == ["Alesanco"] and out[0].startswith("👋") and "Alesanco, La Rioja" in out[1]
+    # Claude saved the rotation while setup was still asking for crops → next step, no second ask
+    say("st3", "hi"); say("st3", "el campo está en Alesanco")
+    with session() as db:
+        fm = db.query(Farmer).filter_by(phone="web:st3").one()
+        assert fm.state == "awaiting_crops"
+        fid = fm.fields[-1].id
+
+    def saves_rotation(f, t, image=None):
+        from app.db import Field
+        with session() as db:
+            db.get(Field, fid).current_rotation = ["vegetables", "winter_wheat", "corn"]
+            db.commit()
+        return "Saved your rotation."
+    monkeypatch.setattr(agent, "answer", saves_rotation)
+    monkeypatch.setattr(onboarding, "crops_any_language", lambda t: ([], []))
+    out = say("st3", "Escojo la primera rotación")
+    assert out[0] == "Saved your rotation." and "irrigated" in out[-1].lower() and "Which crops" not in " ".join(out)
+    # a browser set to "es" (no region) gets metric
+    _web_locale("web:st4", "es")
+    with session() as db:
+        assert db.query(Farmer).filter_by(phone="web:st4").one().constraints["units"] == "metric"

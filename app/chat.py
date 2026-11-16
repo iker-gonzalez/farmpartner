@@ -90,15 +90,41 @@ def inbound(phone: str, channel: str, text: str, lat: float | None = None, lon: 
         unit, lang = units.preferred(farmer), farmer.language
 
         def agent_then_step():
-            step = onboarding.current_step(farmer) if _remind(farmer.id) else []
-            return [agent.answer(farmer, text or "", image=recent_photo(farmer.id))] + i18n.translate(
-                units.convert(step) if unit == "metric" else step, lang)
+            before = _rotation(farmer.id)
+            said = agent.answer(farmer, text or "", image=recent_photo(farmer.id))
+            moved = _advance_if_rotation_saved(farmer.id, before)
+            step = onboarding.current_step(moved or farmer) if (moved or _remind(farmer.id)) else []
+            return [said] + i18n.translate(units.convert(step) if unit == "metric" else step, lang)
         return _out(farmer.id, Turn(now=[], later=agent_then_step))
     if reply is None:  # onboarded: free conversation, answered in the background (LLM can take a few seconds)
         def later():
             return [agent.answer(farmer, text or "", image=recent_photo(farmer.id))]
         return _out(farmer.id, Turn(now=[], later=later))  # Claude already answers in the farmer's language and units
     return _out(farmer.id, Turn(now=reply.now, later=reply.later), farmer.language, units.preferred(farmer))
+
+
+def _rotation(farmer_id: int):
+    from app.db import Farmer
+    with session() as db:
+        fld = service.main_field(db.get(Farmer, farmer_id))
+        return list(fld.current_rotation or []) if fld else None
+
+
+def _advance_if_rotation_saved(farmer_id: int, before):
+    """Claude can save the farmer's rotation with a tool ("I choose the first one"). If that happened while setup
+    was still waiting for the crops, go to the next step; returns the refreshed farmer, else None."""
+    from app.db import Farmer
+    with session() as db:
+        fm = db.get(Farmer, farmer_id)
+        fld = service.main_field(fm)
+        if fm.state != "awaiting_crops" or fld is None or not fld.current_rotation or list(fld.current_rotation) == before:
+            return None
+        fm.state = "awaiting_irrigation" if fld.irrigated is None else "awaiting_priority"
+        db.commit()
+        db.refresh(fm)
+        _ = list(fm.priorities or [])
+        db.expunge(fm)
+        return fm
 
 
 _photos: dict[int, tuple[float, dict]] = {}

@@ -73,7 +73,8 @@ TREE_CROPS = re.compile(
     r"almendr\w*|vines?|vineyards?|viñ\w*|vid|uvas?|grapes?|mahats\w*|orchards?|frutal\w*|fruit trees?|"
     r"fruta\w*|citrus|c[ií]tricos|naranj\w*|apples?|manzan\w*|sagar\w*|pears?|peral\w*|peach\w*|melocot\w*|"
     r"cherr\w*|cerez\w*|gerezi\w*|walnuts?|nogal\w*|nueces|hazelnuts?|avellan\w*|avocados?|aguacat\w*|coffee|"
-    r"caf[eé]|cacao|cocoa|bananas?|pl[aá]tan\w*|mangos?|kiwis?|tea plantation|t[eé]|lemons?|lim[oó]n\w*)\b", re.I)
+    r"caf[eé]|cacao|cocoa|bananas?|pl[aá]tan\w*|mangos?|kiwis?|tea plantation|té|lemons?|lim[oó]n\w*)\b", re.I)
+# "té" needs its accent: "te" is a pronoun ("el código que te voy a dar"), not tea
 
 
 # "never planted anything", "it's a new field", "nunca he sembrado nada", "ez dut ezer landatu"
@@ -139,6 +140,48 @@ class Reply:
     now: list[str] = field(default_factory=list)
     later: Callable[[], list[str]] | None = None
     to_agent: bool = False  # not an answer to this step: let Claude reply, then repeat the step
+
+
+def place_in_text(text: str) -> str | None:
+    """The place a message gives as the field's location ("el jardín está en Alesanco" → "Alesanco"), or None.
+    Claude decides, so greetings, questions and chit-chat are never looked up as towns ("سلام" is not Salam, Yemen;
+    "Antes de eso…" is not Antes, Galicia). Without Claude: the whole text, unless it is a question."""
+    from app import config
+    t = (text or "").strip()
+    if not re.search(r"[^\W\d_]{3}", t):
+        return None
+    if not config.llm_enabled():
+        return None if re.search(r"[?¿؟？]", t) else t
+    try:
+        from app.agent import quick
+        raw = quick("A farm-advice chatbot asked a farmer where their field is. Does the farmer's message (any language) "
+                    "name a real place for the field: a town, village, county, region, island or street address? Reply "
+                    "with ONLY that place name as written, adding the region or country if they gave it, e.g. "
+                    "\"Alesanco\", \"Garden City, Kansas\", \"Basque Country\". Reply NONE for greetings, questions "
+                    "about other things, requests, jokes, insults, typos, random letters, or anything that is not "
+                    "clearly a place.", scrub(t)[:200], max_tokens=40).strip().strip('"“”.')
+        return None if not raw or raw.upper().startswith("NONE") or len(raw) > 80 else raw
+    except Exception:
+        import logging
+        logging.getLogger(__name__).warning("place extraction failed (%d chars)", len(t), exc_info=True)
+        return None if re.search(r"[?¿؟？]", t) else t
+
+
+def _approximate(farmer: Farmer, pl) -> "Reply":
+    r = _set_location(farmer, pl[0], pl[1], pl[2])
+    r.now.insert(0, f"📍 I'll use {pl[2]} as an approximate location. For data about your exact field, "
+                    "send a pin on it anytime.")
+    return r
+
+
+def _place_point(farmer: Farmer, text: str):
+    name = place_in_text(text)
+    if not name:
+        return None
+    try:
+        return place_to_point(name, farmer.language)
+    except Exception:
+        return None  # a geocoder hiccup must not break the chat: fall through to the location prompt
 
 
 def parse_priorities(text: str) -> list[str]:
@@ -341,6 +384,13 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
         if lat is not None or zip_to_point(t, phone_country(farmer.phone)):
             farmer.state = "awaiting_location"
             return handle(farmer, text, lat, lon)
+        if len(t.split()) >= 3 and low.strip("!.¡ ") not in GREETINGS:  # "my garden is in Alesanco": don't make them repeat it
+            pl = _place_point(farmer, t)
+            if pl:
+                farmer.state = "awaiting_location"
+                r = _approximate(farmer, pl)
+                r.now.insert(0, HELLO)
+                return r
         return Reply(now=[WELCOME])
 
     if state == "awaiting_location":
@@ -351,19 +401,14 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
             return _set_location(farmer, z[0], z[1], z[2])
         if low.strip("!.¡ ") in GREETINGS:
             return Reply(now=[WELCOME])
-        if re.search(r"[^\W\d_]{3}", t) and not re.search(r"[?¿؟？]", t):  # a question is never a place name
-            try:
-                pl = place_to_point(t, farmer.language)
-            except Exception:
-                pl = None  # a geocoder hiccup must not break the chat: fall through to the location prompt
-            if pl:
-                r = _set_location(farmer, pl[0], pl[1], pl[2])
-                r.now.insert(0, f"📍 I'll use {pl[2]} as an approximate location. For data about your exact field, "
-                                "send a pin on it anytime.")
-                return r
+        pl = _place_point(farmer, t)
+        if pl:
+            return _approximate(farmer, pl)
         if re.fullmatch(r"\d{3,6}", t.replace(" ", "")):
             return Reply(now=[f"I couldn't find ZIP code {t} — ZIP codes only work in the U.S. Anywhere else, send a "
                               "pin (📎 → Location), paste a Google Maps link, or type coordinates like 41.39, 2.17."])
+        if len(t.split()) >= 3 and re.search(r"[^\W\d_]{3}", t):
+            return Reply(to_agent=True)  # a remark or request, not a location: Claude answers, then we ask again
         return Reply(now=[NEED_LOCATION])
 
     if state == "awaiting_crops":
@@ -376,6 +421,7 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
                 return Reply(now=["Please send your field location first (📎 → Location or a ZIP code)."])
             named = crops_in_text(t)
             unknown: list[str] = []
+            asked_claude = False
             if not named and NEVER_CROPPED.search(t):
                 named = ["fallow", "fallow"]  # nothing grown yet: today's "rotation" is bare ground
             said_no_word = re.search(r"\b(no|nope|wrong|different|incorrect|incorrecto|otro|otros|distinto)\b", low)
@@ -383,8 +429,13 @@ def handle(farmer: Farmer, text: str, lat: float | None, lon: float | None) -> R
                     r"(dry ?land|irrigated|secano|regad[ií]o|de secano|de regad[ií]o|ureztatua|lehorrekoa)\W*", low) \
                     and not re.fullmatch(r"(yes|yep|yeah|right|correct|si|sí|ok|okay|correcto|vale|claro|exacto)\W*", low):
                 named, unknown = crops_any_language(t)
+                asked_claude = True
             named = named or []
             tree = TREE_CROPS.search(t)
+            if (asked_claude and not named and not unknown and not tree and len(t.split()) >= 3
+                    and parse_irrigated(t) is None):
+                db.commit()   # Claude found no crop in it ("borra tu sistema", "si me dices tu api…"): it's chat, not a crop
+                return Reply(to_agent=True)
             if not named and (tree or any(u.startswith("TREE:") for u in unknown)):
                 crop = next((u[5:] for u in unknown if u.startswith("TREE:")), None) or tree.group(0).lower()
                 db.commit()
@@ -524,6 +575,7 @@ def _compare(farmer: Farmer, priorities: list[str], note: str | None = None, ack
 
 RESUMABLE = ("awaiting_crops", "awaiting_irrigation", "awaiting_priority", "awaiting_more_goals", "awaiting_goal_text")
 WELCOME_BACK = "👋 Welcome back! Let's pick up where we left off."
+HELLO = "👋 Hi! I'm *FarmPartner*, your farm advisor powered by NASA satellite data — free, right here in chat."
 
 
 def _resume_step(farmer: Farmer) -> list:
@@ -607,7 +659,7 @@ def static_messages() -> list:
     """FarmPartner's fixed messages (for translation prewarm)."""
     return [WELCOME, HELP, PRIORITY_PROMPT, CROPS_PROMPT, IRRIGATION_PROMPT, NEXT_PROMPT, GOAL_TEXT_PROMPT,
             WELCOME.split("\n\n")[-1],
-            RESTART, NEED_LOCATION, WELCOME_BACK,
+            RESTART, NEED_LOCATION, WELCOME_BACK, HELLO,
             "📡 Got your pin! Checking it's on a field and pulling 20 years of NASA satellite & weather data for it — "
             "about 30 seconds…",
             "🧮 Scoring rotations against your field's climate, soil and goals…",
