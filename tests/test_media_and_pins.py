@@ -141,7 +141,7 @@ def test_pasted_coordinates_and_duplicate_pins(offline):
 
 def test_favicon(offline):
     r = _client().get("/favicon.ico")
-    assert r.status_code == 200 and r.headers["content-type"] == "image/png"
+    assert r.status_code == 200 and r.headers["content-type"] == "image/x-icon"
 
 
 def test_place_on_the_equator(monkeypatch):

@@ -593,11 +593,56 @@ def run_alerts(token: str = Form("")):
         return {"alerts": _send_alerts(db)}
 
 
-@app.get("/favicon.ico", include_in_schema=False)
+_BRAND = config.ROOT / "app" / "static" / "brand"
+
+
+@app.api_route("/favicon.ico", methods=["GET", "HEAD"], include_in_schema=False)
 def favicon():
     from fastapi.responses import FileResponse
-    return FileResponse(config.ROOT / "app" / "static" / "brand" / "favicon-32.png", media_type="image/png",
+    return FileResponse(_BRAND / "favicon.ico", media_type="image/x-icon",
                         headers={"Cache-Control": "public, max-age=86400"})
+
+
+@app.api_route("/site.webmanifest", methods=["GET", "HEAD"], include_in_schema=False)
+def webmanifest():
+    """Icons and colours for a phone's home screen and for search results."""
+    return JSONResponse({
+        "name": "FarmPartner", "short_name": "FarmPartner", "start_url": "/", "display": "standalone",
+        "background_color": "#0a0a0b", "theme_color": "#0a0a0b",
+        "icons": [{"src": f"/static/brand/favicon-{n}.png", "sizes": f"{n}x{n}", "type": "image/png"}
+                  for n in (48, 96, 192, 512)],
+    }, media_type="application/manifest+json", headers={"Cache-Control": "public, max-age=86400"})
+
+
+# Pages a search engine should list: the translated public pages plus the browser chat.
+SITEMAP_PAGES = (*site_i18n.PAGES, "/chat")
+
+
+@app.api_route("/robots.txt", methods=["GET", "HEAD"], include_in_schema=False)
+def robots():
+    """Search engines may read the public pages. Field reports (/r/…) are private links, never to be listed."""
+    lines = ["User-agent: *", "Allow: /", "Disallow: /r/", "Disallow: /api/", "Disallow: /admin/",
+             "Disallow: /internal/", "Disallow: /twilio/", "Disallow: /voice/", "",
+             f"Sitemap: {config.PUBLIC_BASE_URL}/sitemap.xml", ""]
+    return Response("\n".join(lines), media_type="text/plain")
+
+
+@app.api_route("/sitemap.xml", methods=["GET", "HEAD"], include_in_schema=False)
+def sitemap():
+    """Every public page, each with its translations (?lang=) as alternates."""
+    base = config.PUBLIC_BASE_URL
+    out = ['<?xml version="1.0" encoding="UTF-8"?>',
+           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">']
+    for path in SITEMAP_PAGES:
+        out.append(f"<url><loc>{base}{path}</loc>")
+        if path in site_i18n.PAGES:
+            for code in site_i18n.LANGS:
+                href = f"{base}{path}" if code == site_i18n.DEFAULT else f"{base}{path}?lang={code}"
+                out.append(f'<xhtml:link rel="alternate" hreflang="{code}" href="{href}"/>')
+            out.append(f'<xhtml:link rel="alternate" hreflang="x-default" href="{base}{path}"/>')
+        out.append("</url>")
+    out.append("</urlset>")
+    return Response("\n".join(out), media_type="application/xml", headers={"Cache-Control": "public, max-age=3600"})
 
 
 @app.get("/health")

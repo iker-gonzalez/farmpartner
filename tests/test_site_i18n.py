@@ -59,3 +59,27 @@ def test_a_menu_of_links_is_translated_link_by_link():
     page = '<div class="mnav"><a href="/a" class="on">WHAT &amp; HOW</a>\n <a href="/b">TEAM</a></div>'
     out = site_i18n.translate(page, {"WHAT &amp; HOW": "QUÉ Y CÓMO", "TEAM": "EQUIPO"}.get)
     assert out == '<div class="mnav"><a href="/a" class="on">QUÉ Y CÓMO</a>\n <a href="/b">EQUIPO</a></div>'
+
+
+def test_sitemap_robots_and_icons():
+    from fastapi.testclient import TestClient
+    from app import config, site_i18n
+    from app.main import app
+    c = TestClient(app)
+    sm = c.get("/sitemap.xml")
+    assert sm.status_code == 200 and sm.headers["content-type"].startswith("application/xml")
+    import xml.etree.ElementTree as ET
+    ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+    locs = [e.text for e in ET.fromstring(sm.text).findall("s:url/s:loc", ns)]
+    assert locs == [config.PUBLIC_BASE_URL + p for p in (*site_i18n.PAGES, "/chat")]
+    assert f'hreflang="es" href="{config.PUBLIC_BASE_URL}/team?lang=es"' in sm.text
+    for path in (*site_i18n.PAGES, "/chat"):  # every listed page really exists
+        assert c.get(path).status_code == 200
+    rb = c.get("/robots.txt").text
+    assert "Disallow: /r/" in rb and f"Sitemap: {config.PUBLIC_BASE_URL}/sitemap.xml" in rb
+    ico = c.get("/favicon.ico")
+    assert ico.headers["content-type"] == "image/x-icon" and ico.content[:4] == b"\x00\x00\x01\x00"
+    assert c.head("/favicon.ico").status_code == 200
+    for icon in c.get("/site.webmanifest").json()["icons"]:
+        assert c.get(icon["src"]).status_code == 200
+    assert 'rel="manifest"' in c.get("/").text
